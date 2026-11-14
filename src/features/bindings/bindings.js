@@ -478,6 +478,7 @@ export function createBindingsFeature({
     elements,
     editorState,
     hideLearnPanel,
+    labelForControl,
     labelForMidiDevice,
     listState,
     renderConfigPreview: (...args) => renderConfigPreview(...args),

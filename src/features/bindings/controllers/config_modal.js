@@ -145,6 +145,7 @@ export function createConfigModal({
     }
     ensureMacroConfigDom();
     const isButton = effectiveIsButton(binding);
+    const isKeyboardSource = String(binding.device_id || "").startsWith("keyboard:");
     const isMacroBinding = isButton && binding.action === "Macro";
     const isSoundboardBinding =
       isButton &&
@@ -154,6 +155,8 @@ export function createConfigModal({
     const showSoundboardPage =
       isSoundboardBinding && editorState.soundboardPageOpen;
     const showSpecialPage = showMacroPage || showSoundboardPage;
+    // Keyboard bindings have no MIDI LED/fader feedback hardware.
+    const hideMidiFeedback = isKeyboardSource || showSpecialPage;
     if (elements.bindingConfigSave) elements.bindingConfigSave.disabled = false;
     if (elements.bindingConfigTitle) {
       elements.bindingConfigTitle.textContent = showMacroPage
@@ -193,7 +196,7 @@ export function createConfigModal({
     if (elements.bindingConfigButtonLightSection)
       elements.bindingConfigButtonLightSection.classList.toggle(
         "hidden",
-        !isButton || showSpecialPage,
+        !isButton || hideMidiFeedback,
       );
     if (elements.bindingConfigButtonLearnSection)
       elements.bindingConfigButtonLearnSection.classList.toggle(
@@ -222,11 +225,14 @@ export function createConfigModal({
         "hidden",
         isButton || showSpecialPage,
       );
-    elements.bindingConfigOutputsSection?.classList.toggle("hidden", isButton || showSpecialPage);
+    elements.bindingConfigOutputsSection?.classList.toggle(
+      "hidden",
+      isButton || hideMidiFeedback,
+    );
     if (elements.bindingConfigModifiersSection)
       elements.bindingConfigModifiersSection.classList.toggle(
         "hidden",
-        isButton || showSpecialPage,
+        isButton || hideMidiFeedback,
       );
     if (elements.bindingConfigName)
       elements.bindingConfigName.value = binding.name?.trim() || "";

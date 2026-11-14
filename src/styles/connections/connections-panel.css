@@ -274,3 +274,15 @@
   margin-top: 24px;
 }
 
+.keyboard-controls-list {
+  margin: 10px 0 0;
+  padding-left: 1.2rem;
+  color: #5c6280;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.keyboard-controls-list li {
+  margin: 0;
+}
+

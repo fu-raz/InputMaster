@@ -19,6 +19,7 @@ mod fader_curve;
 mod feedback;
 mod file_dialog;
 mod fxsound;
+mod keyboard_input;
 mod midi;
 mod midi_event_queue;
 mod midi_learning;
@@ -288,6 +289,19 @@ pub fn run() {
                 app_settings.clone(),
                 recovery_notices,
             ));
+
+            if app_settings.keyboard_input_enabled {
+                let state = app.state::<AppState>();
+                if let Err(error) =
+                    commands::apply_keyboard_input_enabled(app.handle(), state.inner(), true)
+                {
+                    run_logger::warn(
+                        "keyboard_input",
+                        "startup_enable_failed",
+                        &format!("error={error}"),
+                    );
+                }
+            }
 
             #[cfg(feature = "perf-audit")]
             let osd_url = "osd.html?perf-audit=1";

@@ -219,6 +219,16 @@ fn stop_managed_resources(app: &AppHandle) {
         }
     }
 
+    match state.keyboard_input.lock() {
+        Ok(mut keyboard) => {
+            keyboard.stop();
+            run_logger::info("app", "shutdown_keyboard_input_stopped", "");
+        }
+        Err(_) => {
+            run_logger::warn("app", "shutdown_keyboard_input_lock_failed", "");
+        }
+    }
+
     if let Err(err) = app.state::<VoicemeeterState>().disconnect_for_shutdown() {
         run_logger::warn(
             "app",

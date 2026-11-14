@@ -27,6 +27,10 @@ import { createMidiConnectionStatusHandler } from "../features/midi/connection_s
 import { getBindingTargets, normalizeBinding, setBindingTargets } from "../core/binding_model.js";
 import { createTargetCore } from "../core/target_core.js";
 import { createConnectionsPanelController } from "../app/connections_panel.js";
+import {
+  isKeyboardDeviceId,
+  keyboardControlLabel,
+} from "../features/keyboard/catalog.js";
 import { createAlertsController } from "../app/alerts.js";
 import { createTauriBridge } from "../app/bootstrap.js";
 import { normalizeMidiPreference, normalizeMidiRoutes } from "../core/midi_preferences.js";
@@ -704,7 +708,12 @@ export function createApplication() {
     },
     bindingFallbackName,
     controlLabel,
-    getMidiDeviceLabel: (id) => features.midi?.getDeviceMappingLabel(id) || preferenceActions.midiDeviceLabelForBindingDevice(id),
+    getMidiDeviceLabel: (id) => {
+      if (isKeyboardDeviceId(id)) {
+        return t("keyboard.deviceName");
+      }
+      return features.midi?.getDeviceMappingLabel(id) || preferenceActions.midiDeviceLabelForBindingDevice(id);
+    },
     buildTargetSelect: (...args) => features.targets?.buildTargetSelect(...args),
     getVolumeForTarget,
     getMuteForTarget,
@@ -799,7 +808,10 @@ export function createApplication() {
     features.bindings?.renderBindings();
   }
 
-  function controlLabel(control) {
+  function controlLabel(control, deviceId = null) {
+    if (isKeyboardDeviceId(deviceId)) {
+      return keyboardControlLabel(control, t) || t("keyboard.unknownControl");
+    }
     const msgType = normalizeMidiMessageType(control?.msg_type || control?.msgType);
     const channel = control?.channel ?? "?";
     const controller = control?.controller ?? "?";
@@ -847,6 +859,7 @@ export function createApplication() {
       mountPluginsBrowserTab: (...args) => pluginsTabs.mountPluginsBrowserTab(...args),
     },
     i18n: { t },
+    invoke,
     getPluginHost,
     setPluginHost: (next) => features.plugins?.setPluginHost?.(next),
     startPluginHostIfNeeded,

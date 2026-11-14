@@ -86,7 +86,7 @@ export function createConfigPreview({
       elements.bindingConfigPreviewMainMidi,
       binding.device_id,
       binding.control,
-      labelForControl(binding.control || {}),
+      labelForControl(binding.control || {}, binding.device_id),
     );
 
   }

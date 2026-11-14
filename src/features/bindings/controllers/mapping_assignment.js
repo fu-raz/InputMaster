@@ -11,6 +11,10 @@ import {
   normalizeMuteBehavior,
   ensureAuxShape,
 } from "../shape_helpers.js";
+import {
+  isKeyboardDeviceId,
+  isKeyboardVolumeWheel,
+} from "../../keyboard/catalog.js";
 
 /** mapping assignment workflow. */
 export function createMappingAssignment({
@@ -60,6 +64,30 @@ export function createMappingAssignment({
     return "Mapping";
   }
 
+  function applyPrimaryControlMapping(binding, mapping) {
+    binding.device_id = mapping.device_id;
+    binding.control = {
+      channel: mapping.channel,
+      controller: mapping.controller,
+      msg_type: mapping.msg_type || "ControlChange",
+    };
+    const keyboardWheel =
+      isKeyboardDeviceId(mapping.device_id) &&
+      isKeyboardVolumeWheel(binding.control);
+    binding.control_kind = keyboardWheel
+      ? "Continuous"
+      : normalizeControlKind(mapping.control_kind);
+    binding.mode = keyboardWheel
+      ? "Relative"
+      : mapping.mode || binding.mode || "Absolute";
+    if (keyboardWheel) {
+      binding.relative_format = "TwosComplement";
+    }
+    if (isKeyboardDeviceId(mapping.device_id)) {
+      binding.feedback_enabled = false;
+    }
+  }
+
   async function commitTransferPrompt() {
     if (!editorState.transferPrompt) return;
     const { field, mapping, conflict } = editorState.transferPrompt;
@@ -72,14 +100,7 @@ export function createMappingAssignment({
       setControlMapping(binding, conflict.field, null);
     }
     if (field === "control") {
-      binding.device_id = mapping.device_id;
-      binding.control = {
-        channel: mapping.channel,
-        controller: mapping.controller,
-        msg_type: mapping.msg_type || "ControlChange",
-      };
-      binding.control_kind = normalizeControlKind(mapping.control_kind);
-      binding.mode = mapping.mode || binding.mode || "Absolute";
+      applyPrimaryControlMapping(binding, mapping);
     } else {
       if (field === "mute_control" && mapping && typeof mapping === "object") {
         mapping.mute_behavior = normalizeMuteBehavior(
@@ -132,14 +153,7 @@ export function createMappingAssignment({
     }
 
     if (field === "control") {
-      binding.device_id = mapping.device_id;
-      binding.control = {
-        channel: mapping.channel,
-        controller: mapping.controller,
-        msg_type: mapping.msg_type || "ControlChange",
-      };
-      binding.control_kind = normalizeControlKind(mapping.control_kind);
-      binding.mode = mapping.mode || binding.mode || "Absolute";
+      applyPrimaryControlMapping(binding, mapping);
     } else {
       if (field === "mute_control" && mapping && typeof mapping === "object") {
         mapping.mute_behavior = normalizeMuteBehavior(

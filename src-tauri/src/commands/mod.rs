@@ -1,5 +1,6 @@
 pub mod audio;
 pub mod bindings;
+pub mod keyboard;
 pub mod midi;
 pub mod profiles;
 pub mod settings;
@@ -10,6 +11,7 @@ pub mod virtual_audio;
 
 pub use audio::*;
 pub use bindings::*;
+pub use keyboard::*;
 pub use midi::*;
 pub use profiles::*;
 pub use settings::*;
@@ -25,6 +27,9 @@ macro_rules! command_registry {
             checkpoint_profile_state,
             list_midi_devices,
             list_midi_output_devices,
+            get_keyboard_input_status,
+            set_keyboard_input_enabled,
+            list_keyboard_controls,
             get_midi_connection_health,
             get_midi_route_health,
             start_midi_device,

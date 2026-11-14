@@ -10,6 +10,7 @@ export function createMidiLearn({
   elements,
   editorState,
   hideLearnPanel,
+  labelForControl,
   labelForMidiDevice,
   listState,
   renderConfigPreview,
@@ -152,8 +153,12 @@ export function createMidiLearn({
     }
   }
 
-  function formatMidiControlLabel(control) {
+  function formatMidiControlLabel(control, deviceId = null) {
     if (!control) return "Not mapped";
+    if (typeof labelForControl === "function") {
+      const labeled = labelForControl(control, deviceId);
+      if (labeled) return labeled;
+    }
     const msg =
       control.msg_type === "PitchBend"
         ? "PB"
@@ -229,7 +234,10 @@ export function createMidiLearn({
         : binding?.assign_mode === "Clear"
           ? "Clear"
           : "Add";
-    const mappingText = formatMidiControlLabel(binding?.assign_control);
+    const mappingText = formatMidiControlLabel(
+      binding?.assign_control,
+      binding?.assign_control?.device_id,
+    );
     elements.bindingConfigAssignLabel.innerHTML = "";
 
     const main = document.createElement("span");
@@ -258,7 +266,10 @@ export function createMidiLearn({
     const behavior = muteBehaviorLabel(
       binding?.mute_control?.mute_behavior || binding?.mute_behavior,
     );
-    const mappingText = formatMidiControlLabel(binding?.mute_control);
+    const mappingText = formatMidiControlLabel(
+      binding?.mute_control,
+      binding?.mute_control?.device_id,
+    );
     elements.bindingConfigMuteLabel.innerHTML = "";
 
     const main = document.createElement("span");

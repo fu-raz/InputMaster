@@ -23,7 +23,7 @@ export function createBindingRenderModel({
     return [
       binding?.name || "",
       fallbackNameFor(binding, index),
-      labelForControl(binding?.control || {}),
+      labelForControl(binding?.control || {}, binding?.device_id),
       displayModeName(binding),
       JSON.stringify(getTargets(binding)),
       binding?.action || "",

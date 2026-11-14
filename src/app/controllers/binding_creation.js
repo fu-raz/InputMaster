@@ -5,6 +5,10 @@ import {
 import { findControlConflict } from "../../core/control_mapping.js";
 import { t } from "../i18n.js";
 import { normalizeCustomCurvePoints } from "../../core/binding_model.js";
+import {
+  isKeyboardDeviceId,
+  isKeyboardVolumeWheel,
+} from "../../features/keyboard/catalog.js";
 
 /** binding creation workflow. */
 export function createBindingCreation({
@@ -108,17 +112,19 @@ export function createBindingCreation({
     const defaultName = t("bindings.bindingFallback", {
       number: profileState.bindings.length + 1,
     });
+    const keyboardWheel =
+      isKeyboardDeviceId(payload.device_id) && isKeyboardVolumeWheel(control);
     return {
       id: `${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       name: defaultName,
       device_id: payload.device_id,
       control,
-      control_kind: controlKind,
+      control_kind: keyboardWheel ? "Continuous" : controlKind,
       targets: ["Unset"],
       target: "Unset",
       action: isButton ? "ToggleMute" : "Volume",
-      mode: "Absolute",
-      relative_format: "Auto",
+      mode: keyboardWheel ? "Relative" : "Absolute",
+      relative_format: keyboardWheel ? "TwosComplement" : "Auto",
       fader_curve: "Linear",
       custom_curve: normalizeCustomCurvePoints([]),
       deadzone: 0,
@@ -130,6 +136,8 @@ export function createBindingCreation({
       assign_mode: "Add",
       hotkey: null,
       open_application: null,
+      // Keyboard sources have no MIDI feedback hardware.
+      feedback_enabled: !isKeyboardDeviceId(payload.device_id),
     };
   }
 

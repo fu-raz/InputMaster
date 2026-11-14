@@ -267,6 +267,9 @@ pub struct AppSettings {
     pub midi_device_inventory_consent: MidiDeviceInventoryConsent,
     pub midi_device_inventory_notice_version: u32,
     pub midi_device_inventory_last_sent_hash: Option<String>,
+    /// When true, capture and suppress catalogued Windows media/volume keys.
+    #[serde(default)]
+    pub keyboard_input_enabled: bool,
 }
 
 impl Default for AppSettings {
@@ -293,6 +296,7 @@ impl Default for AppSettings {
             midi_device_inventory_consent: MidiDeviceInventoryConsent::Unknown,
             midi_device_inventory_notice_version: 0,
             midi_device_inventory_last_sent_hash: None,
+            keyboard_input_enabled: false,
         }
     }
 }
