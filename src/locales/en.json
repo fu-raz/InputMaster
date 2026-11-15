@@ -18,7 +18,7 @@
   "inputs.keyboard.title": "Keyboard",
   "inputs.keyboard.help": "Media and volume keys map with Learn on Bindings.",
   "inputs.controller.title": "Controller",
-  "inputs.controller.help": "Games still see every press; InputMaster only listens for Learn and bindings.",
+  "inputs.controller.help": "Use connected controllers with Learn and bindings.",
   "ui.enable": "Enable",
   "controller.col.number": "Controller",
   "controller.col.name": "Name",

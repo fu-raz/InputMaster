@@ -1,46 +1,74 @@
-/* App-wide UI consistency tokens + primitives (ILS-10 r2). See docs/ui-consistency.md */
+/* App-wide UI consistency tokens + primitives (ILS-10). See docs/ui-consistency.md
+ *
+ * Cascade notes (verified via CDP):
+ * - Custom props resolve var() where they are *defined*, then inherit the result.
+ *   So scale-dependent tokens must be re-declared wherever --ui-text-scale changes.
+ * - Theme colors live on body[data-theme], not :root. Panel/row tokens that need
+ *   those colors must be defined on body (or use theme vars directly in rules).
+ */
 
 :root {
   --ui-text-scale: 1;
-  --ui-rail-title-size: calc(18px * var(--ui-text-scale));
-  --ui-h1-size: calc(18px * var(--ui-text-scale));
   --ui-h1-weight: 750;
   --ui-h1-line: 1.2;
-  /* Subsection ≥ button label (midi-route-action / secondary ≈ 13px) */
   --ui-button-label-size: 13px;
-  --ui-h3-size: max(calc(14px * var(--ui-text-scale)), var(--ui-button-label-size));
   --ui-h3-weight: 650;
   --ui-h3-line: 1.3;
-  --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-help-line: 1.45;
-  --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
-  --ui-subnav-size: calc(13px * var(--ui-text-scale));
   --ui-subnav-weight: 500;
   --ui-panel-radius: var(--radius-card, 5px);
   --ui-panel-pad: 16px 18px;
-  --ui-panel-border: var(--control-border);
-  --ui-panel-bg: var(--surface-raised);
   --ui-icon-size: 18px;
-  /* Title icon = title + subtitle (help) combined height */
+  --ui-header-gap: 14px;
+  --ui-section-gap: 16px;
+}
+
+/* Scale-dependent sizes — redeclare at every --ui-text-scale change */
+:root,
+#main-screen {
+  --ui-text-scale: 1;
+  --ui-rail-title-size: calc(18px * var(--ui-text-scale));
+  --ui-h1-size: calc(18px * var(--ui-text-scale));
+  --ui-h3-size: max(calc(14px * var(--ui-text-scale)), var(--ui-button-label-size));
+  --ui-help-size: calc(13px * var(--ui-text-scale));
+  --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
+  --ui-subnav-size: calc(13px * var(--ui-text-scale));
   --ui-header-icon-size: calc(
     (var(--ui-h1-size) * var(--ui-h1-line)) + 4px + (var(--ui-help-size) * var(--ui-help-line))
   );
-  --ui-header-gap: 14px;
-  --ui-section-gap: 16px;
-  --ui-list-row-bg: color-mix(in srgb, var(--control-bg) 86%, var(--surface-muted) 14%);
-  --ui-list-row-border: color-mix(in srgb, var(--control-border) 82%, transparent);
+  --ui-toggle-label-size: calc(12px * var(--ui-text-scale));
+  --ui-device-font-size: calc(13px * var(--ui-text-scale));
+  --ui-device-header-size: calc(11px * var(--ui-text-scale));
+  --ui-meta-size: calc(12px * var(--ui-text-scale));
 }
 
-/* 1.25× text on all pages except Bindings */
 #inputs-page,
 #plugins-page,
 #settings-panel {
   --ui-text-scale: 1.25;
+  --ui-rail-title-size: calc(18px * var(--ui-text-scale));
+  --ui-h1-size: calc(18px * var(--ui-text-scale));
+  --ui-h3-size: max(calc(14px * var(--ui-text-scale)), var(--ui-button-label-size));
+  --ui-help-size: calc(13px * var(--ui-text-scale));
+  --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
+  --ui-subnav-size: calc(13px * var(--ui-text-scale));
+  --ui-header-icon-size: calc(
+    (var(--ui-h1-size) * var(--ui-h1-line)) + 4px + (var(--ui-help-size) * var(--ui-help-line))
+  );
+  --ui-toggle-label-size: calc(12px * var(--ui-text-scale));
+  --ui-device-font-size: calc(13px * var(--ui-text-scale));
+  --ui-device-header-size: calc(11px * var(--ui-text-scale));
+  --ui-meta-size: calc(12px * var(--ui-text-scale));
   font-size: var(--ui-body-size);
 }
 
-#main-screen {
-  --ui-text-scale: 1;
+/* Theme-dependent panel/row chrome — body owns theme colors */
+body,
+body[data-theme] {
+  --ui-panel-border: var(--control-border);
+  --ui-panel-bg: var(--surface-raised);
+  --ui-list-row-bg: color-mix(in srgb, var(--control-bg) 86%, var(--surface-muted) 14%);
+  --ui-list-row-border: color-mix(in srgb, var(--control-border) 82%, transparent);
 }
 
 /* Left-rail page chrome title */
@@ -71,28 +99,40 @@
 
 .ui-page-header__main {
   min-width: 0;
-  display: flex;
-  align-items: stretch;
-  gap: var(--ui-header-gap);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: var(--ui-header-gap);
+  row-gap: 4px;
+  align-items: center;
 }
 
 .ui-page-header__copy {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
+  display: contents;
+}
+
+.ui-page-header__copy .ui-content-title {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.ui-page-header__copy .ui-help {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .ui-page-header__icon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
   width: var(--ui-header-icon-size);
-  height: var(--ui-header-icon-size);
+  height: auto;
+  min-height: var(--ui-header-icon-size);
   margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto;
-  align-self: center;
+  align-self: stretch;
   color: var(--text-muted);
 }
 
@@ -102,7 +142,7 @@
   max-width: 100%;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.7;
+  stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -170,15 +210,15 @@
   margin-top: 0;
 }
 
-/* Bordered content container */
+/* Bordered content container — theme vars used directly (body-owned colors) */
 .ui-panel {
   width: 100%;
   max-width: none;
-  border-radius: var(--ui-panel-radius);
-  border: 1px solid var(--ui-panel-border);
-  background: var(--ui-panel-bg);
-  padding: var(--ui-panel-pad);
-  overflow: hidden;
+  border-radius: var(--ui-panel-radius, 5px);
+  border: 1px solid var(--ui-panel-border, var(--control-border));
+  background: var(--ui-panel-bg, var(--surface-raised));
+  padding: var(--ui-panel-pad, 16px 18px);
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -193,8 +233,8 @@
   width: 100%;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--ui-panel-border);
-  border-radius: var(--ui-panel-radius);
+  border: 1px solid var(--ui-panel-border, var(--control-border));
+  border-radius: var(--ui-panel-radius, 5px);
   background: color-mix(in srgb, var(--surface) 28%, var(--surface-raised) 72%);
   overflow: hidden;
   display: flex;
@@ -219,7 +259,7 @@
 .ui-toggle-row__label {
   min-width: 0;
   color: color-mix(in srgb, var(--text-primary) 82%, var(--text-secondary));
-  font-size: calc(12px * var(--ui-text-scale));
+  font-size: var(--ui-toggle-label-size, 12px);
   font-weight: 600;
   line-height: 1.3;
 }
@@ -330,9 +370,9 @@
   align-items: center;
   gap: 8px;
   padding: 8px;
-  border: 1px solid var(--ui-list-row-border);
+  border: 1px solid var(--ui-list-row-border, color-mix(in srgb, var(--control-border) 82%, transparent));
   border-radius: var(--radius-control, 4px);
-  background: var(--ui-list-row-bg);
+  background: var(--ui-list-row-bg, color-mix(in srgb, var(--control-bg) 86%, var(--surface-muted) 14%));
 }
 
 .ui-list-row + .ui-list-row,
@@ -357,7 +397,7 @@
   flex-wrap: wrap;
   gap: 10px 14px;
   color: var(--text-muted);
-  font-size: calc(12px * var(--ui-text-scale));
+  font-size: var(--ui-meta-size, 12px);
   font-variant-numeric: tabular-nums;
 }
 
@@ -392,7 +432,7 @@
 .ui-device-table__header {
   padding: 0 10px;
   color: var(--text-muted);
-  font-size: calc(11px * var(--ui-text-scale));
+  font-size: var(--ui-device-header-size, 11px);
   font-weight: 750;
   line-height: 1.2;
   white-space: nowrap;
@@ -400,10 +440,10 @@
 
 .ui-device-table__row {
   padding: 10px 10px;
-  border: 1px solid var(--ui-list-row-border);
+  border: 1px solid var(--ui-list-row-border, color-mix(in srgb, var(--control-border) 82%, transparent));
   border-radius: var(--radius-control, 4px);
-  background: var(--ui-list-row-bg);
-  font-size: calc(13px * var(--ui-text-scale));
+  background: var(--ui-list-row-bg, color-mix(in srgb, var(--control-bg) 86%, var(--surface-muted) 14%));
+  font-size: var(--ui-device-font-size, 13px);
   color: var(--text-primary);
 }
 
