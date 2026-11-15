@@ -5,7 +5,10 @@
 //! - No RIDEV_NOLEGACY (that stuck after disable)
 //! - Hook callback only emits MidiEvents (no UI / SendMessage)
 
-use super::catalog::{note_event, volume_wheel_event, KeyboardControlId};
+use super::catalog::{
+    note_event, volume_wheel_event, KeyboardControlId, MASK_ALL, MASK_MEDIA_NEXT,
+    MASK_MEDIA_PLAY_PAUSE, MASK_MEDIA_PREV, MASK_MEDIA_STOP, MASK_VOLUME_MUTE, MASK_VOLUME_WHEEL,
+};
 use crate::model::MidiEvent;
 use crate::run_logger;
 use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU32, Ordering};
@@ -21,15 +24,16 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     CallNextHookEx, CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW,
-    PostQuitMessage, PostThreadMessageW, RegisterClassExW, SetWindowsHookExW, TranslateMessage,
-    UnhookWindowsHookEx, CS_GLOBALCLASS, HHOOK, HMENU, HWND_MESSAGE, KBDLLHOOKSTRUCT, MSG,
-    WINDOW_EX_STYLE, WINDOW_STYLE, WM_CREATE, WM_DESTROY, WM_HOTKEY, WM_KEYDOWN, WM_KEYUP, WM_QUIT,
-    WM_SYSKEYDOWN, WM_SYSKEYUP, WNDCLASSEXW, WH_KEYBOARD_LL,
+    PostMessageW, PostQuitMessage, PostThreadMessageW, RegisterClassExW, SetWindowsHookExW,
+    TranslateMessage, UnhookWindowsHookEx, CS_GLOBALCLASS, HHOOK, HMENU, HWND_MESSAGE,
+    KBDLLHOOKSTRUCT, MSG, WINDOW_EX_STYLE, WINDOW_STYLE, WM_APP, WM_CREATE, WM_DESTROY, WM_HOTKEY,
+    WM_KEYDOWN, WM_KEYUP, WM_QUIT, WM_SYSKEYDOWN, WM_SYSKEYUP, WNDCLASSEXW, WH_KEYBOARD_LL,
 };
 
 const LLKHF_INJECTED: u32 = 0x10;
 const LLKHF_LOWER_IL_INJECTED: u32 = 0x02;
 const HC_ACTION: i32 = 0;
+const WM_REFRESH_HOTKEYS: u32 = WM_APP + 2;
 
 type EventSink = Arc<dyn Fn(MidiEvent) + Send + Sync + 'static>;
 
@@ -37,7 +41,37 @@ static HOOK_ACTIVE: AtomicBool = AtomicBool::new(false);
 static HOOK_HANDLE: AtomicIsize = AtomicIsize::new(0);
 static HOOK_THREAD_ID: AtomicU32 = AtomicU32::new(0);
 static HOTKEY_HWND: AtomicIsize = AtomicIsize::new(0);
+static ENABLED_MASK: AtomicU32 = AtomicU32::new(MASK_ALL);
 static EVENT_SINK: OnceLock<Mutex<Option<EventSink>>> = OnceLock::new();
+
+pub(super) fn set_global_enabled_mask(mask: u32) {
+    ENABLED_MASK.store(mask, Ordering::SeqCst);
+}
+
+fn vk_capture_mask(vk: u16) -> Option<u32> {
+    if vk == VK_VOLUME_MUTE.0 {
+        Some(MASK_VOLUME_MUTE)
+    } else if vk == VK_VOLUME_UP.0 || vk == VK_VOLUME_DOWN.0 {
+        Some(MASK_VOLUME_WHEEL)
+    } else if vk == VK_MEDIA_PLAY_PAUSE.0 {
+        Some(MASK_MEDIA_PLAY_PAUSE)
+    } else if vk == VK_MEDIA_NEXT_TRACK.0 {
+        Some(MASK_MEDIA_NEXT)
+    } else if vk == VK_MEDIA_PREV_TRACK.0 {
+        Some(MASK_MEDIA_PREV)
+    } else if vk == VK_MEDIA_STOP.0 {
+        Some(MASK_MEDIA_STOP)
+    } else {
+        None
+    }
+}
+
+fn is_vk_enabled(vk: u16) -> bool {
+    match vk_capture_mask(vk) {
+        Some(bit) => (ENABLED_MASK.load(Ordering::SeqCst) & bit) != 0,
+        None => false,
+    }
+}
 
 fn event_sink_slot() -> &'static Mutex<Option<EventSink>> {
     EVENT_SINK.get_or_init(|| Mutex::new(None))
@@ -113,7 +147,7 @@ unsafe extern "system" fn low_level_keyboard_proc(
     }
 
     let vk = kb.vkCode as u16;
-    if !is_catalogued_vk(vk) {
+    if !is_catalogued_vk(vk) || !is_vk_enabled(vk) {
         return CallNextHookEx(None, code, wparam, lparam);
     }
 
@@ -132,7 +166,11 @@ unsafe extern "system" fn low_level_keyboard_proc(
 }
 
 fn register_hotkeys(hwnd: HWND) {
+    unregister_hotkeys(hwnd);
     for (vk, id) in catalogued_vks() {
+        if !is_vk_enabled(vk) {
+            continue;
+        }
         match unsafe { RegisterHotKey(Some(hwnd), id as i32, HOT_KEY_MODIFIERS(0), vk as u32) } {
             Ok(()) => run_logger::info(
                 "keyboard_input",
@@ -162,32 +200,53 @@ fn handle_hotkey(id: i32) {
     // Emit a short press for buttons / one wheel step for volume.
     match id {
         1 => {
+            if !is_vk_enabled(VK_VOLUME_MUTE.0) {
+                return;
+            }
             emit(note_event(KeyboardControlId::VolumeMute, true));
             emit(note_event(KeyboardControlId::VolumeMute, false));
         }
         2 => {
+            if !is_vk_enabled(VK_VOLUME_DOWN.0) {
+                return;
+            }
             if let Some(event) = volume_wheel_event(-1) {
                 emit(event);
             }
         }
         3 => {
+            if !is_vk_enabled(VK_VOLUME_UP.0) {
+                return;
+            }
             if let Some(event) = volume_wheel_event(1) {
                 emit(event);
             }
         }
         4 => {
+            if !is_vk_enabled(VK_MEDIA_NEXT_TRACK.0) {
+                return;
+            }
             emit(note_event(KeyboardControlId::MediaNext, true));
             emit(note_event(KeyboardControlId::MediaNext, false));
         }
         5 => {
+            if !is_vk_enabled(VK_MEDIA_PREV_TRACK.0) {
+                return;
+            }
             emit(note_event(KeyboardControlId::MediaPrev, true));
             emit(note_event(KeyboardControlId::MediaPrev, false));
         }
         6 => {
+            if !is_vk_enabled(VK_MEDIA_STOP.0) {
+                return;
+            }
             emit(note_event(KeyboardControlId::MediaStop, true));
             emit(note_event(KeyboardControlId::MediaStop, false));
         }
         7 => {
+            if !is_vk_enabled(VK_MEDIA_PLAY_PAUSE.0) {
+                return;
+            }
             emit(note_event(KeyboardControlId::MediaPlayPause, true));
             emit(note_event(KeyboardControlId::MediaPlayPause, false));
         }
@@ -205,6 +264,15 @@ unsafe extern "system" fn hotkey_wnd_proc(
         WM_CREATE => LRESULT(0),
         WM_HOTKEY => {
             handle_hotkey(wparam.0 as i32);
+            LRESULT(0)
+        }
+        WM_REFRESH_HOTKEYS => {
+            register_hotkeys(hwnd);
+            run_logger::info(
+                "keyboard_input",
+                "hotkeys_refreshed",
+                &format!("mask=0x{:02X}", ENABLED_MASK.load(Ordering::SeqCst)),
+            );
             LRESULT(0)
         }
         WM_DESTROY => {
@@ -292,10 +360,12 @@ pub struct KeyboardCapture {
 }
 
 impl KeyboardCapture {
-    pub fn start(on_event: EventSink) -> Result<Self, String> {
+    pub fn start(on_event: EventSink, enabled_mask: u32) -> Result<Self, String> {
         if HOOK_ACTIVE.swap(true, Ordering::SeqCst) {
             return Err("Keyboard capture already running".into());
         }
+
+        ENABLED_MASK.store(enabled_mask, Ordering::SeqCst);
 
         {
             let mut sink = event_sink_slot()
@@ -343,7 +413,10 @@ impl KeyboardCapture {
                 run_logger::info(
                     "keyboard_input",
                     "hook_started",
-                    "LL hook + RegisterHotKey suppress active",
+                    &format!(
+                        "LL hook + RegisterHotKey suppress active mask=0x{:02X}",
+                        ENABLED_MASK.load(Ordering::SeqCst)
+                    ),
                 );
 
                 let mut msg = MSG::default();
@@ -375,6 +448,16 @@ impl KeyboardCapture {
             })?;
 
         Ok(Self { join: Some(join) })
+    }
+
+    pub fn set_enabled_mask(&mut self, mask: u32) {
+        ENABLED_MASK.store(mask, Ordering::SeqCst);
+        let hwnd = HWND(HOTKEY_HWND.load(Ordering::SeqCst) as *mut _);
+        if !hwnd.0.is_null() {
+            unsafe {
+                let _ = PostMessageW(Some(hwnd), WM_REFRESH_HOTKEYS, WPARAM(0), LPARAM(0));
+            }
+        }
     }
 
     pub fn stop(&mut self) {

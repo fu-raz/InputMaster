@@ -118,9 +118,25 @@ pub struct KeyboardControlInfo {
     pub controller: u8,
     pub msg_type: MidiMessageType,
     pub continuous: bool,
+    /// Whether this control is currently selected for capture/suppress.
+    pub enabled: bool,
 }
 
-pub fn catalog_controls() -> Vec<KeyboardControlInfo> {
+/// Bitmask bits for capture filtering (LL hook + hotkeys). Hook-safe AtomicU32.
+pub const MASK_VOLUME_MUTE: u32 = 1 << 0;
+pub const MASK_VOLUME_WHEEL: u32 = 1 << 1;
+pub const MASK_MEDIA_PLAY_PAUSE: u32 = 1 << 2;
+pub const MASK_MEDIA_NEXT: u32 = 1 << 3;
+pub const MASK_MEDIA_PREV: u32 = 1 << 4;
+pub const MASK_MEDIA_STOP: u32 = 1 << 5;
+pub const MASK_ALL: u32 = MASK_VOLUME_MUTE
+    | MASK_VOLUME_WHEEL
+    | MASK_MEDIA_PLAY_PAUSE
+    | MASK_MEDIA_NEXT
+    | MASK_MEDIA_PREV
+    | MASK_MEDIA_STOP;
+
+pub fn capture_controls() -> [KeyboardControlId; 6] {
     // Volume Up/Down Note slots stay reserved; capture uses the relative wheel instead.
     [
         KeyboardControlId::VolumeMute,
@@ -130,17 +146,79 @@ pub fn catalog_controls() -> Vec<KeyboardControlInfo> {
         KeyboardControlId::MediaPrev,
         KeyboardControlId::MediaStop,
     ]
-    .into_iter()
-    .map(|control| KeyboardControlInfo {
-        id: control.id_str().to_string(),
-        name: control.display_name().to_string(),
-        device_id: DEVICE_ID.to_string(),
-        channel: CHANNEL,
-        controller: control.controller(),
-        msg_type: control.msg_type(),
-        continuous: control.is_continuous(),
-    })
-    .collect()
+}
+
+pub fn default_enabled_control_ids() -> Vec<String> {
+    capture_controls()
+        .into_iter()
+        .map(|c| c.id_str().to_string())
+        .collect()
+}
+
+impl KeyboardControlId {
+    pub fn capture_mask(self) -> u32 {
+        match self {
+            Self::VolumeMute => MASK_VOLUME_MUTE,
+            Self::VolumeUp | Self::VolumeDown | Self::VolumeWheel => MASK_VOLUME_WHEEL,
+            Self::MediaPlayPause => MASK_MEDIA_PLAY_PAUSE,
+            Self::MediaNext => MASK_MEDIA_NEXT,
+            Self::MediaPrev => MASK_MEDIA_PREV,
+            Self::MediaStop => MASK_MEDIA_STOP,
+        }
+    }
+
+    pub fn from_id_str(id: &str) -> Option<Self> {
+        match id {
+            "volume_mute" => Some(Self::VolumeMute),
+            "volume_up" => Some(Self::VolumeUp),
+            "volume_down" => Some(Self::VolumeDown),
+            "volume_wheel" => Some(Self::VolumeWheel),
+            "media_play_pause" => Some(Self::MediaPlayPause),
+            "media_next" => Some(Self::MediaNext),
+            "media_prev" => Some(Self::MediaPrev),
+            "media_stop" => Some(Self::MediaStop),
+            _ => None,
+        }
+    }
+}
+
+/// Resolve persisted preference into a capture bitmask. `None` → all enabled.
+pub fn enabled_mask_from_preference(ids: Option<&[String]>) -> u32 {
+    match ids {
+        None => MASK_ALL,
+        Some(list) => {
+            let mut mask = 0u32;
+            for id in list {
+                if let Some(control) = KeyboardControlId::from_id_str(id) {
+                    if capture_controls().contains(&control) {
+                        mask |= control.capture_mask();
+                    }
+                }
+            }
+            mask
+        }
+    }
+}
+
+pub fn catalog_controls() -> Vec<KeyboardControlInfo> {
+    catalog_controls_with_enabled(None)
+}
+
+pub fn catalog_controls_with_enabled(enabled_ids: Option<&[String]>) -> Vec<KeyboardControlInfo> {
+    let mask = enabled_mask_from_preference(enabled_ids);
+    capture_controls()
+        .into_iter()
+        .map(|control| KeyboardControlInfo {
+            id: control.id_str().to_string(),
+            name: control.display_name().to_string(),
+            device_id: DEVICE_ID.to_string(),
+            channel: CHANNEL,
+            controller: control.controller(),
+            msg_type: control.msg_type(),
+            continuous: control.is_continuous(),
+            enabled: (mask & control.capture_mask()) != 0,
+        })
+        .collect()
 }
 
 pub fn note_event(control: KeyboardControlId, pressed: bool) -> MidiEvent {

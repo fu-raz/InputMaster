@@ -276,13 +276,31 @@
 
 .keyboard-controls-list {
   margin: 10px 0 0;
-  padding-left: 1.2rem;
+  padding-left: 0;
+  list-style: none;
   color: #5c6280;
   font-size: 13px;
   line-height: 1.6;
 }
 
-.keyboard-controls-list li {
+.keyboard-controls-list li,
+.keyboard-control-item {
   margin: 0;
+}
+
+.keyboard-control-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.keyboard-control-checkbox {
+  margin: 0;
+}
+
+.keyboard-control-checkbox:disabled + span {
+  opacity: 0.55;
 }
 

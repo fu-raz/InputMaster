@@ -29,6 +29,7 @@ macro_rules! command_registry {
             list_midi_output_devices,
             get_keyboard_input_status,
             set_keyboard_input_enabled,
+            set_keyboard_control_enabled,
             list_keyboard_controls,
             get_midi_connection_health,
             get_midi_route_health,

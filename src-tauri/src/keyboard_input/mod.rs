@@ -3,7 +3,11 @@ mod catalog;
 #[cfg(target_os = "windows")]
 mod capture_windows;
 
-pub use catalog::{catalog_controls, KeyboardControlInfo, DEVICE_ID, DEVICE_NAME};
+pub use catalog::{
+    capture_controls, catalog_controls, catalog_controls_with_enabled, default_enabled_control_ids,
+    enabled_mask_from_preference, KeyboardControlId, KeyboardControlInfo, DEVICE_ID, DEVICE_NAME,
+    MASK_ALL,
+};
 
 use crate::model::MidiEvent;
 use crate::run_logger;
@@ -18,6 +22,7 @@ pub struct KeyboardInputManager {
     #[cfg(target_os = "windows")]
     capture: Option<KeyboardCapture>,
     enabled: bool,
+    enabled_mask: u32,
     on_event: Option<EventSink>,
 }
 
@@ -33,6 +38,7 @@ impl KeyboardInputManager {
             #[cfg(target_os = "windows")]
             capture: None,
             enabled: false,
+            enabled_mask: MASK_ALL,
             on_event: None,
         }
     }
@@ -45,6 +51,18 @@ impl KeyboardInputManager {
         self.on_event = Some(on_event);
         if self.enabled {
             let _ = self.ensure_started();
+        }
+    }
+
+    pub fn set_enabled_mask(&mut self, mask: u32) {
+        self.enabled_mask = mask;
+        #[cfg(target_os = "windows")]
+        if let Some(capture) = self.capture.as_mut() {
+            capture.set_enabled_mask(mask);
+        }
+        #[cfg(target_os = "windows")]
+        if self.capture.is_none() {
+            capture_windows::set_global_enabled_mask(mask);
         }
     }
 
@@ -78,7 +96,7 @@ impl KeyboardInputManager {
             .on_event
             .clone()
             .ok_or_else(|| "Keyboard input event sink is not configured".to_string())?;
-        self.capture = Some(KeyboardCapture::start(sink)?);
+        self.capture = Some(KeyboardCapture::start(sink, self.enabled_mask)?);
         Ok(())
     }
 

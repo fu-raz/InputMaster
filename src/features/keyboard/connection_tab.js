@@ -27,9 +27,30 @@ export function createKeyboardConnectionTab({ invoke, t }) {
       list.appendChild(empty);
       return;
     }
+    const masterOn = Boolean(status.enabled) && status.supported !== false;
     for (const control of controls) {
       const item = document.createElement("li");
-      item.textContent = control.name || control.id;
+      item.className = "keyboard-control-item";
+
+      const label = document.createElement("label");
+      label.className = "keyboard-control-label";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "keyboard-control-checkbox";
+      checkbox.checked = control.enabled !== false;
+      checkbox.disabled = !masterOn || busy;
+      checkbox.dataset.controlId = control.id;
+      checkbox.onchange = () => {
+        void setControlEnabled(control.id, checkbox.checked);
+      };
+
+      const name = document.createElement("span");
+      name.textContent = control.name || control.id;
+
+      label.appendChild(checkbox);
+      label.appendChild(name);
+      item.appendChild(label);
       list.appendChild(item);
     }
   }
@@ -93,6 +114,25 @@ export function createKeyboardConnectionTab({ invoke, t }) {
       await refresh();
     } catch (error) {
       console.error("Failed to update keyboard input", error);
+      await refresh();
+    } finally {
+      busy = false;
+      update();
+    }
+  }
+
+  async function setControlEnabled(controlId, enabled) {
+    if (busy) return;
+    busy = true;
+    update();
+    try {
+      await invoke("set_keyboard_control_enabled", {
+        controlId: String(controlId),
+        enabled: Boolean(enabled),
+      });
+      await refresh();
+    } catch (error) {
+      console.error("Failed to update keyboard control", error);
       await refresh();
     } finally {
       busy = false;

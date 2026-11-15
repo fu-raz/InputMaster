@@ -270,6 +270,10 @@ pub struct AppSettings {
     /// When true, capture and suppress catalogued Windows media/volume keys.
     #[serde(default)]
     pub keyboard_input_enabled: bool,
+    /// Per-control capture filter. `None` = all catalog controls enabled.
+    /// `Some(ids)` = only those catalog control ids (e.g. `volume_mute`) are captured/suppressed.
+    #[serde(default)]
+    pub keyboard_controls_enabled: Option<Vec<String>>,
 }
 
 impl Default for AppSettings {
@@ -297,6 +301,7 @@ impl Default for AppSettings {
             midi_device_inventory_notice_version: 0,
             midi_device_inventory_last_sent_hash: None,
             keyboard_input_enabled: false,
+            keyboard_controls_enabled: None,
         }
     }
 }
