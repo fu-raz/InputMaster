@@ -1,5 +1,8 @@
 /* App-wide UI consistency tokens + primitives (ILS-10). See docs/ui-consistency.md
  *
+ * HARD RULE (Rick approved): do not change font sizes / type-scale tokens until
+ * he explicitly asks. Current sizes are the baseline; other UI work is fine.
+ *
  * Cascade notes (verified via CDP):
  * - Custom props resolve var() where they are *defined*, then inherit the result.
  *   So scale-dependent tokens must be re-declared wherever --ui-text-scale changes.
