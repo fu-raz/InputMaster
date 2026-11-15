@@ -2,13 +2,17 @@ import { KEYBOARD_DEVICE_ID } from "./catalog.js";
 
 const KEYBOARD_ICON = `
   <svg viewBox="0 0 24 24" focusable="false">
-    <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-    <path d="M6 10h.01"></path>
-    <path d="M10 10h.01"></path>
-    <path d="M14 10h.01"></path>
-    <path d="M18 10h.01"></path>
-    <path d="M8 14h.01"></path>
-    <path d="M12 14h4"></path>
+    <rect x="1.5" y="5" width="21" height="14" rx="2.2"></rect>
+    <path d="M5.5 9h.01"></path>
+    <path d="M9 9h.01"></path>
+    <path d="M12.5 9h.01"></path>
+    <path d="M16 9h.01"></path>
+    <path d="M19.5 9h.01"></path>
+    <path d="M5.5 12.5h.01"></path>
+    <path d="M9 12.5h.01"></path>
+    <path d="M12.5 12.5h.01"></path>
+    <path d="M16 12.5h.01"></path>
+    <path d="M7.5 16h9"></path>
   </svg>
 `;
 

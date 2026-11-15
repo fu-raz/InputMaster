@@ -605,6 +605,11 @@ input::placeholder {
   font-weight: 700;
 }
 
+/* Keep route actions at the fixed button label size so subsection H3 stays larger */
+#inputs-page .midi-route-action-button {
+  font-size: var(--ui-button-label-size, 13px);
+}
+
 .midi-route-action-button.primary-action {
   border-color: var(--accent);
   background: var(--accent);

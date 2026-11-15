@@ -1,16 +1,17 @@
-/** Xbox-like gamepad (inline SVG — not limited by an icon font). */
+/** Xbox-style pad: angled grips, offset sticks, d-pad, ABXY diamond. */
 const GAMEPAD_ICON = `
   <svg viewBox="0 0 24 24" focusable="false">
-    <path d="M7.2 8.8h9.6c1.9 0 3.4 1.5 3.4 3.3v1.1c0 1.3-.6 2.5-1.6 3.3l-1.5 1.2c-.35.28-.8.43-1.25.43H8.15c-.45 0-.9-.15-1.25-.43l-1.5-1.2A4.1 4.1 0 0 1 3.8 13.2v-1.1c0-1.8 1.5-3.3 3.4-3.3Z"></path>
-    <path d="M8.3 11.6v3.2"></path>
-    <path d="M6.7 13.2h3.2"></path>
-    <circle cx="15.35" cy="11.55" r="0.85"></circle>
-    <circle cx="17.35" cy="13.35" r="0.85"></circle>
-    <circle cx="13.35" cy="13.35" r="0.85"></circle>
-    <circle cx="15.35" cy="15.15" r="0.85"></circle>
-    <path d="M9.4 7.6c.55-.85 1.45-1.35 2.55-1.35h.1c1.1 0 2 .5 2.55 1.35"></path>
-    <circle cx="9.9" cy="16.9" r="0.55"></circle>
-    <circle cx="14.1" cy="16.9" r="0.55"></circle>
+    <path d="M2.4 9.1c0-1.1.9-2 2-2h15.2c1.1 0 2 .9 2 2v1.3c0 .9-.3 1.7-.9 2.4l-1.6 1.9c-.4.5-1 .8-1.6.8h-.7c-.4 0-.8-.2-1-.5L14.4 13H9.6l-1.4 2c-.2.3-.6.5-1 .5h-.7c-.6 0-1.2-.3-1.6-.8l-1.6-1.9c-.6-.7-.9-1.5-.9-2.4V9.1Z"></path>
+    <path d="M7.2 10.6v3.2"></path>
+    <path d="M5.6 12.2h3.2"></path>
+    <circle cx="9.2" cy="15.8" r="1.15"></circle>
+    <circle cx="15.5" cy="14.2" r="1.15"></circle>
+    <circle cx="16.2" cy="10.5" r="0.85"></circle>
+    <circle cx="18.1" cy="12.3" r="0.85"></circle>
+    <circle cx="14.3" cy="12.3" r="0.85"></circle>
+    <circle cx="16.2" cy="14.1" r="0.85"></circle>
+    <circle cx="12" cy="11.4" r="0.55"></circle>
+    <path d="M8.6 5.8c.9-1.2 2.2-1.9 3.8-1.9s2.9.7 3.8 1.9"></path>
   </svg>
 `;
 
