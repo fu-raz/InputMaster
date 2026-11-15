@@ -18,6 +18,7 @@ mod durable_json_store;
 mod fader_curve;
 mod feedback;
 mod file_dialog;
+mod controller_input;
 mod keyboard_input;
 mod midi;
 mod midi_event_queue;
@@ -287,6 +288,19 @@ pub fn run() {
                 {
                     run_logger::warn(
                         "keyboard_input",
+                        "startup_enable_failed",
+                        &format!("error={error}"),
+                    );
+                }
+            }
+
+            if app_settings.controller_input_enabled {
+                let state = app.state::<AppState>();
+                if let Err(error) =
+                    commands::apply_controller_input_enabled(app.handle(), state.inner(), true)
+                {
+                    run_logger::warn(
+                        "controller_input",
                         "startup_enable_failed",
                         &format!("error={error}"),
                     );

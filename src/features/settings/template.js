@@ -3,6 +3,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
           <div class="settings-panel-body">
             <div class="settings-shell">
               <aside class="settings-sidebar" aria-label="Settings sections" data-i18n-aria-label="settings.sections">
+                <h1 class="settings-page-title" data-i18n="settings.title">Settings</h1>
                 <div class="settings-nav-indicator" aria-hidden="true"></div>
                 <nav class="settings-nav">
                   <button class="settings-nav-item active" type="button" data-settings-section="startup" aria-current="page">

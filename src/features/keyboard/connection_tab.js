@@ -1,6 +1,6 @@
 import { KEYBOARD_DEVICE_ID } from "./catalog.js";
 
-/** Connections panel pane: enable/disable keyboard media/volume capture. */
+/** Inputs → Keyboard pane: Settings-style master toggle + per-key capture list. */
 export function createKeyboardConnectionTab({ invoke, t }) {
   let root = null;
   let status = {
@@ -27,7 +27,6 @@ export function createKeyboardConnectionTab({ invoke, t }) {
       list.appendChild(empty);
       return;
     }
-    const masterOn = Boolean(status.enabled) && status.supported !== false;
     for (const control of controls) {
       const item = document.createElement("li");
       item.className = "keyboard-control-item";
@@ -39,7 +38,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
       checkbox.type = "checkbox";
       checkbox.className = "keyboard-control-checkbox";
       checkbox.checked = control.enabled !== false;
-      checkbox.disabled = !masterOn || busy;
+      checkbox.disabled = busy;
       checkbox.dataset.controlId = control.id;
       checkbox.onchange = () => {
         void setControlEnabled(control.id, checkbox.checked);
@@ -59,33 +58,28 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     if (!root) return;
     const supported = status.supported !== false;
     const enabled = Boolean(status.enabled);
-    const dot = read("dot");
-    const statusEl = read("status");
-    const toggle = read("toggle");
-    const help = read("help");
-    if (dot) {
-      dot.classList.toggle("connected", enabled && supported);
-      dot.classList.toggle("connecting", busy);
+    const masterInput = read("master-input");
+    const masterRow = read("master-row");
+    const controlsBlock = read("controls-block");
+    const unsupported = read("unsupported");
+
+    if (masterInput) {
+      masterInput.checked = enabled;
+      masterInput.disabled = !supported || busy;
     }
-    if (statusEl) {
-      statusEl.textContent = !supported
-        ? t("keyboard.unsupported")
-        : busy
-          ? t("keyboard.updating")
-          : enabled
-            ? t("keyboard.enabledStatus")
-            : t("keyboard.disabledStatus");
+    if (masterRow) {
+      masterRow.classList.toggle("is-disabled", !supported || busy);
     }
-    if (toggle) {
-      toggle.disabled = !supported || busy;
-      toggle.textContent = enabled ? t("keyboard.disable") : t("keyboard.enable");
-      toggle.classList.toggle("danger", enabled && supported && !busy);
-      toggle.classList.toggle("disabled", !supported || busy);
+    if (unsupported) {
+      unsupported.classList.toggle("hidden", supported);
+      unsupported.textContent = t("keyboard.unsupported");
     }
-    if (help) {
-      help.textContent = t("keyboard.help");
+    if (controlsBlock) {
+      controlsBlock.classList.toggle("hidden", !enabled || !supported);
     }
-    renderControls();
+    if (enabled && supported) {
+      renderControls();
+    }
   }
 
   async function refresh() {
@@ -143,31 +137,38 @@ export function createKeyboardConnectionTab({ invoke, t }) {
   function mount(container) {
     root = container;
     root.innerHTML = `
-      <div class="connection-item-header">
-        <div class="connection-info">
-          <span class="connection-name" data-role="title"></span>
+      <div class="keyboard-settings">
+        <p class="keyboard-unsupported hidden" data-role="unsupported"></p>
+        <div class="settings-startup-row keyboard-master-row" data-role="master-row">
+          <div class="settings-startup-row-main">
+            <span class="settings-startup-copy">
+              <strong data-role="master-label"></strong>
+              <span class="settings-startup-help" data-role="master-help"></span>
+            </span>
+          </div>
+          <label class="settings-toggle" data-role="master-toggle">
+            <input type="checkbox" data-role="master-input" />
+            <span class="plugins-toggle-ui" aria-hidden="true"></span>
+          </label>
         </div>
-        <div class="connection-status">
-          <span class="connection-status-dot" data-role="dot"></span>
-          <span data-role="status"></span>
-        </div>
-      </div>
-      <div class="connection-content-wrapper">
-        <div class="connection-description">
-          <p data-role="help"></p>
-          <p data-role="controls-heading"></p>
+        <div class="keyboard-controls-block hidden" data-role="controls-block">
+          <p class="keyboard-controls-heading" data-role="controls-heading"></p>
           <ul class="keyboard-controls-list" data-role="controls"></ul>
         </div>
       </div>
-      <div class="connection-footer">
-        <button type="button" class="connection-button" data-role="toggle"></button>
-      </div>
     `;
-    const title = read("title");
-    if (title) title.textContent = t("keyboard.title");
+    const masterLabel = read("master-label");
+    if (masterLabel) masterLabel.textContent = t("keyboard.masterLabel");
+    const masterHelp = read("master-help");
+    if (masterHelp) masterHelp.textContent = t("keyboard.masterHelp");
     const heading = read("controls-heading");
     if (heading) heading.textContent = t("keyboard.controlsHeading");
-    read("toggle").onclick = () => setEnabled(!status.enabled);
+    const masterInput = read("master-input");
+    if (masterInput) {
+      masterInput.addEventListener("change", () => {
+        void setEnabled(masterInput.checked);
+      });
+    }
     update();
     void refresh();
   }

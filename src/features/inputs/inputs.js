@@ -1,9 +1,10 @@
 import { createKeyboardConnectionTab } from "../keyboard/connection_tab.js";
+import { createControllerConnectionTab } from "../controller/connection_tab.js";
 import { getNavIndicatorMetrics } from "../../app/connections_panel.js";
 
 const INPUT_SECTIONS = ["midi", "keyboard", "controller", "wheel"];
 
-/** Top-level Inputs page: left nav + MIDI / Keyboard panes (Controller/Wheel stubs). */
+/** Top-level Inputs page: left nav + MIDI / Keyboard / Controller panes. */
 export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
   const t = (key, params = {}) =>
     i18n && typeof i18n.t === "function" ? i18n.t(key, params) : String(key || "");
@@ -15,6 +16,8 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
   let sidebarBound = false;
   let keyboardTab = null;
   let keyboardMounted = false;
+  let controllerTab = null;
+  let controllerMounted = false;
 
   function syncNavIndicator() {
     if (!sidebar) return;
@@ -56,6 +59,20 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
     }
   }
 
+  function ensureControllerMounted() {
+    if (controllerMounted || !controllerTab) return;
+    const pane = content?.querySelector(
+      '[data-inputs-panel="controller"] [data-role="controller-host"]',
+    );
+    if (!pane) return;
+    try {
+      controllerTab.mount(pane);
+      controllerMounted = true;
+    } catch (error) {
+      console.error("Failed to mount controller inputs pane", error);
+    }
+  }
+
   function activateSection(sectionId) {
     const next = INPUT_SECTIONS.includes(sectionId) ? sectionId : "midi";
     activeSection = next;
@@ -76,6 +93,10 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
     if (activeSection === "keyboard") {
       ensureKeyboardMounted();
       keyboardTab?.refresh?.();
+    }
+    if (activeSection === "controller") {
+      ensureControllerMounted();
+      controllerTab?.refresh?.();
     }
     if (activeSection === "midi" && typeof onMidiSectionShown === "function") {
       try {
@@ -110,6 +131,12 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
         t,
       });
     }
+    if (!controllerTab) {
+      controllerTab = createControllerConnectionTab({
+        invoke: typeof invoke === "function" ? invoke : async () => ({}),
+        t,
+      });
+    }
     activateSection(sectionId || activeSection || "midi");
   }
 
@@ -122,5 +149,6 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
     activateSection,
     bindUi,
     refreshKeyboard: () => keyboardTab?.refresh?.(),
+    refreshController: () => controllerTab?.refresh?.(),
   };
 }

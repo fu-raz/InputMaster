@@ -227,6 +227,16 @@ fn stop_managed_resources(app: &AppHandle) {
             run_logger::warn("app", "shutdown_keyboard_input_lock_failed", "");
         }
     };
+
+    match state.controller_input.lock() {
+        Ok(mut controller) => {
+            controller.stop();
+            run_logger::info("app", "shutdown_controller_input_stopped", "");
+        }
+        Err(_) => {
+            run_logger::warn("app", "shutdown_controller_input_lock_failed", "");
+        }
+    };
 }
 
 fn stop_managed_resources_best_effort(app: &AppHandle) {

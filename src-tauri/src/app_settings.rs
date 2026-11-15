@@ -274,6 +274,9 @@ pub struct AppSettings {
     /// `Some(ids)` = only those catalog control ids (e.g. `volume_mute`) are captured/suppressed.
     #[serde(default)]
     pub keyboard_controls_enabled: Option<Vec<String>>,
+    /// When true, poll XInput slots and emit observe-only controller events.
+    #[serde(default)]
+    pub controller_input_enabled: bool,
 }
 
 impl Default for AppSettings {
@@ -302,6 +305,7 @@ impl Default for AppSettings {
             midi_device_inventory_last_sent_hash: None,
             keyboard_input_enabled: false,
             keyboard_controls_enabled: None,
+            controller_input_enabled: false,
         }
     }
 }

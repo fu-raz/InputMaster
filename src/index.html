@@ -122,6 +122,7 @@
                 <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="buttons" data-i18n="bindings.filterButtons">Buttons</button>
                 <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="midi" data-i18n="bindings.filterMidi">MIDI</button>
                 <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="keyboard" data-i18n="bindings.filterKeyboard">Keyboard</button>
+                <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="controller" data-i18n="bindings.filterController">Controller</button>
               </div>
               <label class="binding-search-field">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -179,9 +180,8 @@
                 <button type="button" class="inputs-nav-item" data-inputs-section="keyboard">
                   <span class="inputs-nav-label" data-i18n="inputs.nav.keyboard">Keyboard</span>
                 </button>
-                <button type="button" class="inputs-nav-item is-soon" data-inputs-section="controller" disabled aria-disabled="true">
+                <button type="button" class="inputs-nav-item" data-inputs-section="controller">
                   <span class="inputs-nav-label" data-i18n="inputs.nav.controller">Controller</span>
-                  <span class="inputs-nav-soon" data-i18n="inputs.comingSoon">Soon</span>
                 </button>
                 <button type="button" class="inputs-nav-item is-soon" data-inputs-section="wheel" disabled aria-disabled="true">
                   <span class="inputs-nav-label" data-i18n="inputs.nav.wheel">Wheel</span>
@@ -220,9 +220,13 @@
               <section class="inputs-panel" data-inputs-panel="controller">
                 <div class="inputs-panel-header">
                   <h2 data-i18n="inputs.controller.title">Controller</h2>
-                  <p class="inputs-panel-help" data-i18n="inputs.controller.help">Gamepads and controllers will appear here. Observe-only mapping is planned next.</p>
+                  <p class="inputs-panel-help" data-i18n="inputs.controller.help">Observe connected XInput gamepads. Games still see the pad; InputMaster only listens for Learn and bindings.</p>
                 </div>
-                <div class="inputs-empty" data-i18n="inputs.comingSoonBody">Coming soon.</div>
+                <div class="inputs-device-list" data-role="controller-device-list">
+                  <div class="inputs-device-card connection-tab active" data-device-kind="controller">
+                    <div data-role="controller-host"></div>
+                  </div>
+                </div>
               </section>
               <section class="inputs-panel" data-inputs-panel="wheel">
                 <div class="inputs-panel-header">

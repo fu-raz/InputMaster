@@ -56,7 +56,8 @@ windows = { version = "0.61", features = [
   "Win32_UI_Shell_Common",
   "Win32_UI_Shell_PropertiesSystem",
   "Win32_UI_WindowsAndMessaging",
-  "Win32_UI_Input_KeyboardAndMouse"
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_Input_XboxController"
 ] }
 windows-core = "0.61"
 tokio-tungstenite = { version = "0.21", features = ["native-tls"] }

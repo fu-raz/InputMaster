@@ -9,6 +9,7 @@ import {
   isKeyboardDeviceId,
   isKeyboardVolumeWheel,
 } from "../../features/keyboard/catalog.js";
+import { isControllerDeviceId } from "../../features/controller/catalog.js";
 
 /** binding creation workflow. */
 export function createBindingCreation({
@@ -136,8 +137,9 @@ export function createBindingCreation({
       assign_mode: "Add",
       hotkey: null,
       open_application: null,
-      // Keyboard sources have no MIDI feedback hardware.
-      feedback_enabled: !isKeyboardDeviceId(payload.device_id),
+      // Keyboard / controller sources have no MIDI feedback hardware.
+      feedback_enabled:
+        !isKeyboardDeviceId(payload.device_id) && !isControllerDeviceId(payload.device_id),
     };
   }
 

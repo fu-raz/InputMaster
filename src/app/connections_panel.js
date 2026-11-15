@@ -192,6 +192,11 @@ export function createConnectionsPanelController({
     d.connectionsSidebar.innerHTML = "";
     d.connectionsContent.innerHTML = "";
 
+    const pageTitle = document.createElement("h1");
+    pageTitle.className = "plugins-page-title";
+    pageTitle.textContent = t("plugins.title");
+    d.connectionsSidebar.appendChild(pageTitle);
+
     const indicator = document.createElement("div");
     indicator.className = "connections-nav-indicator";
     indicator.setAttribute("aria-hidden", "true");

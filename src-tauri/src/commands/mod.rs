@@ -1,5 +1,6 @@
 pub mod audio;
 pub mod bindings;
+pub mod controller;
 pub mod keyboard;
 pub mod midi;
 pub mod profiles;
@@ -11,6 +12,7 @@ pub mod virtual_audio;
 
 pub use audio::*;
 pub use bindings::*;
+pub use controller::*;
 pub use keyboard::*;
 pub use midi::*;
 pub use profiles::*;
@@ -31,6 +33,9 @@ macro_rules! command_registry {
             set_keyboard_input_enabled,
             set_keyboard_control_enabled,
             list_keyboard_controls,
+            get_controller_input_status,
+            set_controller_input_enabled,
+            list_controller_controls,
             get_midi_connection_health,
             get_midi_route_health,
             start_midi_device,

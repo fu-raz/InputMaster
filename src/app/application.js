@@ -32,6 +32,11 @@ import {
   isKeyboardDeviceId,
   keyboardControlLabel,
 } from "../features/keyboard/catalog.js";
+import {
+  controllerControlLabel,
+  controllerDeviceLabel,
+  isControllerDeviceId,
+} from "../features/controller/catalog.js";
 import { createAlertsController } from "../app/alerts.js";
 import { createTauriBridge } from "../app/bootstrap.js";
 import { normalizeMidiPreference, normalizeMidiRoutes } from "../core/midi_preferences.js";
@@ -718,6 +723,9 @@ export function createApplication() {
       if (isKeyboardDeviceId(id)) {
         return t("keyboard.deviceName");
       }
+      if (isControllerDeviceId(id)) {
+        return controllerDeviceLabel(id, t) || t("controller.title");
+      }
       return features.midi?.getDeviceMappingLabel(id) || preferenceActions.midiDeviceLabelForBindingDevice(id);
     },
     buildTargetSelect: (...args) => features.targets?.buildTargetSelect(...args),
@@ -817,6 +825,9 @@ export function createApplication() {
   function controlLabel(control, deviceId = null) {
     if (isKeyboardDeviceId(deviceId)) {
       return keyboardControlLabel(control, t) || t("keyboard.unknownControl");
+    }
+    if (isControllerDeviceId(deviceId)) {
+      return controllerControlLabel(control, t) || t("controller.unknownControl");
     }
     const msgType = normalizeMidiMessageType(control?.msg_type || control?.msgType);
     const channel = control?.channel ?? "?";

@@ -6,6 +6,7 @@ use crate::bindings::{BindingKey, BindingState};
 use crate::device_target::{parse_device_target, DeviceTargetKind};
 use crate::durable_json_store::StorageRecoveryNotices;
 use crate::feedback;
+use crate::controller_input::ControllerInputManager;
 use crate::keyboard_input::KeyboardInputManager;
 use crate::midi::MidiManager;
 use crate::midi_event_queue::MidiEventQueue;
@@ -84,6 +85,7 @@ pub(crate) struct AppState {
     pub(crate) audio_feedback: Mutex<crate::audio_feedback::AudioFeedbackState>,
     pub(crate) midi: Arc<Mutex<MidiManager>>,
     pub(crate) keyboard_input: Arc<Mutex<KeyboardInputManager>>,
+    pub(crate) controller_input: Arc<Mutex<ControllerInputManager>>,
     pub(crate) midi_dispatch_lock: Mutex<()>,
     pub(crate) midi_event_queue: Arc<Mutex<MidiEventQueue>>,
     pub(crate) profile_store: ProfileStore,
@@ -142,6 +144,7 @@ impl AppState {
             audio,
             midi: Arc::new(Mutex::new(MidiManager::new())),
             keyboard_input: Arc::new(Mutex::new(KeyboardInputManager::new())),
+            controller_input: Arc::new(Mutex::new(ControllerInputManager::new())),
             midi_dispatch_lock: Mutex::new(()),
             midi_event_queue: Arc::new(Mutex::new(MidiEventQueue::default())),
             profile_store,

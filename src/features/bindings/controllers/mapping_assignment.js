@@ -15,6 +15,7 @@ import {
   isKeyboardDeviceId,
   isKeyboardVolumeWheel,
 } from "../../keyboard/catalog.js";
+import { isControllerDeviceId } from "../../controller/catalog.js";
 
 /** mapping assignment workflow. */
 export function createMappingAssignment({
@@ -83,7 +84,7 @@ export function createMappingAssignment({
     if (keyboardWheel) {
       binding.relative_format = "TwosComplement";
     }
-    if (isKeyboardDeviceId(mapping.device_id)) {
+    if (isKeyboardDeviceId(mapping.device_id) || isControllerDeviceId(mapping.device_id)) {
       binding.feedback_enabled = false;
     }
   }
