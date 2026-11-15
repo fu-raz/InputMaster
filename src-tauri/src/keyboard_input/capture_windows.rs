@@ -24,16 +24,20 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     CallNextHookEx, CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW,
-    PostMessageW, PostQuitMessage, PostThreadMessageW, RegisterClassExW, SetWindowsHookExW,
-    TranslateMessage, UnhookWindowsHookEx, CS_GLOBALCLASS, HHOOK, HMENU, HWND_MESSAGE,
-    KBDLLHOOKSTRUCT, MSG, WINDOW_EX_STYLE, WINDOW_STYLE, WM_APP, WM_CREATE, WM_DESTROY, WM_HOTKEY,
-    WM_KEYDOWN, WM_KEYUP, WM_QUIT, WM_SYSKEYDOWN, WM_SYSKEYUP, WNDCLASSEXW, WH_KEYBOARD_LL,
+    PostMessageW, PostQuitMessage, PostThreadMessageW, RegisterClassExW, SendMessageW,
+    SetWindowsHookExW, TranslateMessage, UnhookWindowsHookEx, CS_GLOBALCLASS, HHOOK, HMENU,
+    HWND_MESSAGE, KBDLLHOOKSTRUCT, MSG, WINDOW_EX_STYLE, WINDOW_STYLE, WM_APP, WM_CREATE,
+    WM_DESTROY, WM_HOTKEY, WM_KEYDOWN, WM_KEYUP, WM_QUIT, WM_SYSKEYDOWN, WM_SYSKEYUP, WNDCLASSEXW,
+    WH_KEYBOARD_LL,
 };
 
 const LLKHF_INJECTED: u32 = 0x10;
 const LLKHF_LOWER_IL_INJECTED: u32 = 0x02;
 const HC_ACTION: i32 = 0;
 const WM_REFRESH_HOTKEYS: u32 = WM_APP + 2;
+/// Capture-thread: unregister hotkeys, SendInput media VK, re-register.
+/// Binding media actions must not be swallowed by our own RegisterHotKey suppress.
+const WM_SYNTHETIC_MEDIA: u32 = WM_APP + 3;
 
 type EventSink = Arc<dyn Fn(MidiEvent) + Send + Sync + 'static>;
 
@@ -42,7 +46,72 @@ static HOOK_HANDLE: AtomicIsize = AtomicIsize::new(0);
 static HOOK_THREAD_ID: AtomicU32 = AtomicU32::new(0);
 static HOTKEY_HWND: AtomicIsize = AtomicIsize::new(0);
 static ENABLED_MASK: AtomicU32 = AtomicU32::new(MASK_ALL);
+/// >0 while InputMaster is synthesizing a media key for a binding action.
+static SYNTHETIC_MEDIA: AtomicU32 = AtomicU32::new(0);
 static EVENT_SINK: OnceLock<Mutex<Option<EventSink>>> = OnceLock::new();
+
+fn is_synthetic_media() -> bool {
+    SYNTHETIC_MEDIA.load(Ordering::SeqCst) > 0
+}
+
+fn inject_media_key_raw(vk: u16) {
+    use windows::Win32::UI::Input::KeyboardAndMouse::{
+        SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYBD_EVENT_FLAGS, KEYEVENTF_KEYUP,
+        VIRTUAL_KEY,
+    };
+
+    let key_down = INPUT {
+        r#type: INPUT_KEYBOARD,
+        Anonymous: INPUT_0 {
+            ki: KEYBDINPUT {
+                wVk: VIRTUAL_KEY(vk),
+                wScan: 0,
+                dwFlags: KEYBD_EVENT_FLAGS(0),
+                time: 0,
+                dwExtraInfo: 0,
+            },
+        },
+    };
+    let key_up = INPUT {
+        r#type: INPUT_KEYBOARD,
+        Anonymous: INPUT_0 {
+            ki: KEYBDINPUT {
+                wVk: VIRTUAL_KEY(vk),
+                wScan: 0,
+                dwFlags: KEYEVENTF_KEYUP,
+                time: 0,
+                dwExtraInfo: 0,
+            },
+        },
+    };
+    unsafe {
+        SendInput(&[key_down, key_up], std::mem::size_of::<INPUT>() as i32);
+    }
+}
+
+/// Send a media VK so OS/apps receive it even while keyboard capture is suppressing
+/// the same physical keys (RegisterHotKey would otherwise eat our own SendInput).
+pub fn send_media_key_bypassing_capture(vk: u16) {
+    if !HOOK_ACTIVE.load(Ordering::SeqCst) {
+        inject_media_key_raw(vk);
+        return;
+    }
+    let hwnd = HWND(HOTKEY_HWND.load(Ordering::SeqCst) as *mut _);
+    if hwnd.0.is_null() {
+        // LL hook alone: injected events already CallNextHookEx.
+        inject_media_key_raw(vk);
+        return;
+    }
+    // Run on the capture thread so UnregisterHotKey/RegisterHotKey stay on the owner thread.
+    unsafe {
+        let _ = SendMessageW(
+            hwnd,
+            WM_SYNTHETIC_MEDIA,
+            Some(WPARAM(vk as usize)),
+            Some(LPARAM(0)),
+        );
+    }
+}
 
 pub(super) fn set_global_enabled_mask(mask: u32) {
     ENABLED_MASK.store(mask, Ordering::SeqCst);
@@ -142,7 +211,8 @@ unsafe extern "system" fn low_level_keyboard_proc(
 
     let kb = &*(lparam.0 as *const KBDLLHOOKSTRUCT);
     let injected = (kb.flags.0 & (LLKHF_INJECTED | LLKHF_LOWER_IL_INJECTED)) != 0;
-    if injected {
+    // Pass through OS injection and our own binding media actions.
+    if injected || is_synthetic_media() {
         return CallNextHookEx(None, code, wparam, lparam);
     }
 
@@ -196,6 +266,10 @@ fn unregister_hotkeys(hwnd: HWND) {
 }
 
 fn handle_hotkey(id: i32) {
+    // Do not treat our own synthesized media SendInput as a captured physical press.
+    if is_synthetic_media() {
+        return;
+    }
     // Backup path if the OS delivers WM_HOTKEY instead of (or without) a suppressible LL event.
     // Emit a short press for buttons / one wheel step for volume.
     match id {
@@ -272,6 +346,20 @@ unsafe extern "system" fn hotkey_wnd_proc(
                 "keyboard_input",
                 "hotkeys_refreshed",
                 &format!("mask=0x{:02X}", ENABLED_MASK.load(Ordering::SeqCst)),
+            );
+            LRESULT(0)
+        }
+        WM_SYNTHETIC_MEDIA => {
+            let vk = wparam.0 as u16;
+            SYNTHETIC_MEDIA.fetch_add(1, Ordering::SeqCst);
+            unregister_hotkeys(hwnd);
+            inject_media_key_raw(vk);
+            register_hotkeys(hwnd);
+            SYNTHETIC_MEDIA.fetch_sub(1, Ordering::SeqCst);
+            run_logger::info(
+                "keyboard_input",
+                "synthetic_media_sent",
+                &format!("vk=0x{vk:02X}"),
             );
             LRESULT(0)
         }

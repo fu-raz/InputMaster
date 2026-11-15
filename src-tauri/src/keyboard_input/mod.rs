@@ -16,6 +16,17 @@ use std::sync::Arc;
 #[cfg(target_os = "windows")]
 use capture_windows::KeyboardCapture;
 
+/// Synthesize a media VK for binding actions without our capture path swallowing it.
+#[cfg(target_os = "windows")]
+pub fn send_media_key_bypassing_capture(vk: u16) {
+    capture_windows::send_media_key_bypassing_capture(vk);
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn send_media_key_bypassing_capture(vk: u16) {
+    crate::runtime_helpers::send_media_key(vk);
+}
+
 type EventSink = Arc<dyn Fn(MidiEvent) + Send + Sync + 'static>;
 
 pub struct KeyboardInputManager {

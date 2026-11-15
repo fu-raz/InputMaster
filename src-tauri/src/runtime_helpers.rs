@@ -184,40 +184,10 @@ pub(crate) fn open_path_with_shell_association(_path: &std::path::Path) -> Resul
 
 #[cfg(target_os = "windows")]
 pub(crate) fn send_media_key(vk: u16) {
-    use windows::Win32::UI::Input::KeyboardAndMouse::{
-        SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYBD_EVENT_FLAGS, KEYEVENTF_KEYUP,
-        VIRTUAL_KEY,
-    };
-
-    let key_down = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(vk),
-                wScan: 0,
-                dwFlags: KEYBD_EVENT_FLAGS(0),
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    let key_up = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(vk),
-                wScan: 0,
-                dwFlags: KEYEVENTF_KEYUP,
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
-    };
-
-    unsafe {
-        SendInput(&[key_down, key_up], std::mem::size_of::<INPUT>() as i32);
-    }
+    // While keyboard capture registers the same media VKs as hotkeys, a plain
+    // SendInput is eaten by our suppress path. Route through capture so hotkeys
+    // are released for the injection, then restored.
+    crate::keyboard_input::send_media_key_bypassing_capture(vk);
 }
 
 #[cfg(target_os = "windows")]
