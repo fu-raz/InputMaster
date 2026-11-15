@@ -99,13 +99,20 @@ async function metrics(cdp, label) {
       const enableCol = document.querySelector('.midi-route-column-label--enable');
       const enableCell = document.querySelector('.midi-route-row .midi-route-enable');
       const fa = document.querySelectorAll('svg.fa-icon').length;
+      const tr = title?.getBoundingClientRect();
+      const hr = help?.getBoundingClientRect();
+      const ir = icon?.getBoundingClientRect();
+      const hdr = header?.getBoundingClientRect();
+      const pr = panel?.getBoundingClientRect();
       return {
         label: ${JSON.stringify(label)},
-        iconH: icon?.getBoundingClientRect().height ?? null,
-        titleH: title?.getBoundingClientRect().height ?? null,
-        helpH: help?.getBoundingClientRect().height ?? null,
-        stack: title && help ? (title.getBoundingClientRect().height + 4 + help.getBoundingClientRect().height) : null,
+        iconH: ir?.height ?? null,
+        titleH: tr?.height ?? null,
+        helpH: hr?.height ?? null,
+        gapTitleHelp: tr && hr ? hr.top - tr.bottom : null,
+        textBlockH: tr && hr ? hr.bottom - tr.top : null,
         headerOutside: Boolean(header && panel && !panel.contains(header)),
+        headerAbovePanel: hdr && pr ? hdr.bottom <= pr.top + 1 : null,
         panelOpacity: panel ? getComputedStyle(panel).opacity : null,
         masterOff: panel?.classList.contains('is-master-off') ?? null,
         enableCol: enableCol?.textContent ?? null,
@@ -130,7 +137,21 @@ await shot(
     document.querySelector('[data-page="inputs"]')?.click();
     return new Promise((r) => setTimeout(() => {
       document.querySelector('[data-inputs-section="midi"]')?.click();
-      setTimeout(r, 400);
+      setTimeout(() => {
+        const add = [...document.querySelectorAll('.midi-route-action-button')]
+          .find((b) => /add route/i.test(b.textContent || ''));
+        if (add && !document.querySelector('.midi-route-row')) add.click();
+        setTimeout(() => {
+          const input = document.querySelector('#midi-master-enabled');
+          if (input && !input.checked) {
+            input.checked = true;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          const panel = document.querySelector('[data-role="midi-panel"]');
+          panel?.classList.remove('is-master-off');
+          setTimeout(r, 500);
+        }, 400);
+      }, 400);
     }, 300));
   })()`
 );

@@ -34,9 +34,10 @@
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
   --ui-subnav-size: calc(13px * var(--ui-text-scale));
-  /* Title icon height = title + subtitle stack only (row-gap 4px) */
+  /* Tight title↔subtitle; icon sized to the tightened stack (never larger) */
+  --ui-header-title-gap: 0px;
   --ui-header-icon-size: calc(
-    (var(--ui-h1-size) * var(--ui-h1-line)) + 4px + (var(--ui-help-size) * var(--ui-help-line))
+    (var(--ui-h1-size) * 1.1) + (var(--ui-help-size) * 1.25)
   );
   --ui-toggle-label-size: calc(13px * var(--ui-text-scale));
   --ui-device-font-size: calc(14px * var(--ui-text-scale));
@@ -54,8 +55,9 @@
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
   --ui-subnav-size: calc(13px * var(--ui-text-scale));
+  --ui-header-title-gap: 0px;
   --ui-header-icon-size: calc(
-    (var(--ui-h1-size) * var(--ui-h1-line)) + 4px + (var(--ui-help-size) * var(--ui-help-line))
+    (var(--ui-h1-size) * 1.1) + (var(--ui-help-size) * 1.25)
   );
   --ui-toggle-label-size: calc(14px * var(--ui-text-scale));
   --ui-device-font-size: calc(16px * var(--ui-text-scale));
@@ -91,16 +93,18 @@ body[data-theme] {
   margin-bottom: 4px;
 }
 
-/* Content H1 — large icon + title/help + Enable control (outside bordered panel) */
+/* Content H1 — icon + title/help + Enable (ALWAYS outside bordered .ui-panel) */
 .ui-page-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 18px;
   align-items: start;
-  margin: 0 0 var(--ui-section-gap);
+  margin: 0 0 18px;
   padding: 0;
-  border: none;
+  border: 0 none;
+  border-radius: 0;
   background: transparent;
+  box-shadow: none;
 }
 
 .ui-page-header + .ui-panel {
@@ -111,43 +115,52 @@ body[data-theme] {
   opacity: 0.75;
 }
 
+/*
+ * Copy is a normal column (tight title↔subtitle). Icon is a fixed square
+ * sized to that stack estimate and vertically centered — it must never use
+ * stretch/aspect-ratio tricks that expand the text block.
+ */
 .ui-page-header__main {
   min-width: 0;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  column-gap: var(--ui-header-gap);
-  row-gap: 4px;
+  display: flex;
+  flex-direction: row;
   align-items: center;
+  column-gap: var(--ui-header-gap);
 }
 
 .ui-page-header__copy {
   min-width: 0;
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--ui-header-title-gap, 0px);
+}
+
+.ui-page-header__copy .ui-content-title,
+.ui-page-header__copy .ui-help {
+  margin: 0;
 }
 
 .ui-page-header__copy .ui-content-title {
-  grid-column: 2;
-  grid-row: 1;
+  line-height: 1.1;
 }
 
 .ui-page-header__copy .ui-help {
-  grid-column: 2;
-  grid-row: 2;
+  line-height: 1.25;
 }
 
 .ui-page-header__icon {
-  grid-column: 1;
-  grid-row: 1 / span 2;
+  flex: 0 0 var(--ui-header-icon-size);
   width: var(--ui-header-icon-size);
   height: var(--ui-header-icon-size);
-  min-width: var(--ui-header-icon-size);
-  min-height: var(--ui-header-icon-size);
+  max-width: var(--ui-header-icon-size);
+  max-height: var(--ui-header-icon-size);
+  min-width: 0;
+  min-height: 0;
   margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  align-self: center;
   color: var(--text-primary);
 }
 
@@ -155,7 +168,7 @@ body[data-theme] {
   width: 100%;
   height: 100%;
   display: block;
-  overflow: visible;
+  overflow: hidden;
 }
 
 /* Font Awesome Pro — filled currentColor glyphs (beats legacy stroke icon rules) */
@@ -245,6 +258,13 @@ body[data-theme] svg.fa-icon {
 
 .ui-page-header + .ui-subsection-title {
   margin-top: var(--ui-section-gap);
+}
+
+/* Inside the bordered panel, first subsection sits flush at the top */
+.ui-panel > .ui-subsection-title:first-child,
+.ui-panel .keyboard-controls-block > .ui-subsection-title:first-child,
+.ui-panel .controller-devices-block > .ui-subsection-title:first-child {
+  margin-top: 0;
 }
 
 .ui-help {
@@ -597,6 +617,20 @@ body[data-theme] svg.fa-icon {
 
 .inputs-content .ui-panel {
   margin: 0;
+  /* Same border as the rest of the app (.ui-panel / settings-card) */
+  border: 1px solid var(--ui-panel-border, var(--control-border));
+  background: var(--ui-panel-bg, var(--surface-raised));
+  box-shadow: none;
+}
+
+/* Header strip must never pick up panel chrome */
+#inputs-page .ui-page-header,
+#inputs-page .ui-page-header.ui-panel {
+  border: 0 none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
 }
 
 /* Natural height: Settings General + Maintenance */
