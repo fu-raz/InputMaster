@@ -1,7 +1,7 @@
 /* App-wide UI consistency tokens + primitives (ILS-10). See docs/ui-consistency.md
  *
- * HARD RULE (Rick approved): do not change font sizes / type-scale tokens until
- * he explicitly asks. Current sizes are the baseline; other UI work is fine.
+ * HARD RULE (Rick): no ×1.25 (or similar) font multipliers. Labels/body use base
+ * `--app-font-size` (14px). Do not change type-scale tokens unless he asks.
  *
  * Cascade notes (verified via CDP):
  * - Custom props resolve var() where they are *defined*, then inherit the result.
@@ -55,21 +55,23 @@
   --ui-meta-size: calc(12px * var(--ui-text-scale));
 }
 
+/* Inputs / Plugins / Settings: scale = 1 (×1.25 removed). Labels/controls = --app-font-size. */
 #inputs-page,
 #plugins-page,
 #settings-panel {
-  --ui-text-scale: 1.25;
+  --ui-text-scale: 1;
   --ui-rail-title-size: calc(18px * var(--ui-text-scale));
   --ui-h1-size: calc(18px * var(--ui-text-scale));
   --ui-h3-size: max(calc(18px * var(--ui-text-scale)), calc(var(--ui-button-label-size) + 8px));
   --ui-help-size: calc(13px * var(--ui-text-scale));
-  --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
+  --ui-body-size: var(--app-font-size, 14px);
   /* Same Settings-perfect sub-nav size on Inputs/Plugins (do not shrink vs Settings) */
   --ui-subnav-size: var(--app-font-size, 14px);
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
-  --ui-toggle-label-size: calc(14px * var(--ui-text-scale));
-  --ui-control-font-size: calc(14px * var(--ui-text-scale));
+  --ui-toggle-label-size: var(--app-font-size, 14px);
+  --ui-control-font-size: var(--app-font-size, 14px);
+  /* Bases below were already set for these pages; only the ×1.25 multiplier was removed */
   --ui-device-font-size: calc(16px * var(--ui-text-scale));
   --ui-device-header-size: calc(12px * var(--ui-text-scale));
   --ui-meta-size: calc(12px * var(--ui-text-scale));
@@ -254,7 +256,7 @@ body[data-theme] svg.fa-icon {
 }
 
 #inputs-page .ui-subsection-title {
-  font-size: max(22.5px, var(--ui-h3-size));
+  font-size: max(18px, var(--ui-h3-size));
   font-weight: 750;
   letter-spacing: 0.01em;
 }
@@ -585,7 +587,7 @@ body[data-theme] svg.fa-icon {
   border: var(--ui-border-width) solid var(--ui-list-row-border, var(--control-border-strong));
   border-radius: var(--radius-control, 4px);
   background: var(--ui-list-row-bg);
-  font-size: max(17.5px, var(--ui-device-font-size, 14px));
+  font-size: max(14px, var(--ui-device-font-size, 14px));
   color: var(--text-primary);
   box-sizing: border-box;
 }
