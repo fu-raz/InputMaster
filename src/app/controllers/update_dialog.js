@@ -14,7 +14,7 @@ export function createUpdateDialog({
     const showInlineDialog = () =>
       showChoices({
         title: "Update Available",
-        message: `MIDIMaster ${latest} is available (current: ${current || "unknown"})`,
+        message: `InputMaster ${latest} is available (current: ${current || "unknown"})`,
         options: [
           { id: "skip", label: "Skip Update", variant: "secondary" },
           { id: "install", label: "Download and Install", variant: "primary" },

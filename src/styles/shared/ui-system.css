@@ -40,8 +40,8 @@
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
   /* Shared sub-nav size for Inputs / Plugins / Settings (do not enlarge Plugins alone) */
-  /* Sub-nav stays compact; do not scale with page body text */
-  --ui-subnav-size: 13px;
+  /* Sub-nav matches Settings label size (--app-font-size = 14px). Do not shrink below this. */
+  --ui-subnav-size: var(--app-font-size, 14px);
   /* Title↔subtitle stay tight; icon size is set from measured copy height in JS */
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
@@ -61,8 +61,8 @@
   --ui-h3-size: max(calc(18px * var(--ui-text-scale)), calc(var(--ui-button-label-size) + 8px));
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
-  /* Keep the smaller Settings/Inputs sub-nav size on Plugins too */
-  --ui-subnav-size: 13px;
+  /* Same Settings-perfect sub-nav size on Inputs/Plugins (do not shrink vs Settings) */
+  --ui-subnav-size: var(--app-font-size, 14px);
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
   --ui-toggle-label-size: calc(14px * var(--ui-text-scale));
@@ -409,12 +409,19 @@ body[data-theme] svg.fa-icon {
   border-radius: 5px;
   background: transparent;
   color: var(--text-secondary);
-  /* Explicit — never inherit page body scale on Plugins */
-  font-size: var(--ui-subnav-size, 13px) !important;
+  font-size: var(--ui-subnav-size, var(--app-font-size, 14px));
   font-weight: var(--ui-subnav-weight);
   line-height: 1.25;
   text-align: left;
   font-family: inherit;
+}
+
+/* Labels use the same token as the row (Settings already did via --app-font-size) */
+.inputs-nav-label,
+.settings-nav-label,
+#plugins-page .connections-nav-label,
+.ui-subnav-label {
+  font-size: var(--ui-subnav-size, var(--app-font-size, 14px)) !important;
 }
 
 .ui-subnav-item:hover,

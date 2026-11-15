@@ -183,7 +183,9 @@ export function createConnectionsPanelController({
       items: navItems.map((item) => ({ tabId: item.tabId, count: item.count || 0, section: item.section, name: item.name })),
     });
 
-    if (!force && signature === connectionsTabsSignature && d.connectionsSidebar.childElementCount > 0) {
+    // Title-only sidebar (no .connections-nav-item) is incomplete — rebuild.
+    const hasNavItems = Boolean(d.connectionsSidebar.querySelector(".connections-nav-item"));
+    if (!force && signature === connectionsTabsSignature && hasNavItems) {
       setActiveTab(requestedTabId);
       return;
     }

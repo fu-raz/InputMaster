@@ -118,7 +118,7 @@ fn decorate_compatibility(app: &AppHandle, catalog: &mut StoreCatalog) {
                 (Some(current), Ok(required)) if current < &required => {
                     plugin.latest.compatible = false;
                     plugin.latest.compatibility_reason =
-                        Some(format!("Requires MIDIMaster {} or newer", required));
+                        Some(format!("Requires InputMaster {} or newer", required));
                 }
                 (_, Err(_)) => {
                     plugin.latest.compatible = false;
@@ -128,7 +128,7 @@ fn decorate_compatibility(app: &AppHandle, catalog: &mut StoreCatalog) {
                 (None, _) => {
                     plugin.latest.compatible = false;
                     plugin.latest.compatibility_reason =
-                        Some("Unable to determine MIDIMaster version".to_string());
+                        Some("Unable to determine InputMaster version".to_string());
                 }
                 _ => {}
             }
@@ -256,7 +256,7 @@ fn install_catalog_plugin(
 
     if !plugin.latest.compatible {
         return Err(plugin.latest.compatibility_reason.unwrap_or_else(|| {
-            "Plugin is not compatible with this MIDIMaster version".to_string()
+            "Plugin is not compatible with this InputMaster version".to_string()
         }));
     }
 

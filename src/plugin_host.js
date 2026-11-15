@@ -1,4 +1,4 @@
-// Runtime plugin host for MIDIMaster.
+// Runtime plugin host for InputMaster.
 //
 // Goals (v1):
 // - Load plugin JS modules from the app config directory via backend commands.

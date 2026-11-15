@@ -7339,7 +7339,7 @@
     "bindings.outputsHelp": "27b3b5482ae46ddd48df8452869bf91233ca5f85bc10b2cf08cf30f3b1610348",
     "targets.action.setDefaultDeviceHelp": "eab4f81a8505475bae7fdb34b5b3526119cd6177a85e06067e7dff87d95ff29b"
   },
-  "settings.appearance.description": "Customize how MIDIMaster looks and feels.",
+  "settings.appearance.description": "Customize how InputMaster looks and feels.",
   "settings.appearance.themePresets": "Theme Presets",
   "settings.appearance.presetSystem": "System",
   "settings.appearance.presetDark": "Dark",

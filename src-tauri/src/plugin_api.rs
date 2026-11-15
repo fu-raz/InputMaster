@@ -50,7 +50,7 @@ pub struct PluginManifest {
     pub description: String,
     #[serde(default)]
     pub categories: Vec<String>,
-    // Augmented fields computed by MIDIMaster.
+    // Augmented fields computed by InputMaster.
     #[serde(default)]
     pub bundled: bool,
     #[serde(default = "default_true")]
@@ -68,10 +68,9 @@ fn validate_min_app_version(app: &AppHandle, manifest: &PluginManifest) -> Resul
     let required = Version::parse(required_raw.trim())
         .map_err(|_| "Invalid min_app_version in plugin manifest".to_string())?;
     let current = Version::parse(&app.package_info().version.to_string())
-        .map_err(|_| "Invalid MIDIMaster application version".to_string())?;
-    if current < required {
+        .map_err(|_| "Invalid InputMaster application version".to_string())?;    if current < required {
         return Err(format!(
-            "Plugin requires MIDIMaster {} or newer (current {})",
+            "Plugin requires InputMaster {} or newer (current {})",
             required, current
         ));
     }
