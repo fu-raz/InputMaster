@@ -34,24 +34,11 @@ export function createAppearanceEditor({
       card.className = "appearance-token-color";
       card.style.setProperty("--theme-color", value);
 
-      const header = document.createElement("div");
-      header.className = "appearance-token-color-header";
-
+      // Same 3-col order as slider rows: label | swatches | trailing edit
       const label = document.createElement("span");
       label.className = "appearance-token-color-label";
       label.textContent = name;
-      header.appendChild(label);
-
-      const edit = document.createElement("button");
-      edit.type = "button";
-      edit.className = "appearance-token-color-edit";
-      edit.dataset.appearanceColorTrigger = control.target;
-      edit.dataset.appearanceColorName = name;
-      if (control.token) edit.dataset.appearanceToken = control.token;
-      edit.setAttribute("aria-label", t("settings.appearance.themeColorValue", { name, color: value }));
-      appendSvgIcon(edit, ["M12 20h9", "M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"]);
-      header.appendChild(edit);
-      card.appendChild(header);
+      card.appendChild(label);
 
       const swatches = document.createElement("div");
       swatches.className = "appearance-token-swatches";
@@ -78,6 +65,16 @@ export function createAppearanceEditor({
         swatches.appendChild(swatch);
       });
       card.appendChild(swatches);
+
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "appearance-token-color-edit";
+      edit.dataset.appearanceColorTrigger = control.target;
+      edit.dataset.appearanceColorName = name;
+      if (control.token) edit.dataset.appearanceToken = control.token;
+      edit.setAttribute("aria-label", t("settings.appearance.themeColorValue", { name, color: value }));
+      appendSvgIcon(edit, ["M12 20h9", "M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"]);
+      card.appendChild(edit);
 
       const intensity = appearanceColorControlIntensity(control, appearance);
       const intensityRow = document.createElement("div");

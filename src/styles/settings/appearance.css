@@ -374,6 +374,7 @@
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
+/* Legacy wrapper (no longer emitted); keep contents so old markup still grids */
 .appearance-token-color-header {
   min-width: 0;
   display: contents;
@@ -381,6 +382,7 @@
 
 .appearance-token-color-label {
   grid-column: 1;
+  grid-row: 1;
   min-width: 0;
   overflow: hidden;
   color: inherit;
@@ -389,13 +391,17 @@
   font-weight: 750;
   text-overflow: ellipsis;
   white-space: nowrap;
+  align-self: center;
 }
 
 .appearance-token-color-edit {
   grid-column: 3;
+  grid-row: 1;
   position: static;
+  inset: auto;
   width: var(--appearance-edit-size);
   height: var(--appearance-edit-size);
+  margin: 0;
   flex: 0 0 var(--appearance-edit-size);
   justify-self: center;
   align-self: center;
@@ -432,9 +438,11 @@
 
 .appearance-token-swatches {
   grid-column: 2;
+  grid-row: 1;
   width: var(--appearance-control-width);
   min-width: 0;
   justify-self: stretch;
+  align-self: center;
   display: grid;
   grid-template-columns: repeat(var(--appearance-swatch-count), var(--appearance-swatch-size));
   grid-auto-rows: var(--appearance-swatch-size);
@@ -442,6 +450,12 @@
   align-content: center;
   align-items: center;
   padding-right: 0;
+}
+
+/* Intensity stays out of the 3-col row */
+.appearance-token-color > .appearance-token-intensity {
+  grid-column: 1 / -1;
+  grid-row: 2;
 }
 
 .appearance-token-intensity {
@@ -542,12 +556,15 @@
 .appearance-inline-control .appearance-control-label,
 .appearance-range-stack .appearance-control-group > .appearance-control-label {
   grid-column: 1;
+  grid-row: 1;
   min-width: 0;
+  align-self: center;
 }
 
 .appearance-inline-control .binding-volume-slider,
 .appearance-range-stack .appearance-control-group .binding-volume-slider {
   grid-column: 2;
+  grid-row: 1;
   width: 100%;
   min-width: 0;
   justify-self: stretch;
@@ -557,6 +574,7 @@
 .appearance-inline-control .settings-range-value,
 .appearance-range-stack .appearance-control-group .settings-range-value {
   grid-column: 3;
+  grid-row: 1;
   justify-self: center;
   align-self: center;
   width: var(--appearance-trailing-col);
