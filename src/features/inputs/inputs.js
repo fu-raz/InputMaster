@@ -4,22 +4,22 @@ import { getNavIndicatorMetrics } from "../../app/connections_panel.js";
 const INPUT_SECTIONS = ["midi", "keyboard", "controller", "wheel"];
 
 /** Top-level Inputs page: left nav + MIDI / Keyboard panes (Controller/Wheel stubs). */
-export function createInputsFeature({ i18n, invoke }) {
+export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
   const t = (key, params = {}) =>
     i18n && typeof i18n.t === "function" ? i18n.t(key, params) : String(key || "");
 
-  let root = null;
   let sidebar = null;
   let content = null;
   let activeSection = "midi";
   let navIndicatorRaf = 0;
+  let sidebarBound = false;
   let keyboardTab = null;
   let keyboardMounted = false;
 
   function syncNavIndicator() {
     if (!sidebar) return;
     const indicator = sidebar.querySelector(".inputs-nav-indicator");
-    const active = sidebar.querySelector(".inputs-nav-item.active");
+    const active = sidebar.querySelector(".inputs-nav-item.active:not(.is-soon)");
     if (!indicator || !active) {
       if (indicator) indicator.style.opacity = "0";
       return;
@@ -65,7 +65,9 @@ export function createInputsFeature({ i18n, invoke }) {
       const id = item.dataset.inputsSection;
       const isActive = id === activeSection;
       item.classList.toggle("active", isActive);
-      item.setAttribute("aria-current", isActive ? "page" : "false");
+      if (!item.disabled) {
+        item.setAttribute("aria-current", isActive ? "page" : "false");
+      }
     });
     content.querySelectorAll("[data-inputs-panel]").forEach((pane) => {
       pane.classList.toggle("active", pane.dataset.inputsPanel === activeSection);
@@ -75,11 +77,19 @@ export function createInputsFeature({ i18n, invoke }) {
       ensureKeyboardMounted();
       keyboardTab?.refresh?.();
     }
+    if (activeSection === "midi" && typeof onMidiSectionShown === "function") {
+      try {
+        onMidiSectionShown();
+      } catch (error) {
+        console.error("Failed to refresh MIDI inputs pane", error);
+      }
+    }
     scheduleNavIndicatorSync();
   }
 
-  function bindSidebar() {
-    if (!sidebar) return;
+  function ensureSidebarBound() {
+    if (sidebarBound || !sidebar) return;
+    sidebarBound = true;
     sidebar.addEventListener("click", (event) => {
       const btn = event.target?.closest?.(".inputs-nav-item");
       if (!btn || btn.disabled || btn.classList.contains("is-soon")) return;
@@ -91,34 +101,20 @@ export function createInputsFeature({ i18n, invoke }) {
   }
 
   function openInputsPanel(sectionId = activeSection) {
-    root = document.getElementById("inputs-page");
     sidebar = document.getElementById("inputs-sidebar");
     content = document.getElementById("inputs-content");
+    ensureSidebarBound();
     if (!keyboardTab) {
       keyboardTab = createKeyboardConnectionTab({
         invoke: typeof invoke === "function" ? invoke : async () => ({}),
         t,
       });
     }
-    activateSection(sectionId || "midi");
+    activateSection(sectionId || activeSection || "midi");
   }
 
-  function bindUi({ switchAppPage } = {}) {
-    bindSidebar();
-    const shortcut = document.getElementById("inputs-midi-shortcut");
-    if (shortcut) {
-      shortcut.addEventListener("click", () => {
-        const go = async () => {
-          if (typeof switchAppPage === "function") {
-            await switchAppPage("inputs");
-          } else {
-            document.querySelector('[data-page="inputs"]')?.click?.();
-          }
-          openInputsPanel("midi");
-        };
-        go().catch(() => openInputsPanel("midi"));
-      });
-    }
+  function bindUi() {
+    // Sidebar is bound lazily in openInputsPanel once the DOM refs exist.
   }
 
   return {

@@ -82,13 +82,6 @@
             <div id="profile-list" class="dropdown hidden"></div>
           </div>
         </div>
-        <div class="topbar-divider" aria-hidden="true"></div>
-        <div class="topbar-field topbar-inputs-shortcut-field">
-          <span class="topbar-label" data-i18n="topbar.inputs">Inputs</span>
-          <button id="inputs-midi-shortcut" class="select-button inputs-midi-shortcut" type="button" title="Open MIDI inputs" data-i18n-title="topbar.openMidiInputs">
-            <span id="inputs-midi-shortcut-label" data-i18n="topbar.midiShortcut">MIDI devices…</span>
-          </button>
-        </div>
         <div class="topbar-actions">
           <button id="topbar-update-button" class="topbar-icon-button topbar-update-button hidden" type="button" aria-label="Update available" title="Update available" data-i18n-aria-label="topbar.updateAvailable" data-i18n-title="topbar.updateAvailable">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -177,6 +170,7 @@
           </div>
           <div class="inputs-panel-body">
             <aside id="inputs-sidebar" class="inputs-sidebar" aria-label="Input kinds" data-i18n-aria-label="inputs.sidebarLabel">
+              <h1 class="inputs-page-title" data-i18n="inputs.title">Inputs</h1>
               <div class="inputs-nav-indicator" aria-hidden="true"></div>
               <div class="inputs-nav-group">
                 <button type="button" class="inputs-nav-item active" data-inputs-section="midi" aria-current="page">
@@ -204,16 +198,11 @@
                 <div class="inputs-device-list" data-role="midi-device-list">
                   <div class="inputs-device-card" data-device-kind="midi">
                     <div class="inputs-device-card-title" data-i18n="inputs.midi.routesHeading">Routes</div>
-                    <div class="inputs-midi-fields">
-                      <div class="topbar-field">
-                        <label class="topbar-label" for="midi-device" data-i18n="topbar.inputDevice">Input Device(s)</label>
-                        <select id="midi-device" title="Input Device(s)" data-i18n-title="topbar.inputDevice"></select>
-                      </div>
-                      <div class="topbar-field">
-                        <label class="topbar-label" for="midi-output-device" data-i18n="topbar.outputDevice">Output Device(s)</label>
-                        <select id="midi-output-device" title="Output Device(s)" data-i18n-title="topbar.outputDevice"></select>
-                      </div>
+                    <div class="inputs-midi-status-row" data-role="midi-status-row">
+                      <select id="midi-device" class="visually-hidden" title="Input Device(s)" data-i18n-title="topbar.inputDevice" aria-hidden="true" tabindex="-1"></select>
+                      <select id="midi-output-device" class="visually-hidden" title="Output Device(s)" data-i18n-title="topbar.outputDevice" aria-hidden="true" tabindex="-1"></select>
                     </div>
+                    <div id="inputs-midi-routes-host" class="midi-routes-inline-host" aria-label="MIDI routes" data-i18n-aria-label="midi.routes"></div>
                   </div>
                 </div>
               </section>

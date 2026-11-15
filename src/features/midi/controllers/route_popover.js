@@ -1,7 +1,7 @@
 import { closeOpenDropdowns, renderLabelWithBadges } from "../../ui/dropdown_badges.js";
 import { routesFromResolvedPreferences } from "../route_policy.js";
 
-/** route popover workflow. */
+/** Route editor host — inline on Inputs→MIDI (no popover button). */
 export function createRoutePopover({
   lifetime,
   connection,
@@ -17,9 +17,12 @@ export function createRoutePopover({
   routeView,
   t,
 }) {
+  function isInlineRoutes() {
+    return Boolean(document.getElementById("inputs-midi-routes-host"));
+  }
+
   function closeDeviceDropdowns() {
     closeOpenDropdowns({ except: null });
-    closeRoutesPopover();
   }
 
   function discardRouteDrafts() {
@@ -28,96 +31,80 @@ export function createRoutePopover({
 
   function closeRoutesPopover({ discard = true } = {}) {
     if (discard) discardRouteDrafts();
+    if (isInlineRoutes()) {
+      // Keep the panel visible; reset drafts to the live desired routes.
+      routeEditor.begin(desiredRoutes());
+      renderRoutesPopover();
+      renderDeviceDropdowns();
+      return;
+    }
     if (routeView.routesPopoverEl) routeView.routesPopoverEl.classList.add("hidden");
     if (routeView.routesButtonEl) routeView.routesButtonEl.setAttribute("aria-expanded", "false");
     renderDeviceDropdowns();
   }
 
-  async function toggleRoutesPopover() {
-    ensureRoutesPopover();
-    const opening = routeView.routesPopoverEl?.classList?.contains("hidden");
-    if (!opening) {
-      closeRoutesPopover();
+  function ensureRoutesPopover() {
+    const host = document.getElementById("inputs-midi-routes-host");
+    if (host) {
+      if (!routeView.routesPopoverEl || routeView.routesPopoverEl.parentElement !== host) {
+        if (routeView.routesPopoverEl?.isConnected) {
+          routeView.routesPopoverEl.remove();
+        }
+        routeView.routesPopoverEl = document.createElement("div");
+        routeView.routesPopoverEl.className = "midi-routes-popover midi-routes-inline";
+        routeView.routesPopoverEl.setAttribute("role", "region");
+        routeView.routesPopoverEl.setAttribute("aria-label", t("midi.routes"));
+        host.replaceChildren(routeView.routesPopoverEl);
+      } else {
+        routeView.routesPopoverEl.classList.remove("hidden");
+        routeView.routesPopoverEl.classList.add("midi-routes-inline");
+      }
+      // Never show the old popover trigger on Inputs.
+      if (routeView.routesButtonEl) {
+        routeView.routesButtonEl.classList.add("hidden");
+        routeView.routesButtonEl.setAttribute("aria-hidden", "true");
+      }
       return;
     }
+
+    // Fallback (should not be needed once Inputs hosts the editor).
+    if (!routeView.routesPopoverEl) {
+      routeView.routesPopoverEl = document.createElement("div");
+      routeView.routesPopoverEl.className = "midi-routes-popover";
+      routeView.routesPopoverEl.setAttribute("role", "region");
+      routeView.routesPopoverEl.setAttribute("aria-label", t("midi.routes"));
+      document.body.appendChild(routeView.routesPopoverEl);
+    }
+  }
+
+  function showInlineRoutesEditor() {
+    ensureRoutesPopover();
     const cachedResolution = resolveDesiredRouteSet(
       discovery.lastDeviceSnapshot,
       { routes: desiredRoutes(), configured: true },
-      "route_editor_open_cached",
+      "route_editor_inline_open",
     );
     routeEditor.begin(routesFromResolvedPreferences(cachedResolution));
-    if (routeView.routesPopoverEl) routeView.routesPopoverEl.classList.remove("hidden");
-    if (routeView.routesButtonEl) routeView.routesButtonEl.setAttribute("aria-expanded", "true");
     renderRoutesPopover();
-
-    void refreshMidiDevices({ force: true, reason: "route_editor_open" }).then((snapshot) => {
-      if (routeView.routesPopoverEl?.classList?.contains("hidden") || routeEditor.isDirty()) return;
+    void refreshMidiDevices({ force: true, reason: "route_editor_inline_open" }).then((snapshot) => {
+      if (routeEditor.isDirty()) return;
       const refreshedResolution = resolveDesiredRouteSet(
         snapshot,
         { routes: desiredRoutes(), configured: true },
-        "route_editor_open_refreshed",
+        "route_editor_inline_refreshed",
       );
       routeEditor.begin(routesFromResolvedPreferences(refreshedResolution));
       renderRoutesPopover();
     });
   }
 
-  function ensureRoutesPopover() {
-    if (!routeView.routesButtonEl && elements.midiOutputSelect) {
-      routeView.routesButtonEl = document.createElement("button");
-      routeView.routesButtonEl.type = "button";
-      routeView.routesButtonEl.className = "midi-routes-button";
-      routeView.routesButtonEl.title = t("midi.routes");
-      routeView.routesButtonEl.setAttribute("aria-label", t("midi.routes"));
-      routeView.routesButtonEl.setAttribute("aria-haspopup", "dialog");
-      routeView.routesButtonEl.setAttribute("aria-expanded", "false");
-      lifetime.listen(routeView.routesButtonEl, "click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        toggleRoutesPopover().catch(() => {});
-      });
-    }
-    ensureOutputRouteShell();
-
-    if (!routeView.routesPopoverEl) {
-      routeView.routesPopoverEl = document.createElement("div");
-      routeView.routesPopoverEl.className = "midi-routes-popover hidden";
-      routeView.routesPopoverEl.setAttribute("role", "dialog");
-      routeView.routesPopoverEl.setAttribute("aria-label", t("midi.routes"));
-      lifetime.listen(routeView.routesPopoverEl, "click", (event) => {
-        event.stopPropagation();
-      });
-      document.body.appendChild(routeView.routesPopoverEl);
-    }
-    syncRoutesPopoverPosition();
-  }
-
   function ensureOutputRouteShell() {
-    const outputRoot = routeView.outputStatusEl || elements.midiOutputSelect;
-    if (!outputRoot || !routeView.routesButtonEl) return;
-
-    const existingShell = outputRoot.closest?.(".midi-output-route-shell");
-    routeView.outputRouteShellEl = existingShell || routeView.outputRouteShellEl;
-    if (!routeView.outputRouteShellEl || !routeView.outputRouteShellEl.isConnected) {
-      routeView.outputRouteShellEl = document.createElement("div");
-      routeView.outputRouteShellEl.className = "midi-output-route-shell";
-      outputRoot.parentNode?.insertBefore(routeView.outputRouteShellEl, outputRoot);
-      routeView.outputRouteShellEl.appendChild(outputRoot);
-    }
-
-    if (routeView.routesButtonEl.parentElement !== routeView.outputRouteShellEl) {
-      routeView.outputRouteShellEl.appendChild(routeView.routesButtonEl);
-    }
+    // Routes button removed; keep status chips next to each other without a shell trigger.
+    return;
   }
 
   function syncRoutesButtonLabel() {
-    if (!routeView.routesButtonEl) return;
-    const count = currentRoutesForSave().filter((route) => route.enabled !== false).length;
-    routeView.routesButtonEl.replaceChildren(createRouteIcon("sliders"));
-    routeView.routesButtonEl.dataset.routeCount = count > 1 ? String(count) : "";
-    routeView.routesButtonEl.classList.toggle("has-multiple-routes", count > 1);
-    routeView.routesButtonEl.title = t("midi.routesCount", { count });
-    routeView.routesButtonEl.setAttribute("aria-label", t("midi.routesCount", { count }));
+    // No-op: popover trigger removed.
   }
 
   function createRouteIcon(name) {
@@ -161,14 +148,7 @@ export function createRoutePopover({
   }
 
   function syncRoutesPopoverPosition() {
-    if (!routeView.routesPopoverEl || !routeView.routesButtonEl) return;
-    const rect = routeView.routesButtonEl.getBoundingClientRect();
-    const viewportPadding = 16;
-    const popoverWidth = Math.min(520, Math.max(0, window.innerWidth - viewportPadding * 2));
-    const maxLeft = Math.max(viewportPadding, window.innerWidth - popoverWidth - viewportPadding);
-    const left = Math.max(viewportPadding, Math.min(rect.left, maxLeft));
-    routeView.routesPopoverEl.style.top = `${Math.round(rect.bottom + 8)}px`;
-    routeView.routesPopoverEl.style.left = `${Math.round(left)}px`;
+    // Inline panel does not need fixed positioning.
   }
 
   function ensureDeviceDropdowns() {
@@ -189,7 +169,12 @@ export function createRoutePopover({
       display.className = "target-display";
       root.appendChild(display);
 
-      selectEl.insertAdjacentElement("afterend", root);
+      const statusRow = document.querySelector('[data-role="midi-status-row"]');
+      if (statusRow) {
+        statusRow.appendChild(root);
+      } else {
+        selectEl.insertAdjacentElement("afterend", root);
+      }
 
       if (kind === "input") {
         routeView.inputStatusEl = root;
@@ -197,7 +182,6 @@ export function createRoutePopover({
       } else {
         routeView.outputStatusEl = root;
         routeView.outputStatusDisplayEl = display;
-        ensureOutputRouteShell();
       }
     };
 
@@ -209,15 +193,16 @@ export function createRoutePopover({
       lifetime.listen(document, "click", (event) => {
         if (routeView.inputStatusEl && routeView.inputStatusEl.contains(event.target)) return;
         if (routeView.outputStatusEl && routeView.outputStatusEl.contains(event.target)) return;
-        if (routeView.routesButtonEl && routeView.routesButtonEl.contains(event.target)) return;
         if (routeView.routesPopoverEl && routeView.routesPopoverEl.contains(event.target)) return;
         closeDeviceDropdowns();
       });
-      lifetime.listen(window, "resize", syncRoutesPopoverPosition);
     }
 
     ensureRoutesPopover();
-    syncRoutesButtonLabel();
+    if (isInlineRoutes() && !routeView.inlineEditorBooted) {
+      routeView.inlineEditorBooted = true;
+      showInlineRoutesEditor();
+    }
   }
 
   function renderDeviceStatus(root, displayEl, kind) {
@@ -261,18 +246,14 @@ export function createRoutePopover({
     ensureDeviceDropdowns();
     renderDeviceStatus(routeView.inputStatusEl, routeView.inputStatusDisplayEl, "input");
     renderDeviceStatus(routeView.outputStatusEl, routeView.outputStatusDisplayEl, "output");
-    syncRoutesButtonLabel();
-    if (
-      routeView.routesPopoverEl &&
-      !routeView.routesPopoverEl.classList.contains("hidden") &&
-      !isRouteDropdownOpen()
-    ) {
-      renderRoutesPopover();
+    if (isInlineRoutes()) {
+      if (!routeEditor.isDirty()) {
+        // Keep inline editor content current when not mid-edit.
+        if (!routeView.routesPopoverEl || routeView.routesPopoverEl.childElementCount === 0) {
+          showInlineRoutesEditor();
+        }
+      }
     }
-  }
-
-  function isRouteDropdownOpen() {
-    return Boolean(routeView.routesPopoverEl?.querySelector?.(".midi-route-dropdown.open"));
   }
 
   return {
@@ -282,5 +263,6 @@ export function createRoutePopover({
     syncRoutesPopoverPosition,
     ensureDeviceDropdowns,
     renderDeviceDropdowns,
+    showInlineRoutesEditor,
   };
 }

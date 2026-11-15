@@ -209,6 +209,7 @@ export function createMidiFeature({
     syncRoutesPopoverPosition,
     ensureDeviceDropdowns,
     renderDeviceDropdowns,
+    showInlineRoutesEditor,
   } = createRoutePopover({
     lifetime,
     connection,
@@ -403,5 +404,6 @@ export function createMidiFeature({
     getDesiredMidiPreference,
     checkAvailabilityNow: checkAvailabilityLoop,
     getDeviceMappingLabel,
+    showInlineRoutesEditor,
   };
 }

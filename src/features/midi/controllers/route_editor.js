@@ -136,6 +136,7 @@ export function createRouteEditor({
     syncRoutesPopoverPosition();
     const routes = currentRoutesForSave();
     const outputCounts = sharedOutputCounts(routes);
+    const inline = routeView.routesPopoverEl.classList.contains("midi-routes-inline");
     routeView.routesPopoverEl.innerHTML = "";
 
     const header = document.createElement("div");
@@ -143,19 +144,21 @@ export function createRouteEditor({
     const title = document.createElement("div");
     title.className = "midi-routes-title";
     title.textContent = t("midi.routes");
-    const actions = document.createElement("div");
-    actions.className = "midi-routes-actions";
-    const close = document.createElement("button");
-    close.type = "button";
-    close.className = "midi-route-icon-button";
-    close.title = t("common.close");
-    close.setAttribute("aria-label", t("common.close"));
-    close.disabled = routeView.routeEditorApplyInFlight;
-    setIconButton(close, "close");
-    close.addEventListener("click", closeRoutesPopover);
-    actions.appendChild(close);
     header.appendChild(title);
-    header.appendChild(actions);
+    if (!inline) {
+      const actions = document.createElement("div");
+      actions.className = "midi-routes-actions";
+      const close = document.createElement("button");
+      close.type = "button";
+      close.className = "midi-route-icon-button";
+      close.title = t("common.close");
+      close.setAttribute("aria-label", t("common.close"));
+      close.disabled = routeView.routeEditorApplyInFlight;
+      setIconButton(close, "close");
+      close.addEventListener("click", closeRoutesPopover);
+      actions.appendChild(close);
+      header.appendChild(actions);
+    }
     routeView.routesPopoverEl.appendChild(header);
 
     const body = document.createElement("div");

@@ -255,15 +255,6 @@ export function createApplication() {
         ? t("midi.statusConnectedMultiple", { input, output, count: routeCount })
         : t("midi.statusConnected", { input, output });
     midiStatus.textContent = statusText;
-    const shortcutLabel = document.getElementById("inputs-midi-shortcut-label");
-    if (shortcutLabel) {
-      shortcutLabel.textContent =
-        input !== t("midi.notSelected")
-          ? routeCount > 1
-            ? `${input} (+${routeCount - 1})`
-            : input
-          : t("topbar.midiShortcut");
-    }
   }
 
   const midiConnectionStatus = createMidiConnectionStatusHandler({
@@ -292,7 +283,7 @@ export function createApplication() {
 
   async function preparePage(page) {
     if (page === "inputs") {
-      features.inputs?.openInputsPanel?.("midi");
+      features.inputs?.openInputsPanel?.();
       return;
     }
     if (page === "plugins") {
@@ -883,13 +874,14 @@ export function createApplication() {
   features.inputs = createInputsFeature({
     i18n: { t },
     invoke,
+    onMidiSectionShown: () => features.midi?.showInlineRoutesEditor?.(),
   });
 
   const mountConnectionsTabs = (...args) => features.connections?.mountConnectionsTabs?.(...args);
   const openConnectionsPanel = (...args) => features.connections?.openConnectionsPanel?.(...args);
 
   features.connections?.bindUi?.();
-  features.inputs?.bindUi?.({ switchAppPage });
+  features.inputs?.bindUi?.();
 
   appNavItems.forEach((item) => {
     lifetime.listen(item, "click", async () => {
