@@ -1,5 +1,6 @@
 import { KEYBOARD_DEVICE_ID } from "./catalog.js";
 import { faSvg, hydrateFaIcons } from "../../shared/fa_icons.js";
+import { fitHeaderIcon } from "../../shared/page_header.js";
 
 /** Inputs → Keyboard input panel. */
 export function createKeyboardConnectionTab({ invoke, t }) {
@@ -145,7 +146,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
   function mount(container) {
     root = container;
     root.innerHTML = `
-      <div class="ui-page-header" data-role="master-row">
+      <header class="ui-page-header" data-role="master-row">
         <div class="ui-page-header__main">
           <span class="ui-page-header__icon" aria-hidden="true">${faSvg("keyboard")}</span>
           <div class="ui-page-header__copy">
@@ -160,7 +161,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
             <span class="plugins-toggle-ui" aria-hidden="true"></span>
           </label>
         </div>
-      </div>
+      </header>
       <div class="ui-panel keyboard-settings" data-role="content-panel">
         <p class="ui-help keyboard-unsupported hidden" data-role="unsupported"></p>
         <div class="keyboard-controls-block hidden" data-role="controls-block">
@@ -182,6 +183,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
         void setEnabled(masterInput.checked);
       });
     }
+    fitHeaderIcon(read("master-row"));
     update();
     void refresh();
   }

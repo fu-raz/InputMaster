@@ -166,23 +166,23 @@
               </div>
             </aside>
             <div id="inputs-content" class="inputs-content">
-              <section class="inputs-panel active" data-inputs-panel="midi">
-                <div class="ui-page-header" data-role="midi-master-row">
-                    <div class="ui-page-header__main">
-                      <span class="ui-page-header__icon" data-fa="music" aria-hidden="true"></span>
-                      <div class="ui-page-header__copy">
-                        <h1 class="ui-content-title" data-i18n="midi.masterLabel">MIDI input</h1>
-                        <p class="ui-help" data-i18n="inputs.midi.help">Route MIDI devices into InputMaster so you can Learn controls and drive bindings.</p>
-                      </div>
-                    </div>
-                    <div class="ui-enable-control">
-                      <span class="ui-enable-caption" data-i18n="ui.enable">Enable</span>
-                      <label class="settings-toggle" title="Enable" data-i18n-title="ui.enable">
-                        <input type="checkbox" id="midi-master-enabled" data-role="midi-master-input" />
-                        <span class="plugins-toggle-ui" aria-hidden="true"></span>
-                      </label>
+              <section class="inputs-panel inputs-page-section active" data-inputs-panel="midi">
+                <header class="ui-page-header" data-role="midi-master-row">
+                  <div class="ui-page-header__main">
+                    <span class="ui-page-header__icon" data-fa="music" aria-hidden="true"></span>
+                    <div class="ui-page-header__copy">
+                      <h1 class="ui-content-title" data-i18n="midi.masterLabel">MIDI input</h1>
+                      <p class="ui-help" data-i18n="inputs.midi.help">Route MIDI devices into InputMaster so you can Learn controls and drive bindings.</p>
                     </div>
                   </div>
+                  <div class="ui-enable-control">
+                    <span class="ui-enable-caption" data-i18n="ui.enable">Enable</span>
+                    <label class="settings-toggle" title="Enable" data-i18n-title="ui.enable">
+                      <input type="checkbox" id="midi-master-enabled" data-role="midi-master-input" />
+                      <span class="plugins-toggle-ui" aria-hidden="true"></span>
+                    </label>
+                  </div>
+                </header>
                 <div class="ui-panel" data-role="midi-panel">
                   <h3 class="ui-subsection-title" data-i18n="inputs.midi.routesHeading">Routes</h3>
                   <select id="midi-device" class="visually-hidden" title="Input Device(s)" data-i18n-title="topbar.inputDevice" aria-hidden="true" tabindex="-1"></select>
@@ -190,10 +190,10 @@
                   <div id="inputs-midi-routes-host" class="midi-routes-inline-host" aria-label="MIDI routes" data-i18n-aria-label="midi.routes"></div>
                 </div>
               </section>
-              <section class="inputs-panel" data-inputs-panel="keyboard">
+              <section class="inputs-panel inputs-page-section" data-inputs-panel="keyboard">
                 <div data-role="keyboard-host"></div>
               </section>
-              <section class="inputs-panel" data-inputs-panel="controller">
+              <section class="inputs-panel inputs-page-section" data-inputs-panel="controller">
                 <div data-role="controller-host"></div>
               </section>
               <section class="inputs-panel" data-inputs-panel="wheel">

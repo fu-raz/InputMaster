@@ -1,4 +1,5 @@
 import { faBrandSvg, faSvg } from "../../shared/fa_icons.js";
+import { fitHeaderIcon } from "../../shared/page_header.js";
 
 function detectVendor(device) {
   const raw = String(device?.vendor || device?.deviceName || "").toLowerCase();
@@ -240,7 +241,7 @@ export function createControllerConnectionTab({ invoke, t }) {
   function mount(container) {
     root = container;
     root.innerHTML = `
-      <div class="ui-page-header" data-role="master-row">
+      <header class="ui-page-header" data-role="master-row">
         <div class="ui-page-header__main">
           <span class="ui-page-header__icon" aria-hidden="true">${faSvg("gamepad-modern")}</span>
           <div class="ui-page-header__copy">
@@ -255,7 +256,7 @@ export function createControllerConnectionTab({ invoke, t }) {
             <span class="plugins-toggle-ui" aria-hidden="true"></span>
           </label>
         </div>
-      </div>
+      </header>
       <div class="ui-panel controller-settings" data-role="content-panel">
         <p class="ui-help controller-unsupported hidden" data-role="unsupported"></p>
         <div class="controller-devices-block hidden" data-role="devices-block">
@@ -276,6 +277,7 @@ export function createControllerConnectionTab({ invoke, t }) {
         void setEnabled(masterInput.checked);
       });
     }
+    fitHeaderIcon(read("master-row"));
     update();
     void refresh();
     startAutoRefresh();

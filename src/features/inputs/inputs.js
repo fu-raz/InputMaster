@@ -1,6 +1,8 @@
 import { createKeyboardConnectionTab } from "../keyboard/connection_tab.js";
 import { createControllerConnectionTab } from "../controller/connection_tab.js";
 import { getNavIndicatorMetrics } from "../../app/connections_panel.js";
+import { fitHeaderIcon } from "../../shared/page_header.js";
+import { hydrateFaIcons } from "../../shared/fa_icons.js";
 
 const INPUT_SECTIONS = ["midi", "keyboard", "controller", "wheel"];
 
@@ -104,6 +106,11 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
       } catch (error) {
         console.error("Failed to refresh MIDI inputs pane", error);
       }
+    }
+    const activePane = content.querySelector(".inputs-panel.active");
+    if (activePane) {
+      hydrateFaIcons(activePane);
+      activePane.querySelectorAll(".ui-page-header").forEach((header) => fitHeaderIcon(header));
     }
     scheduleNavIndicatorSync();
   }

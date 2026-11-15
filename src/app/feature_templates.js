@@ -2,6 +2,7 @@ import { bindingsTemplate } from "../features/bindings/template.js";
 import { settingsTemplate } from "../features/settings/template.js";
 import { targetsTemplate } from "../features/targets/template.js";
 import { hydrateFaIcons } from "../shared/fa_icons.js";
+import { fitHeaderIcon } from "../shared/page_header.js";
 
 export const FEATURE_TEMPLATES = Object.freeze({
   bindings: bindingsTemplate,
@@ -16,4 +17,5 @@ export function mountFeatureTemplates(root = document) {
     placeholder.outerHTML = html;
   }
   hydrateFaIcons(root);
+  root.querySelectorAll(".ui-page-header").forEach((header) => fitHeaderIcon(header));
 }

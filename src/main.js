@@ -1,9 +1,11 @@
 import { initializePerformanceAudit, performanceAudit } from "./app/performance_audit_api.js";
 import { hydrateThemeLogo } from "./app/theme_logo.js";
 import { hydrateFaIcons } from "./shared/fa_icons.js";
+import { fitHeaderIcon } from "./shared/page_header.js";
 
 hydrateThemeLogo();
 hydrateFaIcons();
+document.querySelectorAll(".ui-page-header").forEach((header) => fitHeaderIcon(header));
 
 const STORAGE_KEY = "midimaster.pendingFrontendLogs";
 const pendingLogs = [];
