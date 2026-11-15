@@ -1,12 +1,12 @@
-# MIDIMaster User Guide
+# InputMaster User Guide
 
-This guide explains how to set up MIDIMaster, create bindings, use Profiles, and manage integrations (plugins).
+This guide explains how to set up InputMaster, create bindings, use Profiles, and manage integrations (plugins).
 
 If you are a plugin author, see `docs/PLUGIN_DEVELOPER_GUIDE.md`.
 
-## What MIDIMaster Does
+## What InputMaster Does
 
-MIDIMaster binds controls on your MIDI device (faders, knobs, buttons) to targets such as:
+InputMaster binds controls on your MIDI device (faders, knobs, buttons) to targets such as:
 
 - `Master` volume
 - `Focus` (the currently focused application/session)
@@ -15,18 +15,18 @@ MIDIMaster binds controls on your MIDI device (faders, knobs, buttons) to target
 - Utility actions such as hotkeys, application launch, and AutoHotkey scripts
 - Integrations provided by plugins (OBS Studio, Wave Link, Philips Hue, and third-party integrations)
 
-When a target changes, MIDIMaster can send feedback back to your MIDI controller (for motorized faders, LEDs, etc.).
+When a target changes, InputMaster can send feedback back to your MIDI controller (for motorized faders, LEDs, etc.).
 
 ## First-Time Setup
 
 ### 1) Configure MIDI Routes
 
-1. Open MIDIMaster.
+1. Open InputMaster.
 2. The topbar shows the currently active MIDI input and output. If multiple routes are active, the first route is shown with a `+N` badge.
 3. Open `MIDI Routes` from the route button beside the Output readout.
 4. Add one or more routes. Each route pairs:
    - MIDI Input (the device you move)
-   - MIDI Output (the device MIDIMaster sends feedback to)
+   - MIDI Output (the device InputMaster sends feedback to)
 5. Select `Apply Changes` to validate and activate the complete route set. Closing the popover or selecting `Cancel` discards uncommitted edits.
 
 Notes:
@@ -34,7 +34,7 @@ Notes:
 - Every active MIDI input route requires an output device.
 - Motorized faders and LEDs receive feedback through the output paired with the binding's input route.
 - Duplicate input routes are prevented. Sharing one output is allowed and marked with a `Shared` badge.
-- If a saved route is temporarily unavailable, other routes remain active and MIDIMaster retries the missing route automatically.
+- If a saved route is temporarily unavailable, other routes remain active and InputMaster retries the missing route automatically.
 - Disable a route to disconnect that MIDI session while keeping it saved. `Disconnect All` disables all routes and stops MIDI until you re-enable a route.
 
 ### 2) Pick a Profile
@@ -81,7 +81,7 @@ Choose **Automatic** to control a recognized LED mapping independently; Channel 
 
 - **Follow Value**: display the controlled parameter's value.
 - **Audio Reactive**: display the loudest available audio target, with immediate attack and a fixed 160 ms fade to silence. Audio level bypasses the fader curve.
-- **Always On**: keep the LED lit at full brightness regardless of the controlled value or audio activity. The LED is cleared when its output or binding is removed or MIDIMaster exits.
+- **Always On**: keep the LED lit at full brightness regardless of the controlled value or audio activity. The LED is cleared when its output or binding is removed or InputMaster exits.
 
 Profiles saved with Always On remain readable by 4.9.10. That version uses Follow Value for these outputs; the Always On settings are preserved and restored when you return to a version that supports them.
 
@@ -95,7 +95,7 @@ For an X-TOUCH in **MC mode**, select **Automatic** for a recognized USB output,
 
 The receiving hardware determines how Note velocities or CC values appear. Some LEDs only switch on/off or use specific color codes. Meter LEDs often do not emit MIDI input, so unknown output addresses are entered manually.
 
-Inspired by @jrlpez’s audio-reactive feedback proposal in [#34](https://github.com/prgmitchell/MIDIMaster/pull/34); independently implemented.
+Inspired by @jrlpez’s audio-reactive feedback proposal in [#34](https://github.com/prgmitchell/InputMaster/pull/34); independently implemented.
 
 ### Actions (Buttons)
 
@@ -115,7 +115,7 @@ Integrations may interpret actions differently depending on the plugin.
 
 Choose `Soundboard` from the target picker's Actions category, then select an MP3, WAV, FLAC, OGG/Vorbis, M4A, MP4, or AAC file. A button can contain either one Soundboard or one Macro alongside its normal targets, but never both. Adding a duplicate special target or trying to combine Macro and Soundboard shows an alert without changing the binding. The compact Configure Soundboard editor has play/pause preview controls, a moving waveform playhead and time ruler, draggable start and end handles, playback speed and volume controls, and an output-device selector. The keyboard-accessible trim sliders move by 10 ms with the arrow keys or 100 ms with Shift+arrow.
 
-Soundboard files stay linked at their original absolute paths; profile export does not copy the audio. If a file is moved or unavailable, MIDIMaster preserves the link. Use `Edit Sound` and then `Pick Sound` to choose it again. The selected output is saved with the sound; `System default` keeps following the operating system's default playback device. Audio files must be no larger than 100 MB and no longer than 10 minutes. Pressing the same Soundboard button restarts its sound, while different Soundboard buttons can overlap, including when they use different outputs. Playback continues while MIDIMaster is minimized to the tray.
+Soundboard files stay linked at their original absolute paths; profile export does not copy the audio. If a file is moved or unavailable, InputMaster preserves the link. Use `Edit Sound` and then `Pick Sound` to choose it again. The selected output is saved with the sound; `System default` keeps following the operating system's default playback device. Audio files must be no larger than 100 MB and no longer than 10 minutes. Pressing the same Soundboard button restarts its sound, while different Soundboard buttons can overlap, including when they use different outputs. Playback continues while InputMaster is minimized to the tray.
 
 ## Targets
 
@@ -127,7 +127,7 @@ Soundboard files stay linked at their original absolute paths; profile export do
 - `Playback Devices` / `Recording Devices`
 - `Utilities`: media controls, macros, Soundboard, hotkeys, window focus, capture controls, application launch, AutoHotkey scripts, and profile switching
 
-If an application or device disappears, MIDIMaster will show an unavailable entry (greyed).
+If an application or device disappears, InputMaster will show an unavailable entry (greyed).
 
 ### Integration Targets (Plugins)
 
@@ -139,7 +139,7 @@ Examples:
 - Wave Link channel or mix volume
 - Philips Hue light/group brightness and on/off
 
-Integrations are implemented by plugins and can be installed/uninstalled without rebuilding MIDIMaster.
+Integrations are implemented by plugins and can be installed/uninstalled without rebuilding InputMaster.
 
 ## Plugins (Integrations)
 
@@ -176,7 +176,7 @@ Targets can become greyed/unavailable when:
 - The external app is not running
 - The plugin is missing
 
-MIDIMaster preserves the saved name/icon of integration targets even when a plugin is missing. You will still see the same target name you chose previously, but it will be marked unavailable.
+InputMaster preserves the saved name/icon of integration targets even when a plugin is missing. You will still see the same target name you chose previously, but it will be marked unavailable.
 
 ## Installing and Removing Plugins
 
@@ -186,21 +186,21 @@ Plugins are distributed as a single `.midimaster` package file.
 
 To install a plugin:
 
-1. Open MIDIMaster.
+1. Open InputMaster.
 2. Click the top-right `Plugins` button.
 3. Go to the `Installed` tab.
 4. Click `Install Plugin...`.
 5. Select a `.midimaster` file.
 
-MIDIMaster installs the plugin into its config directory and loads it at runtime.
+InputMaster installs the plugin into its config directory and loads it at runtime.
 
 ### Installing Plugins from the Store
 
-MIDIMaster also includes an in-app Store tab that lists plugins from the official catalog.
+InputMaster also includes an in-app Store tab that lists plugins from the official catalog.
 
 To install a plugin from the Store:
 
-1. Open MIDIMaster.
+1. Open InputMaster.
 2. Click the top-right `Plugins` button.
 3. Go to the `Store` tab.
 4. Find the plugin and click `Install` (or `Update`).
@@ -233,13 +233,13 @@ Faders control Hue brightness. Button bindings let you choose a light or group, 
 
 ### Where Plugins Are Stored (Advanced)
 
-MIDIMaster stores plugins in its config directory:
+InputMaster stores plugins in its config directory:
 
 `<app_config_dir>/plugins/<plugin_id>/manifest.json`
 
 Typical locations (can vary by packaging):
 
-- Windows: `C:\Users\<you>\AppData\Roaming\MIDIMaster\plugins\`
+- Windows: `C:\Users\<you>\AppData\Roaming\InputMaster\plugins\`
 
 Each plugin lives in its own folder named after the plugin id.
 
@@ -282,4 +282,4 @@ Most integrations only return target lists when connected.
   `plugins/<plugin_id>/manifest.json`
 
 - Confirm `manifest.json` has correct `id`, `api_version`, and `entry`.
-- Restart MIDIMaster.
+- Restart InputMaster.

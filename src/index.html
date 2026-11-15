@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MIDIMaster</title>
+  <title>InputMaster</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -12,8 +12,8 @@
   <div class="app-shell sidebar-collapsed">
     <aside class="app-sidebar" aria-label="Primary navigation" data-i18n-aria-label="app.nav.primary">
       <div class="sidebar-brand">
-        <img class="app-logo app-logo--theme" data-theme-logo data-dark-src="assets/MIDIMaster.png" data-light-src="assets/MIDIMaster-light.png" alt="MIDIMaster logo" />
-        <span class="app-name">MIDIMaster</span>
+        <img class="app-logo app-logo--theme" data-theme-logo data-dark-src="assets/MIDIMaster.png" data-light-src="assets/MIDIMaster-light.png" alt="InputMaster logo" />
+        <span class="app-name">InputMaster</span>
       </div>
 
       <nav class="sidebar-nav">
@@ -25,6 +25,16 @@
             </svg>
           </span>
           <span class="nav-label" data-i18n="app.nav.bindings">Bindings</span>
+        </button>
+        <button class="sidebar-nav-item" type="button" data-page="inputs" aria-label="Inputs" title="Inputs" data-i18n-aria-label="app.nav.inputs" data-i18n-title="app.nav.inputs">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M4 8h16v8H4z" />
+              <path d="M8 12h.01M12 12h.01M16 12h.01" />
+              <path d="M7 6v2M12 6v2M17 6v2M7 16v2M12 16v2M17 16v2" />
+            </svg>
+          </span>
+          <span class="nav-label" data-i18n="app.nav.inputs">Inputs</span>
         </button>
         <button id="connections-button" class="sidebar-nav-item" type="button" data-page="plugins" aria-label="Plugins" title="Plugins" data-i18n-aria-label="app.nav.plugins" data-i18n-title="app.nav.plugins">
           <span class="nav-icon" aria-hidden="true">
@@ -73,13 +83,11 @@
           </div>
         </div>
         <div class="topbar-divider" aria-hidden="true"></div>
-        <div class="topbar-field">
-          <label class="topbar-label" for="midi-device" data-i18n="topbar.inputDevice">Input Device(s)</label>
-          <select id="midi-device" title="Input Device(s)" data-i18n-title="topbar.inputDevice"></select>
-        </div>
-        <div class="topbar-field">
-          <label class="topbar-label" for="midi-output-device" data-i18n="topbar.outputDevice">Output Device(s)</label>
-          <select id="midi-output-device" title="Output Device(s)" data-i18n-title="topbar.outputDevice"></select>
+        <div class="topbar-field topbar-inputs-shortcut-field">
+          <span class="topbar-label" data-i18n="topbar.inputs">Inputs</span>
+          <button id="inputs-midi-shortcut" class="select-button inputs-midi-shortcut" type="button" title="Open MIDI inputs" data-i18n-title="topbar.openMidiInputs">
+            <span id="inputs-midi-shortcut-label" data-i18n="topbar.midiShortcut">MIDI devices…</span>
+          </button>
         </div>
         <div class="topbar-actions">
           <button id="topbar-update-button" class="topbar-icon-button topbar-update-button hidden" type="button" aria-label="Update available" title="Update available" data-i18n-aria-label="topbar.updateAvailable" data-i18n-title="topbar.updateAvailable">
@@ -119,6 +127,8 @@
                 <button type="button" class="binding-type-segment selected" aria-pressed="true" data-filter="all" data-i18n="bindings.filterAll">All</button>
                 <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="faders" data-i18n="bindings.filterFaders">Faders</button>
                 <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="buttons" data-i18n="bindings.filterButtons">Buttons</button>
+                <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="midi" data-i18n="bindings.filterMidi">MIDI</button>
+                <button type="button" class="binding-type-segment" aria-pressed="false" data-filter="keyboard" data-i18n="bindings.filterKeyboard">Keyboard</button>
               </div>
               <label class="binding-search-field">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -157,6 +167,81 @@
             </div>
             <div id="bindings" class="list">
               <div class="bindings-empty" data-i18n="bindings.loading">Loading bindings...</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="inputs-page" class="app-page hidden" data-page-panel="inputs">
+          <div class="page-heading-row">
+            <h1 data-i18n="inputs.title">Inputs</h1>
+          </div>
+          <div class="inputs-panel-body">
+            <aside id="inputs-sidebar" class="inputs-sidebar" aria-label="Input kinds" data-i18n-aria-label="inputs.sidebarLabel">
+              <div class="inputs-nav-indicator" aria-hidden="true"></div>
+              <div class="inputs-nav-group">
+                <button type="button" class="inputs-nav-item active" data-inputs-section="midi" aria-current="page">
+                  <span class="inputs-nav-label" data-i18n="inputs.nav.midi">MIDI</span>
+                </button>
+                <button type="button" class="inputs-nav-item" data-inputs-section="keyboard">
+                  <span class="inputs-nav-label" data-i18n="inputs.nav.keyboard">Keyboard</span>
+                </button>
+                <button type="button" class="inputs-nav-item is-soon" data-inputs-section="controller" disabled aria-disabled="true">
+                  <span class="inputs-nav-label" data-i18n="inputs.nav.controller">Controller</span>
+                  <span class="inputs-nav-soon" data-i18n="inputs.comingSoon">Soon</span>
+                </button>
+                <button type="button" class="inputs-nav-item is-soon" data-inputs-section="wheel" disabled aria-disabled="true">
+                  <span class="inputs-nav-label" data-i18n="inputs.nav.wheel">Wheel</span>
+                  <span class="inputs-nav-soon" data-i18n="inputs.comingSoon">Soon</span>
+                </button>
+              </div>
+            </aside>
+            <div id="inputs-content" class="inputs-content">
+              <section class="inputs-panel active" data-inputs-panel="midi">
+                <div class="inputs-panel-header">
+                  <h2 data-i18n="inputs.midi.title">MIDI</h2>
+                  <p class="inputs-panel-help" data-i18n="inputs.midi.help">Connect MIDI input and output routes. Profile stays in the top bar.</p>
+                </div>
+                <div class="inputs-device-list" data-role="midi-device-list">
+                  <div class="inputs-device-card" data-device-kind="midi">
+                    <div class="inputs-device-card-title" data-i18n="inputs.midi.routesHeading">Routes</div>
+                    <div class="inputs-midi-fields">
+                      <div class="topbar-field">
+                        <label class="topbar-label" for="midi-device" data-i18n="topbar.inputDevice">Input Device(s)</label>
+                        <select id="midi-device" title="Input Device(s)" data-i18n-title="topbar.inputDevice"></select>
+                      </div>
+                      <div class="topbar-field">
+                        <label class="topbar-label" for="midi-output-device" data-i18n="topbar.outputDevice">Output Device(s)</label>
+                        <select id="midi-output-device" title="Output Device(s)" data-i18n-title="topbar.outputDevice"></select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section class="inputs-panel" data-inputs-panel="keyboard">
+                <div class="inputs-panel-header">
+                  <h2 data-i18n="inputs.keyboard.title">Keyboard</h2>
+                  <p class="inputs-panel-help" data-i18n="inputs.keyboard.help">Enable media and volume keys as a mappable input source.</p>
+                </div>
+                <div class="inputs-device-list" data-role="keyboard-device-list">
+                  <div class="inputs-device-card connection-tab active" data-device-kind="keyboard" data-device-id="keyboard:local">
+                    <div data-role="keyboard-host"></div>
+                  </div>
+                </div>
+              </section>
+              <section class="inputs-panel" data-inputs-panel="controller">
+                <div class="inputs-panel-header">
+                  <h2 data-i18n="inputs.controller.title">Controller</h2>
+                  <p class="inputs-panel-help" data-i18n="inputs.controller.help">Gamepads and controllers will appear here. Observe-only mapping is planned next.</p>
+                </div>
+                <div class="inputs-empty" data-i18n="inputs.comingSoonBody">Coming soon.</div>
+              </section>
+              <section class="inputs-panel" data-inputs-panel="wheel">
+                <div class="inputs-panel-header">
+                  <h2 data-i18n="inputs.wheel.title">Wheel</h2>
+                  <p class="inputs-panel-help" data-i18n="inputs.wheel.help">Wheel devices will appear here later.</p>
+                </div>
+                <div class="inputs-empty" data-i18n="inputs.comingSoonBody">Coming soon.</div>
+              </section>
             </div>
           </div>
         </section>

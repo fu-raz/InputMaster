@@ -1,5 +1,3 @@
-import { createKeyboardConnectionTab } from "../features/keyboard/connection_tab.js";
-
 export function getNavIndicatorMetrics(sidebarRect, activeRect, scrollLeft = 0, scrollTop = 0) {
   return {
     width: activeRect.width,
@@ -97,17 +95,11 @@ export function createConnectionsPanelController({
     }
   }
 
-  const keyboardTab = createKeyboardConnectionTab({
-    invoke: typeof invoke === "function" ? invoke : async () => ({}),
-    t,
-  });
-
   const navIconPaths = {
     installed: ["M5 12.5 9 16.5 19 6.5", "M4 5h16v14H4z"],
     all: ["M5 5h6v6H5z", "M13 5h6v6h-6z", "M5 13h6v6H5z", "M13 13h6v6h-6z"],
     updates: ["M20 5v5h-5", "M4 19v-5h5", "M6.75 9A7 7 0 0 1 18 6.5L20 10", "M17.25 15A7 7 0 0 1 6 17.5L4 14"],
     store: ["M6 8h12l-1 11H7L6 8Z", "M9 8a3 3 0 0 1 6 0", "M8 12h8"],
-    keyboard: ["M4 7h16v10H4z", "M7 10h.01", "M10 10h.01", "M13 10h.01", "M16 10h.01", "M7 13h10"],
     audio: ["M6 10v4", "M10 7v10", "M14 5v14", "M18 9v6"],
     lighting: ["M12 3v2", "M5.65 5.65 7.05 7.05", "M18.35 5.65 16.95 7.05", "M8 13a4 4 0 1 1 8 0c0 1.5-.8 2.3-1.6 3H9.6C8.8 15.3 8 14.5 8 13Z", "M10 20h4", "M9.5 17h5"],
     streaming: ["M5 7h10v10H5z", "M15 10l4-2v8l-4-2"],
@@ -163,14 +155,6 @@ export function createConnectionsPanelController({
     const pluginTabs = pluginHost ? pluginHost.getConnectionTabs() : [];
 
     const navItems = [
-      {
-        kind: "keyboard",
-        tabId: "keyboard",
-        id: "keyboard",
-        name: keyboardTab.name,
-        section: "primary",
-        mount: (pane) => keyboardTab.mount(pane),
-      },
       ...browserSections.primary.map((item) => ({
         ...item,
         kind: "builtin",
@@ -270,12 +254,6 @@ export function createConnectionsPanelController({
 
         if (item.kind === "plugin") {
           renderPluginTabShell(pane, item);
-        } else if (item.kind === "keyboard") {
-          try {
-            item.mount(pane);
-          } catch (error) {
-            console.error("Failed to mount keyboard connection tab", error);
-          }
         } else {
           await pluginsTabs.mountPluginsBrowserTab(pane, {
             view: item.kind === "category" ? item.view : item.id,

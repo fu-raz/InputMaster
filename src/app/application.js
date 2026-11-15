@@ -24,6 +24,7 @@ import { normalizeFaderCurvePresets } from "../features/bindings/fader_curve_pre
 import { createTargetsFeature } from "../features/targets/targets.js";
 import { createMidiFeature } from "../features/midi/midi.js";
 import { createMidiConnectionStatusHandler } from "../features/midi/connection_status.js";
+import { createInputsFeature } from "../features/inputs/inputs.js";
 import { getBindingTargets, normalizeBinding, setBindingTargets } from "../core/binding_model.js";
 import { createTargetCore } from "../core/target_core.js";
 import { createConnectionsPanelController } from "../app/connections_panel.js";
@@ -249,10 +250,20 @@ export function createApplication() {
     const input = stripDeviceStateSuffix(inputName) || t("midi.notSelected");
     const output = stripDeviceStateSuffix(outputName) || t("midi.notSelected");
     const routeCount = Number(options.routeCount || options.routes?.length || 0);
-    midiStatus.textContent =
+    const statusText =
       routeCount > 1
         ? t("midi.statusConnectedMultiple", { input, output, count: routeCount })
         : t("midi.statusConnected", { input, output });
+    midiStatus.textContent = statusText;
+    const shortcutLabel = document.getElementById("inputs-midi-shortcut-label");
+    if (shortcutLabel) {
+      shortcutLabel.textContent =
+        input !== t("midi.notSelected")
+          ? routeCount > 1
+            ? `${input} (+${routeCount - 1})`
+            : input
+          : t("topbar.midiShortcut");
+    }
   }
 
   const midiConnectionStatus = createMidiConnectionStatusHandler({
@@ -280,6 +291,10 @@ export function createApplication() {
   }
 
   async function preparePage(page) {
+    if (page === "inputs") {
+      features.inputs?.openInputsPanel?.("midi");
+      return;
+    }
     if (page === "plugins") {
       await openConnectionsPanel();
       return;
@@ -865,10 +880,16 @@ export function createApplication() {
     startPluginHostIfNeeded,
   });
 
+  features.inputs = createInputsFeature({
+    i18n: { t },
+    invoke,
+  });
+
   const mountConnectionsTabs = (...args) => features.connections?.mountConnectionsTabs?.(...args);
   const openConnectionsPanel = (...args) => features.connections?.openConnectionsPanel?.(...args);
 
   features.connections?.bindUi?.();
+  features.inputs?.bindUi?.({ switchAppPage });
 
   appNavItems.forEach((item) => {
     lifetime.listen(item, "click", async () => {

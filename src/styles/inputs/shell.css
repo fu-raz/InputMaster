@@ -1,0 +1,179 @@
+#inputs-page .inputs-panel-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 0;
+  min-height: 0;
+  flex: 1;
+  border: 1px solid rgba(120, 130, 160, 0.18);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.inputs-sidebar {
+  position: relative;
+  padding: 12px 10px;
+  border-right: 1px solid rgba(120, 130, 160, 0.16);
+  background: rgba(0, 0, 0, 0.12);
+  overflow: auto;
+}
+
+.inputs-nav-indicator {
+  position: absolute;
+  left: 10px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 8px;
+  background: rgba(120, 140, 200, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 160ms ease, width 160ms ease, height 160ms ease, opacity 120ms ease;
+}
+
+.inputs-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.inputs-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.inputs-nav-item:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.inputs-nav-item.active {
+  font-weight: 600;
+}
+
+.inputs-nav-item.is-soon,
+.inputs-nav-item:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.inputs-nav-soon {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.inputs-content {
+  min-width: 0;
+  overflow: auto;
+  padding: 20px 22px 28px;
+}
+
+.inputs-panel {
+  display: none;
+}
+
+.inputs-panel.active {
+  display: block;
+}
+
+.inputs-panel-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+}
+
+.inputs-panel-help {
+  margin: 0 0 18px;
+  color: #8b91a8;
+  font-size: 13px;
+  line-height: 1.45;
+  max-width: 52rem;
+}
+
+.inputs-device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.inputs-device-card {
+  border: 1px solid rgba(120, 130, 160, 0.16);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.inputs-device-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.inputs-midi-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  align-items: flex-end;
+}
+
+.inputs-midi-fields .topbar-field {
+  min-width: 220px;
+  flex: 1 1 240px;
+}
+
+.inputs-empty {
+  color: #8b91a8;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.topbar-inputs-shortcut-field {
+  min-width: 160px;
+}
+
+.inputs-midi-shortcut {
+  max-width: 280px;
+}
+
+body[data-theme="light"] #inputs-page .inputs-panel-body,
+body:not(.dark-mode) #inputs-page .inputs-panel-body {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+body[data-theme="light"] .inputs-sidebar,
+body:not(.dark-mode) .inputs-sidebar {
+  background: rgba(246, 247, 251, 0.9);
+}
+
+@media (max-width: 900px) {
+  #inputs-page .inputs-panel-body {
+    grid-template-columns: 1fr;
+  }
+
+  .inputs-sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(120, 130, 160, 0.16);
+  }
+
+  .inputs-nav-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .inputs-nav-item {
+    width: auto;
+  }
+}

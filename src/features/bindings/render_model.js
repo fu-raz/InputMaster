@@ -1,4 +1,13 @@
-const BINDING_TYPE_FILTERS = new Set(["all", "faders", "buttons"]);
+const BINDING_TYPE_FILTERS = new Set(["all", "faders", "buttons", "midi", "keyboard"]);
+
+function deviceKind(deviceId) {
+  const id = String(deviceId || "");
+  if (id.startsWith("keyboard:")) return "keyboard";
+  if (id.startsWith("controller:")) return "controller";
+  if (id.startsWith("wheel:")) return "wheel";
+  if (id.startsWith("midi:") || id) return "midi";
+  return "midi";
+}
 
 export function createBindingRenderModel({
   fallbackNameFor,
@@ -15,6 +24,9 @@ export function createBindingRenderModel({
   function matchesTypeFilter(binding, filterValue) {
     const normalized = normalizeTypeFilter(filterValue);
     if (normalized === "all") return true;
+    if (normalized === "midi" || normalized === "keyboard") {
+      return deviceKind(binding?.device_id) === normalized;
+    }
     const isButton = isButtonBinding(binding);
     return normalized === "buttons" ? isButton : !isButton;
   }
