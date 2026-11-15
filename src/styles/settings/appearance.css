@@ -230,7 +230,7 @@
 
 /* Single vertical scrolling list — theme colors + sliders (Font Size, etc.) all discoverable */
 .appearance-subcard {
-  /* Shared control column: width of 6 swatches; right-aligned with color rows */
+  /* Shared 3-col grid: label | 6-swatch-wide control | edit/value slot */
   --appearance-row-pad-x: 26px;
   --appearance-swatch-size: 22px;
   --appearance-swatch-gap: 10px;
@@ -241,9 +241,8 @@
   );
   --appearance-edit-size: 26px;
   --appearance-edit-gap: 16px;
-  --appearance-row-pad-right: calc(
-    var(--appearance-row-pad-x) + var(--appearance-edit-size) + var(--appearance-edit-gap)
-  );
+  --appearance-trailing-col: 40px; /* edit button + %/px value share this slot */
+  --appearance-row-columns: minmax(140px, 1fr) var(--appearance-control-width) var(--appearance-trailing-col);
   position: relative;
   min-width: 0;
   min-height: 0;
@@ -350,12 +349,12 @@
   height: auto;
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) var(--appearance-control-width);
+  grid-template-columns: var(--appearance-row-columns);
   grid-template-rows: auto;
-  gap: 18px;
+  column-gap: var(--appearance-edit-gap);
+  row-gap: 0;
   align-items: center;
   padding: 10px var(--appearance-row-pad-x);
-  padding-right: var(--appearance-row-pad-right);
   border: 0;
   border-bottom: 1px solid color-mix(in srgb, var(--control-border) 72%, transparent);
   border-radius: 0;
@@ -377,13 +376,11 @@
 
 .appearance-token-color-header {
   min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
+  display: contents;
 }
 
 .appearance-token-color-label {
+  grid-column: 1;
   min-width: 0;
   overflow: hidden;
   color: inherit;
@@ -395,12 +392,13 @@
 }
 
 .appearance-token-color-edit {
-  position: absolute;
-  right: var(--appearance-row-pad-x);
-  top: 50%;
+  grid-column: 3;
+  position: static;
   width: var(--appearance-edit-size);
   height: var(--appearance-edit-size);
   flex: 0 0 var(--appearance-edit-size);
+  justify-self: center;
+  align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -410,7 +408,7 @@
   background: color-mix(in srgb, var(--control-bg) 88%, transparent);
   color: var(--text-secondary);
   cursor: pointer;
-  transform: translateY(-50%);
+  transform: none;
 }
 
 .appearance-token-color-edit:hover,
@@ -433,9 +431,10 @@
 }
 
 .appearance-token-swatches {
+  grid-column: 2;
   width: var(--appearance-control-width);
   min-width: 0;
-  justify-self: end;
+  justify-self: stretch;
   display: grid;
   grid-template-columns: repeat(var(--appearance-swatch-count), var(--appearance-swatch-size));
   grid-auto-rows: var(--appearance-swatch-size);
@@ -511,11 +510,11 @@
   min-height: 56px;
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) var(--appearance-control-width);
-  gap: 18px;
+  grid-template-columns: var(--appearance-row-columns);
+  column-gap: var(--appearance-edit-gap);
+  row-gap: 0;
   align-items: center;
   padding: 10px var(--appearance-row-pad-x);
-  padding-right: var(--appearance-row-pad-right);
   border-bottom: 1px solid color-mix(in srgb, var(--control-border) 72%, transparent);
   box-sizing: border-box;
 }
@@ -525,20 +524,45 @@
   min-height: 56px;
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) var(--appearance-control-width);
-  gap: 18px;
+  grid-template-columns: var(--appearance-row-columns);
+  column-gap: var(--appearance-edit-gap);
+  row-gap: 0;
   align-items: center;
   padding: 10px var(--appearance-row-pad-x);
-  padding-right: var(--appearance-row-pad-right);
   border-bottom: 1px solid color-mix(in srgb, var(--control-border) 72%, transparent);
   box-sizing: border-box;
 }
 
+/* Promote slider + value into the same 3-col grid as color rows */
 .appearance-inline-control .settings-range-control,
 .appearance-range-stack .appearance-control-group .settings-range-control {
-  width: 100%;
-  justify-self: end;
+  display: contents;
+}
+
+.appearance-inline-control .appearance-control-label,
+.appearance-range-stack .appearance-control-group > .appearance-control-label {
+  grid-column: 1;
   min-width: 0;
+}
+
+.appearance-inline-control .binding-volume-slider,
+.appearance-range-stack .appearance-control-group .binding-volume-slider {
+  grid-column: 2;
+  width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+  align-self: center;
+}
+
+.appearance-inline-control .settings-range-value,
+.appearance-range-stack .appearance-control-group .settings-range-value {
+  grid-column: 3;
+  justify-self: center;
+  align-self: center;
+  width: var(--appearance-trailing-col);
+  min-width: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .appearance-toggle-row {
@@ -565,14 +589,15 @@
   overflow-y: auto;
 }
 
-.appearance-subcard .settings-range-control {
+.appearance-subcard .binding-volume-slider {
   height: 28px;
-  grid-template-columns: minmax(0, 1fr) 40px;
-  gap: 10px;
 }
 
 .appearance-subcard .settings-range-value {
   font-size: 11px;
+  line-height: 1.2;
+  font-weight: 750;
+  color: var(--text-secondary);
 }
 
 .appearance-color-popover {
@@ -856,9 +881,9 @@
   .appearance-inline-control,
   .appearance-range-stack .appearance-control-group {
     min-height: 62px;
-    grid-template-columns: minmax(120px, 1fr) var(--appearance-control-width);
+    grid-template-columns: minmax(120px, 1fr) var(--appearance-control-width) var(--appearance-trailing-col);
     padding-left: 18px;
-    padding-right: calc(18px + var(--appearance-edit-size) + var(--appearance-edit-gap));
+    padding-right: 18px;
   }
 
 }
@@ -937,9 +962,21 @@
     max-width: none;
   }
 
-  .appearance-inline-control {
+  .appearance-inline-control,
+  .appearance-range-stack .appearance-control-group {
     grid-template-columns: 1fr;
-    gap: 8px;
+    column-gap: 8px;
+    row-gap: 8px;
+  }
+
+  .appearance-inline-control .binding-volume-slider,
+  .appearance-range-stack .appearance-control-group .binding-volume-slider,
+  .appearance-inline-control .settings-range-value,
+  .appearance-range-stack .appearance-control-group .settings-range-value {
+    grid-column: 1;
+    justify-self: stretch;
+    width: auto;
+    text-align: left;
   }
 
 }
