@@ -206,7 +206,7 @@ export const workflows = [
     async (app) => {
       await app.click("[data-page='plugins']");
       await app.shown(".connection-tab.active .plugins-browser");
-      for (const id of ["obs", "hue", "wavelink", "voicemeeter", "fxsound"]) {
+      for (const id of ["obs", "hue", "wavelink"]) {
         await app.fill(
           ".connection-tab.active .plugins-browser [data-role='search']",
           id,

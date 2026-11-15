@@ -2592,7 +2592,6 @@ dependencies = [
  "futures-util",
  "hex",
  "image",
- "libloading 0.8.9",
  "midimaster-virtual-audio-protocol",
  "midir",
  "rand 0.8.8",

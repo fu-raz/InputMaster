@@ -13,7 +13,7 @@ MIDIMaster binds controls on your MIDI device (faders, knobs, buttons) to target
 - Per-application audio sessions
 - Playback / recording devices
 - Utility actions such as hotkeys, application launch, and AutoHotkey scripts
-- Integrations provided by plugins (OBS Studio, Wave Link, Voicemeeter, Philips Hue, and third-party integrations)
+- Integrations provided by plugins (OBS Studio, Wave Link, Philips Hue, and third-party integrations)
 
 When a target changes, MIDIMaster can send feedback back to your MIDI controller (for motorized faders, LEDs, etc.).
 
@@ -137,8 +137,6 @@ Examples:
 
 - OBS Studio audio input volume
 - Wave Link channel or mix volume
-- Voicemeeter strip/bus levels, routing, hardware devices, MacroButtons, and presets
-- FxSound Low/Mid/High EQ, individual bands, effects, processing, and presets
 - Philips Hue light/group brightness and on/off
 
 Integrations are implemented by plugins and can be installed/uninstalled without rebuilding MIDIMaster.
@@ -220,40 +218,7 @@ In `Plugins -> Installed` you can:
 - Enable/disable plugins
 - Uninstall third-party plugins
 
-Bundled plugins (for example, OBS Studio, Wave Link, Voicemeeter, FxSound, and Philips Hue) cannot be uninstalled, but can be disabled.
-
-### FxSound (Bundled) Quick Setup
-
-The FxSound integration requires FxSound 1.2.11.0 or newer on Windows. MIDIMaster controls the installed FxSound executable directly; no separate helper or service is needed.
-
-1. Start FxSound normally, without administrator privileges. If the installer left it running elevated, quit from the tray and reopen from Start.
-2. Open `Plugins -> FxSound` and click `Connect`.
-3. For a fader, choose `Integrations -> FxSound -> EQ Low`, `EQ Mid`, or `EQ High`. Individual EQ bands and effects are also available.
-4. For a button, choose processing on/off, EQ reset, or a preset.
-5. Enable `Auto connect` to attach when FxSound is running. This is off initially and never launches FxSound.
-
-EQ faders range from −12 to +12 dB, with neutral at the midpoint. Low controls bands below 250 Hz, Mid controls 250 Hz to below 4 kHz, and High controls 4 kHz and above. Moving a group sets all its bands to the same gain; when gains differ, feedback shows their average. Profile recall preserves each band's saved gain within a group, provided the EQ layout still matches.
-
-The plugin page provides connection setup only; EQ, effects, processing, and presets are controlled through bindings. Fader writes are batched, and remote changes are polled once per second to update UI and motor feedback. Control writes preserve whether FxSound's window is open or hidden. FxSound's command-line controls have some latency; they are suitable for tone adjustments, rather than rapid audio automation. Reset EQ affects band gains only. Preset switching requires FxSound processing to be enabled.
-
-### Voicemeeter (Bundled) Quick Setup
-
-The Voicemeeter integration supports Voicemeeter Standard, Banana, and Potato on Windows. It uses the Remote API DLL installed by Voicemeeter; no separate helper or network service is required.
-
-1. Start Voicemeeter.
-2. Open `Plugins` and select `Voicemeeter`.
-3. Click `Connect`, or enable `Auto connect` so MIDIMaster attaches when Voicemeeter is running.
-4. Create a binding and choose `Integrations -> Voicemeeter`.
-5. Pick a strip, bus, routing button, hardware device, MacroButton, preset, or safe engine action.
-
-Notes:
-
-- Auto connect never launches Voicemeeter. The dashboard's `Launch` button is always an explicit action.
-- Faders and knobs receive live parameter feedback; stateful MIDI buttons can follow mute, solo, routing, and MacroButton state.
-- The dashboard shows live strip and bus meters only while its tab is open. Meter data is not sent as MIDI feedback.
-- Hardware device changes can interrupt audio. `Restart engine` asks for confirmation.
-- MacroButton aliases use lines such as `1: Stream mute`. Preset targets use lines such as `1: Streaming`; these labels are saved per MIDIMaster profile.
-- System settings, VBAN, patch matrices, recorder controls, shutdown, reset, and arbitrary Voicemeeter scripts are intentionally not exposed.
+Bundled plugins (for example, OBS Studio, Wave Link, and Philips Hue) cannot be uninstalled, but can be disabled.
 
 ### Philips Hue (Bundled) Quick Setup
 

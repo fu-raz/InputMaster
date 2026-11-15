@@ -132,7 +132,7 @@ export function createProfilesFixture({ bindingCount, profileCount, shape }) {
 
 function disabledPlugins(mode) {
   if (mode === "all") return [];
-  if (mode === "one") return BUNDLED_PLUGIN_IDS.filter((id) => id !== "voicemeeter");
+  if (mode === "one") return BUNDLED_PLUGIN_IDS.filter((id) => id !== "obs");
   if (mode === "zero") return [...BUNDLED_PLUGIN_IDS];
   throw new Error(`Unknown plugin mode '${mode}'`);
 }

@@ -1,5 +1,4 @@
 use crate::run_logger;
-use crate::voicemeeter::VoicemeeterState;
 use crate::ws_bridge::WsHub;
 use crate::AppState;
 use std::sync::atomic::{AtomicU8, Ordering};
@@ -227,15 +226,7 @@ fn stop_managed_resources(app: &AppHandle) {
         Err(_) => {
             run_logger::warn("app", "shutdown_keyboard_input_lock_failed", "");
         }
-    }
-
-    if let Err(err) = app.state::<VoicemeeterState>().disconnect_for_shutdown() {
-        run_logger::warn(
-            "app",
-            "shutdown_voicemeeter_disconnect_failed",
-            &format!("error={err}"),
-        );
-    }
+    };
 }
 
 fn stop_managed_resources_best_effort(app: &AppHandle) {
@@ -262,18 +253,7 @@ fn stop_managed_resources_best_effort(app: &AppHandle) {
         midi.stop();
     } else {
         run_logger::warn("app", "shutdown_midi_busy_at_exit", "");
-    }
-
-    if let Err(err) = app
-        .state::<VoicemeeterState>()
-        .try_disconnect_for_shutdown()
-    {
-        run_logger::warn(
-            "app",
-            "shutdown_voicemeeter_busy_at_exit",
-            &format!("error={err}"),
-        );
-    }
+    };
 }
 
 async fn perform_cleanup(app: AppHandle) {

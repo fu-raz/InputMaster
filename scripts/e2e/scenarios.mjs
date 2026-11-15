@@ -36,7 +36,7 @@ export const scenarios = [
       );
       assert.deepEqual(
         (await app.invoke("list_plugins")).map((p) => p.id).sort(),
-        ["fxsound", "hue", "obs", "voicemeeter", "wavelink"],
+        ["hue", "obs", "wavelink"],
       );
     },
   ],

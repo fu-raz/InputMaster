@@ -74,7 +74,6 @@ rodio = { version = "0.22.2", default-features = false, features = ["playback", 
 ringbuf = "0.5"
 
 [target.'cfg(windows)'.dependencies]
-libloading = "0.8"
 winreg = "0.55"
 
 [dev-dependencies]

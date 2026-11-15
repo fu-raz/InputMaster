@@ -18,7 +18,6 @@ mod durable_json_store;
 mod fader_curve;
 mod feedback;
 mod file_dialog;
-mod fxsound;
 mod keyboard_input;
 mod midi;
 mod midi_event_queue;
@@ -44,7 +43,6 @@ mod soundboard;
 mod store_api;
 mod telemetry;
 mod virtual_audio;
-mod voicemeeter;
 mod window_focus;
 mod windows_autostart;
 mod windows_display;
@@ -61,7 +59,6 @@ pub(crate) use app_state::AppState;
 use audio::AudioBackend;
 use commands::*;
 use durable_json_store::new_recovery_notices;
-use fxsound::{fxsound_select_preset, fxsound_snapshot, fxsound_write, FxSoundState};
 use profile_store::ProfileStore;
 use shutdown::{ShutdownAction, ShutdownCoordinator};
 
@@ -76,11 +73,6 @@ use plugin_api::{
     read_plugin_text, set_plugin_enabled, uninstall_plugin,
 };
 use store_api::{fetch_store_catalog, install_store_plugin, install_store_plugins};
-use voicemeeter::{
-    voicemeeter_assign_device, voicemeeter_connect, voicemeeter_device_state,
-    voicemeeter_disconnect, voicemeeter_launch, voicemeeter_list_devices, voicemeeter_safe_command,
-    voicemeeter_snapshot, voicemeeter_status, voicemeeter_write_parameters, VoicemeeterState,
-};
 use ws_bridge::{get_wavelink_ws_port, ws_close, ws_open, ws_send, WsHub};
 
 #[cfg(target_os = "windows")]
@@ -278,8 +270,6 @@ pub fn run() {
 
             // Shared WebSocket bridge for integration plugins.
             app.manage(WsHub::new());
-            app.manage(VoicemeeterState::new());
-            app.manage(FxSoundState::default());
             app.manage(ShutdownCoordinator::new());
 
             app.manage(AppState::new(

@@ -15,10 +15,6 @@
       "lines": 1697
     },
     {
-      "file": "src-tauri/builtin_plugins/voicemeeter/plugin.mjs",
-      "lines": 877
-    },
-    {
       "file": "src-tauri/builtin_plugins/wavelink/plugin.mjs",
       "lines": 1753
     },
@@ -93,10 +89,6 @@
     {
       "file": "src-tauri/src/virtual_audio.rs",
       "lines": 836
-    },
-    {
-      "file": "src-tauri/src/voicemeeter.rs",
-      "lines": 1291
     },
     {
       "file": "src/app/appearance.js",
