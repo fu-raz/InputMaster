@@ -71,7 +71,7 @@ export function createOsdSettings({
     }
     const previewLabel = elements.osdPositionPicker?.querySelector?.(".settings-osd-preview-label");
     if (previewLabel) {
-      previewLabel.textContent = merged.showBindingName ? "Fader Group 1" : "MIDIMaster";
+      previewLabel.textContent = merged.showBindingName ? "Fader Group 1" : "InputMaster";
     }
 
     syncOsdAppearanceUi(merged);

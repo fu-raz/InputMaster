@@ -66,7 +66,7 @@ export function setupUpdateNotificationWindow({
     if (!updateMessage) return;
     const latest = latestVersion || "a new version";
     const current = currentVersion || "unknown";
-    updateMessage.textContent = `MIDIMaster ${latest} is available (current: ${current}).`;
+    updateMessage.textContent = `InputMaster ${latest} is available (current: ${current}).`;
   }
 
   function applyPayload(payload = {}) {

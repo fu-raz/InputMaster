@@ -21,12 +21,12 @@
   --ui-icon-size: 18px;
   --ui-header-gap: 16px;
   --ui-section-gap: 16px;
-  /* Element borders inside containers — always 1px (never 2px plates) */
+  /* Element borders inside containers — always 1px (never 2px / inset double-strokes) */
   --ui-border-width: 1px;
-  /* Icon-only controls: glyph inset; do not fill the button box */
+  /* Icon-only controls: glyph inset; do not fill the button box; hit target stays size */
   --ui-icon-button-size: 32px;
-  --ui-icon-button-pad: 7px;
-  --ui-icon-button-glyph: 16px;
+  --ui-icon-button-pad: 8px;
+  --ui-icon-button-glyph: 14px;
 }
 
 /* Scale-dependent sizes — redeclare at every --ui-text-scale change */
@@ -40,7 +40,8 @@
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
   /* Shared sub-nav size for Inputs / Plugins / Settings (do not enlarge Plugins alone) */
-  --ui-subnav-size: calc(12px * var(--ui-text-scale));
+  /* Sub-nav stays compact; do not scale with page body text */
+  --ui-subnav-size: 13px;
   /* Title↔subtitle stay tight; icon size is set from measured copy height in JS */
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
@@ -60,7 +61,8 @@
   --ui-h3-size: max(calc(18px * var(--ui-text-scale)), calc(var(--ui-button-label-size) + 8px));
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
-  --ui-subnav-size: calc(12px * var(--ui-text-scale));
+  /* Keep the smaller Settings/Inputs sub-nav size on Plugins too */
+  --ui-subnav-size: 13px;
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
   --ui-toggle-label-size: calc(14px * var(--ui-text-scale));
@@ -403,12 +405,14 @@ body[data-theme] svg.fa-icon {
   align-items: center;
   justify-content: flex-start;
   gap: 10px;
-  border: 1px solid transparent;
+  border: var(--ui-border-width, 1px) solid transparent;
   border-radius: 5px;
   background: transparent;
   color: var(--text-secondary);
-  font-size: var(--ui-subnav-size);
+  /* Explicit — never inherit page body scale on Plugins */
+  font-size: var(--ui-subnav-size, 13px) !important;
   font-weight: var(--ui-subnav-weight);
+  line-height: 1.25;
   text-align: left;
   font-family: inherit;
 }

@@ -92,7 +92,7 @@ fn show_update_notification_window(
         "update",
         WebviewUrl::App(format!("update.html?{query}").into()),
     )
-    .title("MIDIMaster Update")
+    .title("InputMaster Update")
     .inner_size(420.0, 230.0)
     .min_inner_size(420.0, 230.0)
     .resizable(false)

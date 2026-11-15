@@ -5,15 +5,15 @@ use std::path::{Path, PathBuf};
 use windows::core::PCWSTR;
 
 #[cfg(target_os = "windows")]
-const APP_NAME: &str = "MIDIMaster";
+const APP_NAME: &str = "InputMaster";
 #[cfg(target_os = "windows")]
-const STARTUP_SHORTCUT_NAME: &str = "MIDIMaster.lnk";
+const STARTUP_SHORTCUT_NAME: &str = "InputMaster.lnk";
 #[cfg(target_os = "windows")]
 const INSTALL_MARKER_NAME: &str = ".midimaster-installed";
 #[cfg(target_os = "windows")]
 const RUN_KEY_PATH: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 #[cfg(target_os = "windows")]
-pub const INSTALL_REQUIRED_ERROR: &str = "Install MIDIMaster before enabling Start with Windows.";
+pub const INSTALL_REQUIRED_ERROR: &str = "Install InputMaster before enabling Start with Windows.";
 
 #[cfg(target_os = "windows")]
 struct ComGuard;

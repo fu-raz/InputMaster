@@ -189,7 +189,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                             <div class="settings-osd-preview-card">
                               <div class="settings-osd-preview-header">
                                 <div class="settings-osd-preview-icon"></div>
-                                <div class="settings-osd-preview-label">MIDIMaster</div>
+                                <div class="settings-osd-preview-label">InputMaster</div>
                                 <div class="settings-osd-preview-value">100%</div>
                               </div>
                               <div class="settings-osd-preview-bar">

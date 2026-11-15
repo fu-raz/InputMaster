@@ -32,6 +32,7 @@
   color: var(--text);
   font-size: var(--bindings-control-font);
   box-sizing: border-box;
+  box-shadow: none;
 }
 
 .binding-add-button,
@@ -77,12 +78,14 @@
 .binding-density-option.selected {
   background: var(--accent-soft);
   color: var(--text);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  /* Selected = fill only — never a thicker stroke than neighbors */
+  box-shadow: none;
+  border: 0;
 }
 
 .binding-density-option:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
+  outline: var(--ui-border-width, 1px) solid var(--accent);
+  outline-offset: -1px;
 }
 
 /* glyph size comes from shared --ui-icon-button-glyph */
@@ -199,7 +202,8 @@
 .binding-type-segment.selected {
   background: var(--accent-soft);
   color: var(--text);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  box-shadow: none;
+  border: 0;
 }
 
 @media (max-width: 900px) {
@@ -1461,7 +1465,8 @@ body[data-theme] .binding-type-segment:hover {
 body[data-theme] .binding-type-segment.selected {
   background: var(--accent-soft);
   color: var(--text-primary);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 54%, transparent);
+  box-shadow: none;
+  border: 0;
 }
 
 body[data-theme] .binding-density-toggle {
@@ -1481,7 +1486,8 @@ body[data-theme] .binding-density-option:hover {
 body[data-theme] .binding-density-option.selected {
   background: var(--accent-soft);
   color: var(--text-primary);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 54%, transparent);
+  box-shadow: none;
+  border: 0;
 }
 
 body[data-theme] .binding-value-cell {

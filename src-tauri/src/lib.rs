@@ -313,7 +313,7 @@ pub fn run() {
             let osd_url = "osd.html";
             let osd_builder =
                 WebviewWindowBuilder::new(app, "osd", WebviewUrl::App(osd_url.into()))
-                    .title("MIDIMaster OSD")
+                    .title("InputMaster OSD")
                     .decorations(false)
                     .transparent(true)
                     .always_on_top(true)
