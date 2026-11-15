@@ -26,7 +26,7 @@
 .binding-density-toggle {
   height: var(--bindings-control-h);
   min-height: var(--bindings-control-h);
-  border: 1px solid var(--line-strong);
+  border: var(--ui-border-width, 1px) solid var(--line-strong);
   border-radius: var(--bindings-control-radius);
   background: var(--control-bg);
   color: var(--text);
@@ -62,10 +62,7 @@
 .binding-density-option {
   min-width: 0;
   height: 100%;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  /* padding comes from shared .ui-icon-button rules */
   border: 0;
   border-radius: 3px;
   background: transparent;
@@ -88,10 +85,7 @@
   outline-offset: -2px;
 }
 
-.binding-density-option svg {
-  width: 18px;
-  height: 18px;
-}
+/* glyph size comes from shared --ui-icon-button-glyph */
 
 .binding-density-option svg:not(.fa-icon) {
   fill: none;
@@ -625,13 +619,14 @@
 }
 
 .binding-action {
-  width: 26px;
-  height: 28px;
-  padding: 0;
-  border: 0;
+  width: var(--ui-icon-button-size, 32px);
+  height: var(--ui-icon-button-size, 32px);
+  min-width: var(--ui-icon-button-size, 32px);
+  min-height: var(--ui-icon-button-size, 32px);
+  border: var(--ui-border-width, 1px) solid transparent;
   background: transparent;
   color: var(--text-muted);
-  font-size: 19px;
+  font-size: var(--ui-icon-button-glyph, 16px);
 }
 
 .binding-action:hover {
@@ -1652,12 +1647,16 @@ body[data-theme] .binding-mute-button.muted {
 }
 
 body[data-theme] .binding-mute-button svg,
-body[data-theme] .binding-action svg,
 body[data-theme] .binding-add-button svg,
-body[data-theme] .binding-search-field svg,
-body[data-theme] .topbar-icon-button svg {
+body[data-theme] .binding-search-field svg {
   width: 18px;
   height: 18px;
+}
+
+body[data-theme] .binding-action svg,
+body[data-theme] .topbar-icon-button svg {
+  width: var(--ui-icon-button-glyph, 16px);
+  height: var(--ui-icon-button-glyph, 16px);
 }
 
 body[data-theme] .binding-action svg:not(.fa-icon),

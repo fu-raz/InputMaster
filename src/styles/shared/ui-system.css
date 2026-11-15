@@ -21,6 +21,12 @@
   --ui-icon-size: 18px;
   --ui-header-gap: 16px;
   --ui-section-gap: 16px;
+  /* Element borders inside containers — always 1px (never 2px plates) */
+  --ui-border-width: 1px;
+  /* Icon-only controls: glyph inset; do not fill the button box */
+  --ui-icon-button-size: 32px;
+  --ui-icon-button-pad: 7px;
+  --ui-icon-button-glyph: 16px;
 }
 
 /* Scale-dependent sizes — redeclare at every --ui-text-scale change */
@@ -33,11 +39,13 @@
   --ui-h3-size: max(calc(18px * var(--ui-text-scale)), calc(var(--ui-button-label-size) + 8px));
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
-  --ui-subnav-size: calc(13px * var(--ui-text-scale));
+  /* Shared sub-nav size for Inputs / Plugins / Settings (do not enlarge Plugins alone) */
+  --ui-subnav-size: calc(12px * var(--ui-text-scale));
   /* Title↔subtitle stay tight; icon size is set from measured copy height in JS */
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
   --ui-toggle-label-size: calc(13px * var(--ui-text-scale));
+  --ui-control-font-size: calc(13px * var(--ui-text-scale));
   --ui-device-font-size: calc(14px * var(--ui-text-scale));
   --ui-device-header-size: calc(11px * var(--ui-text-scale));
   --ui-meta-size: calc(12px * var(--ui-text-scale));
@@ -52,10 +60,11 @@
   --ui-h3-size: max(calc(18px * var(--ui-text-scale)), calc(var(--ui-button-label-size) + 8px));
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
-  --ui-subnav-size: calc(13px * var(--ui-text-scale));
+  --ui-subnav-size: calc(12px * var(--ui-text-scale));
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
   --ui-toggle-label-size: calc(14px * var(--ui-text-scale));
+  --ui-control-font-size: calc(14px * var(--ui-text-scale));
   --ui-device-font-size: calc(16px * var(--ui-text-scale));
   --ui-device-header-size: calc(12px * var(--ui-text-scale));
   --ui-meta-size: calc(12px * var(--ui-text-scale));
@@ -186,20 +195,57 @@ body[data-theme] svg.fa-icon {
 .ui-nav-icon .fa-icon,
 .ui-device-table__vendor .fa-icon,
 .sidebar-footer-icon .fa-icon,
-.topbar-icon-button .fa-icon,
 .binding-search-field .fa-icon,
-.binding-density-option .fa-icon,
 .settings-nav-icon .fa-icon,
 .settings-card-section-icon .fa-icon,
 .settings-startup-icon .fa-icon,
 .settings-status-icon .fa-icon,
-.settings-button-icon .fa-icon,
-.midi-route-icon-button .fa-icon {
+.settings-button-icon .fa-icon {
   width: 100%;
   height: 100%;
   display: block;
   fill: currentColor;
   stroke: none;
+}
+
+/*
+ * Icon-only buttons: fixed glyph + padding inside the box.
+ * Never let the SVG stretch to 100% of the button.
+ */
+.ui-icon-button,
+.midi-route-icon-button,
+.plugins-browser-icon-button,
+.topbar-icon-button,
+.binding-density-option,
+.binding-action,
+.binding-config-icon-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ui-icon-button-pad);
+}
+
+.ui-icon-button svg,
+.midi-route-icon-button svg,
+.plugins-browser-icon-button svg,
+.topbar-icon-button svg,
+.binding-density-option svg,
+.binding-action svg,
+.binding-config-icon-button svg,
+.ui-icon-button .fa-icon,
+.midi-route-icon-button .fa-icon,
+.plugins-browser-icon-button .fa-icon,
+.topbar-icon-button .fa-icon,
+.binding-density-option .fa-icon,
+.binding-action .fa-icon,
+.binding-config-icon-button .fa-icon {
+  width: var(--ui-icon-button-glyph) !important;
+  height: var(--ui-icon-button-glyph) !important;
+  max-width: var(--ui-icon-button-glyph);
+  max-height: var(--ui-icon-button-glyph);
+  flex: 0 0 auto;
+  display: block;
 }
 
 #inputs-page .ui-subsection-title {
@@ -283,7 +329,7 @@ body[data-theme] svg.fa-icon {
   width: 100%;
   max-width: none;
   border-radius: var(--ui-panel-radius, 5px);
-  border: 1px solid var(--ui-panel-border, var(--control-border));
+  border: var(--ui-border-width, 1px) solid var(--ui-panel-border, var(--control-border));
   background: var(--ui-panel-bg, var(--surface-raised));
   padding: var(--ui-panel-pad, 16px 18px);
   overflow: visible;
@@ -317,18 +363,18 @@ body[data-theme] svg.fa-icon {
   gap: 18px;
   align-items: center;
   padding: 12px 16px;
-  border: 2px solid var(--ui-list-row-border, var(--control-border-strong));
+  border: var(--ui-border-width) solid var(--ui-list-row-border, var(--control-border-strong));
   border-radius: 5px;
   background: var(--ui-list-row-bg);
   box-sizing: border-box;
 }
 
-/* Inputs: force unmistakable row plates vs panel */
+/* Inputs: force unmistakable row plates vs panel (still 1px) */
 #inputs-page .ui-toggle-row,
 #inputs-page .ui-device-table__row,
 #inputs-page .midi-route-row {
   background: #1c2633;
-  border: 2px solid #4a5c70;
+  border: var(--ui-border-width) solid #4a5c70;
 }
 
 .ui-toggle-row__label {
@@ -451,7 +497,7 @@ body[data-theme] svg.fa-icon {
   align-items: center;
   gap: 8px;
   padding: 8px;
-  border: 1px solid var(--ui-list-row-border, var(--control-border-strong));
+  border: var(--ui-border-width) solid var(--ui-list-row-border, var(--control-border-strong));
   border-radius: var(--radius-control, 4px);
   background: var(--ui-list-row-bg);
 }
@@ -522,7 +568,7 @@ body[data-theme] svg.fa-icon {
 .ui-device-table__row {
   min-height: 56px;
   padding: 14px 16px;
-  border: 2px solid var(--ui-list-row-border, var(--control-border-strong));
+  border: var(--ui-border-width) solid var(--ui-list-row-border, var(--control-border-strong));
   border-radius: var(--radius-control, 4px);
   background: var(--ui-list-row-bg);
   font-size: max(17.5px, var(--ui-device-font-size, 14px));
@@ -617,7 +663,7 @@ body[data-theme] svg.fa-icon {
 .inputs-content .ui-panel {
   margin: 0;
   /* Same border as the rest of the app (.ui-panel / settings-card) */
-  border: 1px solid var(--ui-panel-border, var(--control-border));
+  border: var(--ui-border-width, 1px) solid var(--ui-panel-border, var(--control-border));
   background: var(--ui-panel-bg, var(--surface-raised));
   box-shadow: none;
 }

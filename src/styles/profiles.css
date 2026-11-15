@@ -333,18 +333,19 @@ body[data-theme] .binding-actions-header {
 
 body[data-theme] .binding-action,
 body[data-theme] .binding-action.delete {
-  width: 28px;
-  height: 32px;
-  min-width: 28px;
-  min-height: 32px;
+  width: var(--ui-icon-button-size, 32px);
+  height: var(--ui-icon-button-size, 32px);
+  min-width: var(--ui-icon-button-size, 32px);
+  min-height: var(--ui-icon-button-size, 32px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  border: 0;
+  padding: var(--ui-icon-button-pad, 7px);
+  border: var(--ui-border-width, 1px) solid transparent;
   border-radius: 4px;
   background: transparent;
   box-shadow: none;
+  box-sizing: border-box;
 }
 
 body[data-theme] .binding-action:hover {

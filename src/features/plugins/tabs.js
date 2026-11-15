@@ -6,6 +6,13 @@ import {
 
 export const PLUGINS_ICON_DATA = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><rect width='18' height='18' rx='4' fill='%232b2d42'/><path d='M6.2 6.1c.6-1 1.6-1.6 2.8-1.6s2.2.6 2.8 1.6c.2.3.6.4.9.2l.7-.4c.3-.2.4-.6.2-.9C15.5 3.5 13.4 2 11 2H7C4.6 2 2.5 3.5 1.4 5c-.2.3-.1.7.2.9l.7.4c.3.2.7.1.9-.2zM11.8 11.9c-.6 1-1.6 1.6-2.8 1.6s-2.2-.6-2.8-1.6c-.2-.3-.6-.4-.9-.2l-.7.4c-.3.2-.4.6-.2.9C2.5 14.5 4.6 16 7 16h4c2.4 0 4.5-1.5 5.6-3 .2-.3.1-.7-.2-.9l-.7-.4c-.3-.2-.7-.1-.9.2z' fill='white' opacity='.85'/></svg>";
 
+/** Fully stripped from the product — hide even if leftovers remain on disk / in catalog. */
+const RETIRED_PLUGIN_IDS = new Set(["fxsound", "voicemeeter"]);
+
+function isRetiredPluginId(id) {
+  return RETIRED_PLUGIN_IDS.has(String(id || "").trim().toLowerCase());
+}
+
 function guessMimeFromPath(p) {
   const s = String(p || "").toLowerCase();
   if (s.endsWith(".svg")) return "image/svg+xml";
@@ -228,13 +235,19 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
   }
 
   function buildEntries({ installed, catalog }) {
-    const installedMap = new Map((Array.isArray(installed) ? installed : []).map((plugin) => [String(plugin.id || ""), plugin]));
-    const storePlugins = Array.isArray(catalog?.plugins) ? catalog.plugins : [];
+    const installedMap = new Map(
+      (Array.isArray(installed) ? installed : [])
+        .filter((plugin) => !isRetiredPluginId(plugin?.id))
+        .map((plugin) => [String(plugin.id || ""), plugin]),
+    );
+    const storePlugins = (Array.isArray(catalog?.plugins) ? catalog.plugins : []).filter(
+      (plugin) => !isRetiredPluginId(plugin?.id),
+    );
     const storeMap = new Map(storePlugins.map((plugin) => [String(plugin.id || ""), plugin]));
     const ids = new Set([...installedMap.keys(), ...storeMap.keys()]);
 
     const entries = [...ids]
-      .filter(Boolean)
+      .filter((id) => Boolean(id) && !isRetiredPluginId(id))
       .map((id) => {
         const installedPlugin = installedMap.get(id) || null;
         const storePlugin = storeMap.get(id) || null;

@@ -17,7 +17,7 @@
 .settings-description {
   margin-top: 4px;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--ui-help-size, 13px);
   line-height: 1.4;
 }
 
@@ -87,7 +87,7 @@
 
 .settings-appearance-control > span:first-child {
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: var(--ui-meta-size, 12px);
   line-height: 14px;
   font-weight: 750;
 }
@@ -199,7 +199,7 @@
 
 .settings-inline-label {
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: var(--ui-meta-size, 12px);
   line-height: 14px;
   font-weight: 750;
   white-space: nowrap;
@@ -223,7 +223,7 @@
   padding: 0 16px;
   border-bottom: 1px solid color-mix(in srgb, var(--control-border) 76%, transparent);
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: var(--ui-control-font-size, 13px);
   font-weight: 650;
 }
 
@@ -338,13 +338,13 @@
 .settings-field-label {
   min-width: 0;
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--ui-toggle-label-size, var(--ui-control-font-size, 13px));
   font-weight: 600;
 }
 
 .settings-general-section .settings-field-label {
   color: color-mix(in srgb, var(--text-primary) 82%, var(--text-secondary));
-  font-size: 12px;
+  font-size: var(--ui-toggle-label-size, var(--ui-control-font-size, 13px));
   font-weight: 600;
   line-height: 1.3;
 }

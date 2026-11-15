@@ -77,12 +77,20 @@ body.dark-mode:not([data-theme]) main {
 }
 
 .sidebar-nav-item svg,
-.topbar-icon-button svg,
 .binding-add-button svg,
-.binding-search-field svg,
-.binding-action svg {
+.binding-search-field svg {
   width: 18px;
   height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: 0 0 auto;
+}
+
+.topbar-icon-button svg:not(.fa-icon),
+.binding-action svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;

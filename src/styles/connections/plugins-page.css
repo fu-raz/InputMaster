@@ -264,14 +264,14 @@
   min-height: 40px;
   padding: 0 16px;
   border-radius: 4px;
-  border: 1px solid var(--control-border);
+  border: var(--ui-border-width, 1px) solid var(--control-border);
   background: var(--control-bg);
   color: var(--text-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: var(--ui-control-font-size, var(--ui-button-label-size, 13px));
   font-weight: 700;
   white-space: nowrap;
   transition:
@@ -318,27 +318,21 @@
 }
 
 #plugins-page .plugins-browser-icon-button {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
+  width: var(--ui-icon-button-size, 32px);
+  min-width: var(--ui-icon-button-size, 32px);
+  height: var(--ui-icon-button-size, 32px);
+  min-height: var(--ui-icon-button-size, 32px);
   border-radius: 4px;
-  border: 1px solid var(--control-border);
+  border: var(--ui-border-width, 1px) solid var(--control-border);
   background: transparent;
   color: var(--text-muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   transition:
     background-color 140ms ease,
     border-color 140ms ease,
     color 140ms ease;
 }
 
-#plugins-page .plugins-browser-icon-button svg {
-  width: 14px;
-  height: 14px;
+#plugins-page .plugins-browser-icon-button svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
@@ -410,7 +404,7 @@
   padding: 12px 14px;
   min-height: 108px;
   border-radius: 5px;
-  border: 1px solid var(--control-border);
+  border: var(--ui-border-width, 1px) solid var(--control-border);
   background: var(--surface-raised);
   align-items: start;
 }
@@ -448,7 +442,7 @@
 #plugins-page .plugins-browser-card-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: var(--ui-device-font-size, var(--ui-body-size));
   line-height: 1.2;
   font-weight: 700;
 }
@@ -458,7 +452,7 @@
   border-radius: 999px;
   background: var(--surface-muted);
   color: var(--text-secondary);
-  font-size: 10px;
+  font-size: var(--ui-meta-size, 12px);
   font-weight: 700;
 }
 
@@ -470,13 +464,13 @@
 #plugins-page .plugins-browser-card-description {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: var(--ui-help-size, 13px);
   line-height: 1.45;
 }
 
 #plugins-page .plugins-browser-card-meta {
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: var(--ui-meta-size, 12px);
   line-height: 1.4;
 }
 
@@ -491,7 +485,7 @@
   border-radius: 999px;
   background: var(--surface-muted);
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: var(--ui-meta-size, 12px);
   font-weight: 600;
 }
 
