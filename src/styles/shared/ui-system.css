@@ -124,7 +124,9 @@ body[data-theme] {
 }
 
 .ui-panel.is-master-off {
-  opacity: 0.75;
+  opacity: 0.65;
+  pointer-events: none;
+  user-select: none;
 }
 
 /*

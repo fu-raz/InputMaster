@@ -42,7 +42,8 @@ export function routesFromResolvedPreferences(resolvedRoutes) {
         outputDeviceId: route.outputMatch.id,
         inputDeviceName: route.inputMatch.name || route.preference?.inputDeviceName,
         outputDeviceName: route.outputMatch.name || route.preference?.outputDeviceName,
-        enabled: true,
+        // Preserve explicit disable; never force-enable on resolve (master toggle).
+        enabled: route.preference?.enabled !== false,
       };
     }),
   });

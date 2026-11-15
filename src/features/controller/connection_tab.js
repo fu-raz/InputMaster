@@ -141,6 +141,7 @@ export function createControllerConnectionTab({ invoke, t }) {
     if (!panel) return;
     const enabled = Boolean(status.enabled) && status.supported !== false;
     panel.classList.toggle("is-master-off", !enabled);
+    if ("inert" in panel) panel.inert = !enabled;
   }
 
   function update() {

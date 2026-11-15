@@ -33,6 +33,7 @@ export function bindMasterPanelOpacity({ input, panel, getEnabled }) {
     const on = typeof getEnabled === "function" ? Boolean(getEnabled()) : Boolean(input.checked);
     // Only the bordered panel dims — header stays full opacity.
     panel.classList.toggle("is-master-off", !on);
+    if ("inert" in panel) panel.inert = !on;
   };
   sync();
   return sync;

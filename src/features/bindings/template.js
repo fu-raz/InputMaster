@@ -363,7 +363,7 @@ export const bindingsTemplate = `<div id="binding-config-panel" class="target-pa
                       <button id="binding-config-button-learn-button" type="button" class="binding-config-button binding-config-button--primary" data-i18n="bindings.learnButton">Learn Button</button>
                       <div id="binding-config-button-learn-indicator" class="binding-config-preview-learn-indicator hidden" aria-live="polite">
                         <div class="learn-panel-spinner" aria-hidden="true"></div>
-                        <span id="binding-config-button-learn-status" data-i18n="bindings.waitingMidiInput">Waiting for MIDI input...</span>
+                        <span id="binding-config-button-learn-status" data-i18n="bindings.waitingMidiInput">Waiting for input...</span>
                       </div>
                     </div>
                   </section>
@@ -375,7 +375,7 @@ export const bindingsTemplate = `<div id="binding-config-panel" class="target-pa
                   <button id="binding-config-preview-learn-button" type="button" class="binding-config-button binding-config-button--primary" data-i18n="bindings.learnFader">Learn Fader</button>
                   <div id="binding-config-preview-learn-indicator" class="binding-config-preview-learn-indicator hidden" aria-live="polite">
                     <div class="learn-panel-spinner" aria-hidden="true"></div>
-                    <span id="binding-config-preview-learn-status" data-i18n="bindings.waitingMidiInput">Waiting for MIDI input...</span>
+                    <span id="binding-config-preview-learn-status" data-i18n="bindings.waitingMidiInput">Waiting for input...</span>
                   </div>
                 </div>
               </div>

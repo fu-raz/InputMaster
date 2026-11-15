@@ -386,25 +386,32 @@ export function createMidiFeature({
   }
 
   async function setMasterEnabled(enabled) {
-    const routes = desiredRoutes();
+    const want = Boolean(enabled);
+    // Prefer draft+preference so inline editor rows participate; fall back to preference.
+    let routes = currentRoutesForSave();
+    if (!routes.length) routes = desiredRoutes();
     if (!routes.length) {
       syncMidiMasterToggleUi();
-      return { ok: true, enabled: false };
+      return { ok: true, enabled: false, reason: "no_routes" };
     }
-    const next = routes.map((route) => ({ ...route, enabled: Boolean(enabled) }));
-    await applyRoutes(next, { source: "manual" });
+    discardRouteDrafts();
+    const next = routes.map((route) => ({ ...route, enabled: want }));
+    await applyRoutes(next, { source: "manual", force: true });
+    // Keep inline editor in sync with the applied preference (enabled flags).
+    routeEditor.begin(desiredRoutes());
     syncMidiMasterToggleUi();
     renderRoutesPopover();
-    return { ok: true, enabled: Boolean(enabled) };
+    return { ok: true, enabled: isMasterEnabled() };
   }
 
   function syncMidiMasterToggleUi() {
     const input = document.querySelector('[data-role="midi-master-input"], #midi-master-enabled');
-    if (!input) return;
-    input.checked = isMasterEnabled();
+    const on = isMasterEnabled();
+    if (input) input.checked = on;
     const panel = document.querySelector('[data-role="midi-panel"]');
     if (panel) {
-      panel.classList.toggle("is-master-off", !isMasterEnabled());
+      panel.classList.toggle("is-master-off", !on);
+      if ("inert" in panel) panel.inert = !on;
     }
   }
 
