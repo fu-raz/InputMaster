@@ -230,6 +230,20 @@
 
 /* Single vertical scrolling list — theme colors + sliders (Font Size, etc.) all discoverable */
 .appearance-subcard {
+  /* Shared control column: width of 6 swatches; right-aligned with color rows */
+  --appearance-row-pad-x: 26px;
+  --appearance-swatch-size: 22px;
+  --appearance-swatch-gap: 10px;
+  --appearance-swatch-count: 6;
+  --appearance-control-width: calc(
+    (var(--appearance-swatch-count) * var(--appearance-swatch-size))
+      + ((var(--appearance-swatch-count) - 1) * var(--appearance-swatch-gap))
+  );
+  --appearance-edit-size: 26px;
+  --appearance-edit-gap: 16px;
+  --appearance-row-pad-right: calc(
+    var(--appearance-row-pad-x) + var(--appearance-edit-size) + var(--appearance-edit-gap)
+  );
   position: relative;
   min-width: 0;
   min-height: 0;
@@ -336,11 +350,12 @@
   height: auto;
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: minmax(150px, 0.9fr) minmax(0, 1.6fr);
+  grid-template-columns: minmax(140px, 1fr) var(--appearance-control-width);
   grid-template-rows: auto;
   gap: 18px;
   align-items: center;
-  padding: 10px 26px;
+  padding: 10px var(--appearance-row-pad-x);
+  padding-right: var(--appearance-row-pad-right);
   border: 0;
   border-bottom: 1px solid color-mix(in srgb, var(--control-border) 72%, transparent);
   border-radius: 0;
@@ -381,11 +396,11 @@
 
 .appearance-token-color-edit {
   position: absolute;
-  right: 22px;
+  right: var(--appearance-row-pad-x);
   top: 50%;
-  width: 26px;
-  height: 26px;
-  flex: 0 0 26px;
+  width: var(--appearance-edit-size);
+  height: var(--appearance-edit-size);
+  flex: 0 0 var(--appearance-edit-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -418,14 +433,16 @@
 }
 
 .appearance-token-swatches {
+  width: var(--appearance-control-width);
   min-width: 0;
+  justify-self: end;
   display: grid;
-  grid-template-columns: repeat(7, 22px);
-  grid-auto-rows: 22px;
-  gap: 10px;
+  grid-template-columns: repeat(var(--appearance-swatch-count), var(--appearance-swatch-size));
+  grid-auto-rows: var(--appearance-swatch-size);
+  gap: var(--appearance-swatch-gap);
   align-content: center;
   align-items: center;
-  padding-right: 42px;
+  padding-right: 0;
 }
 
 .appearance-token-intensity {
@@ -494,10 +511,11 @@
   min-height: 56px;
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: minmax(140px, 1fr) var(--appearance-control-width);
+  gap: 18px;
   align-items: center;
-  padding: 10px 26px 10px 36px;
+  padding: 10px var(--appearance-row-pad-x);
+  padding-right: var(--appearance-row-pad-right);
   border-bottom: 1px solid color-mix(in srgb, var(--control-border) 72%, transparent);
   box-sizing: border-box;
 }
@@ -507,12 +525,20 @@
   min-height: 56px;
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: minmax(140px, 1fr) var(--appearance-control-width);
+  gap: 18px;
   align-items: center;
-  padding: 10px 26px 10px 36px;
+  padding: 10px var(--appearance-row-pad-x);
+  padding-right: var(--appearance-row-pad-right);
   border-bottom: 1px solid color-mix(in srgb, var(--control-border) 72%, transparent);
   box-sizing: border-box;
+}
+
+.appearance-inline-control .settings-range-control,
+.appearance-range-stack .appearance-control-group .settings-range-control {
+  width: 100%;
+  justify-self: end;
+  min-width: 0;
 }
 
 .appearance-toggle-row {
@@ -830,9 +856,9 @@
   .appearance-inline-control,
   .appearance-range-stack .appearance-control-group {
     min-height: 62px;
-    grid-template-columns: minmax(130px, 0.8fr) minmax(0, 1fr);
+    grid-template-columns: minmax(120px, 1fr) var(--appearance-control-width);
     padding-left: 18px;
-    padding-right: 18px;
+    padding-right: calc(18px + var(--appearance-edit-size) + var(--appearance-edit-gap));
   }
 
 }
