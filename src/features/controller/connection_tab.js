@@ -1,4 +1,13 @@
-/** Inputs → Controller: observe-only panel, short master toggle, device table. */
+const GAMEPAD_ICON = `
+  <svg viewBox="0 0 24 24" focusable="false">
+    <path d="M6 9h12a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-2l-1.5 2h-5L9 17H6a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3z"></path>
+    <path d="M9 13h.01"></path>
+    <path d="M15 12v2"></path>
+    <path d="M14 13h2"></path>
+  </svg>
+`;
+
+/** Inputs → Controller input panel (observe-only XInput). */
 export function createControllerConnectionTab({ invoke, t }) {
   let root = null;
   let status = {
@@ -18,42 +27,43 @@ export function createControllerConnectionTab({ invoke, t }) {
   }
 
   function renderDevices() {
-    const tbody = read("devices-body");
-    if (!tbody) return;
-    tbody.innerHTML = "";
+    const list = read("devices");
+    if (!list) return;
+    list.innerHTML = "";
     const devices = Array.isArray(status.devices) ? status.devices : [];
     if (!devices.length) {
-      const row = document.createElement("tr");
-      const cell = document.createElement("td");
-      cell.colSpan = 5;
-      cell.className = "ui-empty";
-      cell.textContent = t("controller.noDevices");
-      row.appendChild(cell);
-      tbody.appendChild(row);
+      const empty = document.createElement("div");
+      empty.className = "ui-list-row";
+      empty.textContent = t("controller.noDevices");
+      list.appendChild(empty);
       return;
     }
     for (const device of devices) {
-      const row = document.createElement("tr");
-      const nameCell = document.createElement("td");
-      nameCell.textContent =
+      const row = document.createElement("div");
+      row.className = "ui-list-row";
+      row.style.gridTemplateColumns = "minmax(0, 1fr) auto";
+      if (device.enabled === false) row.classList.add("is-disabled");
+
+      const main = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "ui-list-row__name";
+      name.textContent =
         device.deviceName || t("controller.deviceName", { number: Number(device.slot) + 1 });
+      const meta = document.createElement("div");
+      meta.className = "ui-list-row__meta";
+      const buttons = Number(device.buttonCount ?? status.buttonCount ?? 14);
+      const faders = Number(device.faderCount ?? status.faderCount ?? 6);
+      const knobs = Number(device.knobCount ?? status.knobCount ?? 0);
+      meta.innerHTML = `
+        <span>${t("ui.count.buttons")}: ${buttons}</span>
+        <span>${t("ui.count.faders")}: ${faders}</span>
+        <span>${t("ui.count.knobs")}: ${knobs}</span>
+      `;
+      main.appendChild(name);
+      main.appendChild(meta);
 
-      const buttons = document.createElement("td");
-      buttons.className = "ui-col-count";
-      buttons.textContent = String(device.buttonCount ?? status.buttonCount ?? 14);
-
-      const faders = document.createElement("td");
-      faders.className = "ui-col-count";
-      faders.textContent = String(device.faderCount ?? status.faderCount ?? 6);
-
-      const knobs = document.createElement("td");
-      knobs.className = "ui-col-count";
-      knobs.textContent = String(device.knobCount ?? status.knobCount ?? 0);
-
-      const toggleCell = document.createElement("td");
-      toggleCell.className = "ui-col-toggle";
-      const toggleLabel = document.createElement("label");
-      toggleLabel.className = "settings-toggle";
+      const toggleCell = document.createElement("label");
+      toggleCell.className = "settings-toggle";
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = device.enabled !== false;
@@ -64,27 +74,12 @@ export function createControllerConnectionTab({ invoke, t }) {
       const ui = document.createElement("span");
       ui.className = "plugins-toggle-ui";
       ui.setAttribute("aria-hidden", "true");
-      toggleLabel.appendChild(input);
-      toggleLabel.appendChild(ui);
-      toggleCell.appendChild(toggleLabel);
+      toggleCell.appendChild(input);
+      toggleCell.appendChild(ui);
 
-      row.appendChild(nameCell);
-      row.appendChild(buttons);
-      row.appendChild(faders);
-      row.appendChild(knobs);
+      row.appendChild(main);
       row.appendChild(toggleCell);
-      tbody.appendChild(row);
-    }
-
-    const advanced = read("advanced-body");
-    if (advanced) {
-      advanced.innerHTML = "";
-      for (const device of devices) {
-        const line = document.createElement("div");
-        line.className = "ui-advanced__body";
-        line.textContent = `${device.deviceName || device.slot}: ${device.deviceId || ""}`;
-        advanced.appendChild(line);
-      }
+      list.appendChild(row);
     }
   }
 
@@ -93,7 +88,6 @@ export function createControllerConnectionTab({ invoke, t }) {
     const supported = status.supported !== false;
     const enabled = Boolean(status.enabled);
     const masterInput = read("master-input");
-    const masterRow = read("master-row");
     const devicesBlock = read("devices-block");
     const unsupported = read("unsupported");
     const observeNote = read("observe-note");
@@ -101,9 +95,6 @@ export function createControllerConnectionTab({ invoke, t }) {
     if (masterInput) {
       masterInput.checked = enabled;
       masterInput.disabled = !supported || busy;
-    }
-    if (masterRow) {
-      masterRow.classList.toggle("is-disabled", !supported || busy);
     }
     if (unsupported) {
       unsupported.classList.toggle("hidden", supported);
@@ -194,66 +185,35 @@ export function createControllerConnectionTab({ invoke, t }) {
     root = container;
     root.innerHTML = `
       <div class="ui-panel controller-settings">
-        <p class="ui-help controller-unsupported hidden" data-role="unsupported"></p>
-        <div class="ui-toggle-row" data-role="master-row">
-          <div class="ui-toggle-row__main">
-            <span class="ui-toggle-row__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path d="M6 10h12v6H6z"></path>
-                <path d="M9 13h.01"></path>
-                <path d="M15 12v2"></path>
-                <path d="M14 13h2"></path>
-                <path d="M4 13h2"></path>
-                <path d="M18 13h2"></path>
-              </svg>
-            </span>
-            <span class="ui-toggle-row__label" data-role="master-label"></span>
+        <div class="ui-page-header" data-role="master-row">
+          <div class="ui-page-header__main">
+            <span class="ui-page-header__icon" aria-hidden="true">${GAMEPAD_ICON}</span>
+            <div>
+              <h1 class="ui-content-title" data-role="master-label"></h1>
+              <p class="ui-help" data-role="master-help"></p>
+            </div>
           </div>
           <label class="settings-toggle" data-role="master-toggle">
             <input type="checkbox" data-role="master-input" />
             <span class="plugins-toggle-ui" aria-hidden="true"></span>
           </label>
         </div>
+        <p class="ui-help controller-unsupported hidden" data-role="unsupported"></p>
         <p class="ui-help controller-observe-note hidden" data-role="observe-note"></p>
         <div class="controller-devices-block hidden" data-role="devices-block">
           <h3 class="ui-subsection-title" data-role="devices-heading"></h3>
-          <table class="ui-device-table" data-role="devices-table">
-            <thead>
-              <tr>
-                <th data-role="col-name"></th>
-                <th class="ui-col-count" data-role="col-buttons"></th>
-                <th class="ui-col-count" data-role="col-faders"></th>
-                <th class="ui-col-count" data-role="col-knobs"></th>
-                <th class="ui-col-toggle" data-role="col-enabled"></th>
-              </tr>
-            </thead>
-            <tbody data-role="devices-body"></tbody>
-          </table>
-          <details class="ui-advanced">
-            <summary data-role="advanced-summary"></summary>
-            <div data-role="advanced-body"></div>
-          </details>
+          <div class="ui-list-stack" data-role="devices"></div>
         </div>
       </div>
     `;
     const masterLabel = read("master-label");
     if (masterLabel) masterLabel.textContent = t("controller.masterLabel");
+    const masterHelp = read("master-help");
+    if (masterHelp) masterHelp.textContent = t("inputs.controller.help");
     const observeNote = read("observe-note");
     if (observeNote) observeNote.textContent = t("controller.observeOnly");
     const heading = read("devices-heading");
     if (heading) heading.textContent = t("controller.devicesHeading");
-    const colName = read("col-name");
-    if (colName) colName.textContent = t("common.name");
-    const colButtons = read("col-buttons");
-    if (colButtons) colButtons.textContent = t("ui.count.buttons");
-    const colFaders = read("col-faders");
-    if (colFaders) colFaders.textContent = t("ui.count.faders");
-    const colKnobs = read("col-knobs");
-    if (colKnobs) colKnobs.textContent = t("ui.count.knobs");
-    const colEnabled = read("col-enabled");
-    if (colEnabled) colEnabled.textContent = t("ui.enabled");
-    const advancedSummary = read("advanced-summary");
-    if (advancedSummary) advancedSummary.textContent = t("ui.showAdvanced");
     const masterInput = read("master-input");
     if (masterInput) {
       masterInput.addEventListener("change", () => {

@@ -19,10 +19,10 @@ body[data-theme] #settings-panel > .page-heading-row {
 body[data-theme] .bindings-toolbar {
   width: 100%;
   margin-left: 0;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 body[data-theme] #main-screen {
@@ -40,49 +40,34 @@ body[data-theme] #main-screen > .page-heading-row {
   border-radius: 5px 5px 0 0;
 }
 
-body[data-theme] .binding-type-filter {
-  grid-column: 1;
-}
-
-body[data-theme] .bindings-toolbar .binding-type-filter {
-  height: 40px;
-  min-height: 40px;
+body[data-theme] .bindings-toolbar .binding-type-filter,
+body[data-theme] .bindings-toolbar .binding-source-filter-field,
+body[data-theme] .bindings-toolbar .binding-search-field,
+body[data-theme] .bindings-toolbar .binding-add-button,
+body[data-theme] .bindings-toolbar .binding-density-toggle {
+  height: var(--bindings-control-h, 36px);
+  min-height: var(--bindings-control-h, 36px);
+  border-radius: var(--bindings-control-radius, 4px);
+  font-size: var(--bindings-control-font, 12px);
 }
 
 body[data-theme] .binding-search-field {
-  grid-column: 2;
-  width: 100%;
-  min-width: 0;
+  width: auto;
+  min-width: 100px;
+  max-width: 220px;
 }
 
-body[data-theme] .binding-search-field:focus-within {
+body[data-theme] .binding-search-field:focus-within,
+body[data-theme] .binding-source-filter-field:focus-within {
   background: var(--control-bg);
   border-color: color-mix(in srgb, var(--accent) 42%, var(--control-border) 58%);
   box-shadow: none;
 }
 
-body[data-theme] .binding-add-button {
-  grid-column: 3;
-  justify-self: end;
-}
-
-body[data-theme] .binding-density-toggle {
-  grid-column: 4;
-  justify-self: end;
-}
-
-body[data-theme] .bindings-toolbar .binding-density-toggle {
-  height: 40px;
-  min-height: 40px;
-}
-
 body[data-theme] .bindings-toolbar .binding-add-button {
-  height: 40px;
-  min-height: 40px;
-  width: 126px;
-  min-width: 126px;
-  padding: 0 16px;
-  border-radius: 4px;
+  width: auto;
+  min-width: 0;
+  padding: 0 var(--bindings-control-pad-x, 12px);
   border-color: color-mix(in srgb, var(--accent) 88%, var(--surface) 12%);
   background: color-mix(in srgb, var(--accent) 84%, var(--surface) 16%);
   color: #fff;
@@ -91,7 +76,6 @@ body[data-theme] .bindings-toolbar .binding-add-button {
   justify-content: center;
   text-align: center;
   gap: 0;
-  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   box-shadow: none;

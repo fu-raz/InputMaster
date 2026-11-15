@@ -65,46 +65,8 @@
   gap: 6px;
 }
 
-.settings-nav-item {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  min-height: 38px;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  text-align: left;
-}
+/* Sub-nav item/icon/label tokens live in shared/ui-system.css */
 
-.settings-nav-item:hover {
-  background: var(--control-bg-hover);
-  color: var(--text-primary);
-}
-
-.settings-nav-item.active {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  color: var(--text-primary);
-}
-
-.settings-nav-icon {
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-}
-
-.settings-nav-icon svg,
 .settings-button-icon svg,
 .settings-status-icon svg,
 .virtual-audio-setup-icon svg,
@@ -116,13 +78,6 @@
   stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.settings-nav-label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .settings-content {
@@ -171,8 +126,9 @@
 }
 
 .settings-maintenance-section .settings-maintenance-layout {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
+  height: auto;
 }
 
 .settings-section-panel.hidden {

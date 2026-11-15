@@ -1000,13 +1000,11 @@ body[data-theme="light"] .settings-osd-preview-stand {
 }
 
 .settings-maintenance-layout {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  display: grid;
-  grid-template-rows:
-    minmax(168px, 1.05fr)
-    minmax(104px, 0.72fr)
-    minmax(168px, 1.18fr);
+  height: auto;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 

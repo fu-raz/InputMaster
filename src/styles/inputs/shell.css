@@ -32,13 +32,7 @@ body[data-theme] #inputs-page > .page-heading-row {
   overflow-y: auto;
 }
 
-.inputs-page-title {
-  margin: 0 10px 18px;
-  font-size: 18px;
-  line-height: 1.2;
-  font-weight: 750;
-  color: var(--text-primary);
-}
+/* .inputs-page-title tokens live in shared/ui-system.css */
 
 .inputs-nav-indicator {
   position: absolute;
@@ -64,20 +58,6 @@ body[data-theme] #inputs-page > .page-heading-row {
 }
 
 .inputs-nav-item {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  min-height: 38px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-  padding: 0 12px;
-  border-radius: 5px;
   cursor: pointer;
   font: inherit;
 }
@@ -117,18 +97,7 @@ body[data-theme] #inputs-page > .page-heading-row {
   display: block;
 }
 
-.inputs-panel-header h2 {
-  margin: 0 0 6px;
-  font-size: 1.25rem;
-}
-
-.inputs-panel-help {
-  margin: 0 0 18px;
-  color: #8b91a8;
-  font-size: 13px;
-  line-height: 1.45;
-  max-width: 52rem;
-}
+/* Content titles/help live in shared/ui-system.css */
 
 .inputs-device-list {
   display: flex;
@@ -214,23 +183,6 @@ body[data-theme] #inputs-page > .page-heading-row {
 .midi-routes-inline-host {
   width: 100%;
   max-width: none;
-}
-
-.binding-source-filter-field {
-  display: inline-flex;
-  align-items: center;
-  min-width: 140px;
-}
-
-.binding-source-filter-field select {
-  height: 36px;
-  min-width: 148px;
-  border-radius: 4px;
-  border: 1px solid var(--control-border);
-  background: var(--control-bg);
-  color: var(--text-primary);
-  font: inherit;
-  padding: 0 10px;
 }
 
 @media (max-width: 900px) {

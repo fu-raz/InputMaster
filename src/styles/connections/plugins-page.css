@@ -39,13 +39,7 @@
   border-right: 1px solid var(--control-border);
 }
 
-#plugins-page .plugins-page-title {
-  margin: 0 10px 4px;
-  font-size: 18px;
-  line-height: 1.2;
-  font-weight: 750;
-  color: var(--text-primary);
-}
+/* .plugins-page-title tokens live in shared/ui-system.css */
 
 #plugins-page .connections-content {
   min-width: 0;
@@ -97,41 +91,10 @@
     opacity 120ms ease;
 }
 
-#plugins-page .connections-nav-item {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  min-height: 38px;
-  padding: 0 12px;
-  border-radius: 5px;
-  border: 1px solid transparent;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  text-align: left;
-}
-
-#plugins-page .connections-nav-item:hover {
-  background: var(--control-bg-hover);
-  color: var(--text-primary);
-}
-
-#plugins-page .connections-nav-item.active {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-primary);
-  box-shadow: none;
-}
+/* Sub-nav item tokens live in shared/ui-system.css */
 
 #plugins-page .connections-nav-icon {
-  width: 18px;
-  height: 18px;
   object-fit: contain;
-  flex: 0 0 auto;
 }
 
 #plugins-page img.connections-nav-icon {
@@ -1121,9 +1084,10 @@ body[data-theme] .profile-select .dropdown-item button.icon-action:hover {
   color: var(--text-primary);
 }
 
-body[data-theme] .binding-add-button,
 body[data-theme] .binding-type-filter,
+body[data-theme] .binding-source-filter-field,
 body[data-theme] .binding-search-field,
+body[data-theme] .binding-density-toggle,
 body[data-theme] .topbar .midi-device-dropdown .target-button,
 body[data-theme] .topbar .midi-device-status,
 body[data-theme] .profile-select .select-button {
@@ -1132,17 +1096,13 @@ body[data-theme] .profile-select .select-button {
   color: var(--text-primary);
 }
 
-body[data-theme] .binding-add-button {
-  color: var(--accent);
-}
-
 body[data-theme] .binding-add-button:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent) 62%, transparent);
   outline-offset: 2px;
 }
 
-body[data-theme] .binding-add-button:hover,
 body[data-theme] .binding-search-field:focus-within,
+body[data-theme] .binding-source-filter-field:focus-within,
 body[data-theme] .topbar .midi-device-dropdown .target-button:hover,
 body[data-theme] .profile-select .select-button:hover {
   background: var(--control-bg-hover);

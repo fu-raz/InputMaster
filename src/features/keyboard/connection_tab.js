@@ -10,7 +10,7 @@ const KEYBOARD_ICON = `
   </svg>
 `;
 
-/** Inputs → Keyboard: Settings-style panel, short master toggle, advanced for ids. */
+/** Inputs → Keyboard input panel. */
 export function createKeyboardConnectionTab({ invoke, t }) {
   let root = null;
   let status = {
@@ -32,30 +32,39 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     list.innerHTML = "";
     const controls = Array.isArray(status.controls) ? status.controls : [];
     if (!controls.length) {
-      const empty = document.createElement("li");
+      const empty = document.createElement("div");
+      empty.className = "ui-list-row";
       empty.textContent = t("keyboard.noControls");
       list.appendChild(empty);
       return;
     }
     for (const control of controls) {
-      const item = document.createElement("li");
-      item.className = "keyboard-control-item";
-      const label = document.createElement("label");
-      label.className = "keyboard-control-label";
+      const row = document.createElement("div");
+      row.className = "ui-list-row keyboard-control-row";
+      row.style.gridTemplateColumns = "minmax(0, 1fr) auto";
+
+      const name = document.createElement("span");
+      name.className = "ui-list-row__name";
+      name.textContent = control.name || control.id;
+
+      const toggleLabel = document.createElement("label");
+      toggleLabel.className = "settings-toggle";
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.className = "keyboard-control-checkbox";
       checkbox.checked = control.enabled !== false;
       checkbox.disabled = busy;
       checkbox.onchange = () => {
         void setControlEnabled(control.id, checkbox.checked);
       };
-      const name = document.createElement("span");
-      name.textContent = control.name || control.id;
-      label.appendChild(checkbox);
-      label.appendChild(name);
-      item.appendChild(label);
-      list.appendChild(item);
+      const ui = document.createElement("span");
+      ui.className = "plugins-toggle-ui";
+      ui.setAttribute("aria-hidden", "true");
+      toggleLabel.appendChild(checkbox);
+      toggleLabel.appendChild(ui);
+
+      row.appendChild(name);
+      row.appendChild(toggleLabel);
+      list.appendChild(row);
     }
   }
 
@@ -64,17 +73,12 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     const supported = status.supported !== false;
     const enabled = Boolean(status.enabled);
     const masterInput = read("master-input");
-    const masterRow = read("master-row");
     const controlsBlock = read("controls-block");
     const unsupported = read("unsupported");
-    const advancedId = read("advanced-id");
 
     if (masterInput) {
       masterInput.checked = enabled;
       masterInput.disabled = !supported || busy;
-    }
-    if (masterRow) {
-      masterRow.classList.toggle("is-disabled", !supported || busy);
     }
     if (unsupported) {
       unsupported.classList.toggle("hidden", supported);
@@ -82,9 +86,6 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     }
     if (controlsBlock) {
       controlsBlock.classList.toggle("hidden", !enabled || !supported);
-    }
-    if (advancedId) {
-      advancedId.textContent = status.deviceId || KEYBOARD_DEVICE_ID;
     }
     if (enabled && supported) {
       renderControls();
@@ -147,33 +148,32 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     root = container;
     root.innerHTML = `
       <div class="ui-panel keyboard-settings">
-        <p class="ui-help keyboard-unsupported hidden" data-role="unsupported"></p>
-        <div class="ui-toggle-row" data-role="master-row">
-          <div class="ui-toggle-row__main">
-            <span class="ui-toggle-row__icon" aria-hidden="true">${KEYBOARD_ICON}</span>
-            <span class="ui-toggle-row__label" data-role="master-label"></span>
+        <div class="ui-page-header" data-role="master-row">
+          <div class="ui-page-header__main">
+            <span class="ui-page-header__icon" aria-hidden="true">${KEYBOARD_ICON}</span>
+            <div>
+              <h1 class="ui-content-title" data-role="master-label"></h1>
+              <p class="ui-help" data-role="master-help"></p>
+            </div>
           </div>
           <label class="settings-toggle" data-role="master-toggle">
             <input type="checkbox" data-role="master-input" />
             <span class="plugins-toggle-ui" aria-hidden="true"></span>
           </label>
         </div>
+        <p class="ui-help keyboard-unsupported hidden" data-role="unsupported"></p>
         <div class="keyboard-controls-block hidden" data-role="controls-block">
           <h3 class="ui-subsection-title" data-role="controls-heading"></h3>
-          <ul class="keyboard-controls-list" data-role="controls"></ul>
+          <div class="ui-list-stack" data-role="controls"></div>
         </div>
-        <details class="ui-advanced">
-          <summary data-role="advanced-summary"></summary>
-          <div class="ui-advanced__body" data-role="advanced-id"></div>
-        </details>
       </div>
     `;
     const masterLabel = read("master-label");
     if (masterLabel) masterLabel.textContent = t("keyboard.masterLabel");
+    const masterHelp = read("master-help");
+    if (masterHelp) masterHelp.textContent = t("inputs.keyboard.help");
     const heading = read("controls-heading");
     if (heading) heading.textContent = t("keyboard.controlsHeading");
-    const advancedSummary = read("advanced-summary");
-    if (advancedSummary) advancedSummary.textContent = t("ui.showAdvanced");
     const masterInput = read("master-input");
     if (masterInput) {
       masterInput.addEventListener("change", () => {
