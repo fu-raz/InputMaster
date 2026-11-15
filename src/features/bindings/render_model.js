@@ -1,4 +1,5 @@
-const BINDING_TYPE_FILTERS = new Set(["all", "faders", "buttons", "midi", "keyboard", "controller"]);
+const BINDING_TYPE_FILTERS = new Set(["all", "faders", "buttons"]);
+const BINDING_SOURCE_FILTERS = new Set(["all", "midi", "keyboard", "controller", "wheel"]);
 
 function deviceKind(deviceId) {
   const id = String(deviceId || "");
@@ -21,14 +22,22 @@ export function createBindingRenderModel({
     return BINDING_TYPE_FILTERS.has(normalized) ? normalized : "all";
   }
 
+  function normalizeSourceFilter(value) {
+    const normalized = String(value || "all").toLowerCase();
+    return BINDING_SOURCE_FILTERS.has(normalized) ? normalized : "all";
+  }
+
   function matchesTypeFilter(binding, filterValue) {
     const normalized = normalizeTypeFilter(filterValue);
     if (normalized === "all") return true;
-    if (normalized === "midi" || normalized === "keyboard" || normalized === "controller") {
-      return deviceKind(binding?.device_id) === normalized;
-    }
     const isButton = isButtonBinding(binding);
     return normalized === "buttons" ? isButton : !isButton;
+  }
+
+  function matchesSourceFilter(binding, filterValue) {
+    const normalized = normalizeSourceFilter(filterValue);
+    if (normalized === "all") return true;
+    return deviceKind(binding?.device_id) === normalized;
   }
 
   function searchText(binding, index) {
@@ -44,5 +53,11 @@ export function createBindingRenderModel({
     ].join(" ").toLowerCase();
   }
 
-  return { normalizeTypeFilter, matchesTypeFilter, searchText };
+  return {
+    normalizeTypeFilter,
+    normalizeSourceFilter,
+    matchesTypeFilter,
+    matchesSourceFilter,
+    searchText,
+  };
 }

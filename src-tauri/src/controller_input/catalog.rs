@@ -181,6 +181,10 @@ pub fn control_label_for(controller: u8, msg_type: &MidiMessageType) -> Option<&
     ControllerControlId::from_controller(controller, msg_type).map(|c| c.display_name())
 }
 
+pub const BUTTON_COUNT: u8 = 14;
+pub const FADER_COUNT: u8 = 6; // sticks (4) + triggers (2); sticks count as faders
+pub const KNOB_COUNT: u8 = 0;
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ControllerDeviceInfo {
@@ -188,6 +192,10 @@ pub struct ControllerDeviceInfo {
     pub device_id: String,
     pub device_name: String,
     pub connected: bool,
+    pub enabled: bool,
+    pub button_count: u8,
+    pub fader_count: u8,
+    pub knob_count: u8,
 }
 
 #[derive(Debug, Clone, Serialize)]

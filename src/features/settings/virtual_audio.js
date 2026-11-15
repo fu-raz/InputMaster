@@ -309,6 +309,11 @@ export function createVirtualAudioSettingsController({ invoke, dom, i18n, showAl
   }
 
   function setActive(nextActive) {
+    if (!elements.virtualAudioPanel) {
+      active = false;
+      stopMeterPolling();
+      return Promise.resolve();
+    }
     active = Boolean(nextActive);
     if (!active) {
       stopMeterPolling();
@@ -383,6 +388,8 @@ export function createVirtualAudioSettingsController({ invoke, dom, i18n, showAl
   }
 
   function bindUi() {
+    // Settings → Virtual Audio tab removed (ILS-10); keep controller inert when DOM is absent.
+    if (!elements.virtualAudioPanel) return;
     lifetime.listen(elements.virtualAudioInstall, "click", () => runAction("install_virtual_audio"));
     lifetime.listen(elements.virtualAudioUpdate, "click", () => runAction("repair_virtual_audio"));
     lifetime.listen(elements.virtualAudioRepair, "click", () => runAction("repair_virtual_audio"));

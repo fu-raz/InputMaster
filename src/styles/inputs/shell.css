@@ -182,39 +182,11 @@ body[data-theme] #inputs-page > .page-heading-row {
   padding: 8px 0;
 }
 
-.keyboard-settings,
-.controller-settings {
-  max-width: 40rem;
+.keyboard-controls-block {
+  margin-top: 12px;
 }
 
-.keyboard-master-row,
-.controller-master-row {
-  margin-top: 0;
-}
-
-.keyboard-master-row.is-disabled,
-.controller-master-row.is-disabled {
-  opacity: 0.65;
-}
-
-.keyboard-unsupported,
-.controller-unsupported,
-.controller-observe-note {
-  margin: 0 0 12px;
-  color: #8b91a8;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.keyboard-controls-heading,
-.controller-devices-heading {
-  margin: 18px 0 8px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.keyboard-controls-list,
-.controller-devices-list {
+.keyboard-controls-list {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -235,26 +207,30 @@ body[data-theme] #inputs-page > .page-heading-row {
   margin: 0;
 }
 
-.controller-device-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--control-border, rgba(120, 130, 160, 0.16));
+.controller-devices-block {
+  margin-top: 8px;
 }
 
-.controller-device-item:last-child {
-  border-bottom: 0;
+.midi-routes-inline-host {
+  width: 100%;
+  max-width: none;
 }
 
-.controller-device-id {
-  color: #8b91a8;
-  font-size: 12px;
+.binding-source-filter-field {
+  display: inline-flex;
+  align-items: center;
+  min-width: 140px;
 }
 
-.controller-empty {
-  color: #8b91a8;
-  font-size: 13px;
+.binding-source-filter-field select {
+  height: 36px;
+  min-width: 148px;
+  border-radius: 4px;
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  color: var(--text-primary);
+  font: inherit;
+  padding: 0 10px;
 }
 
 @media (max-width: 900px) {

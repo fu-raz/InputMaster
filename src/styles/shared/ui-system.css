@@ -1,0 +1,278 @@
+/* App-wide UI consistency tokens + primitives (ILS-10). See docs/ui-consistency.md */
+
+:root {
+  --ui-h1-size: 18px;
+  --ui-h1-weight: 750;
+  --ui-h1-line: 1.2;
+  --ui-h2-size: 1.25rem;
+  --ui-h2-weight: 650;
+  --ui-h2-line: 1.25;
+  --ui-h3-size: 13px;
+  --ui-h3-weight: 600;
+  --ui-h3-line: 1.3;
+  --ui-help-size: 13px;
+  --ui-panel-radius: var(--radius-card, 5px);
+  --ui-panel-pad: 14px 18px;
+  --ui-panel-border: var(--control-border);
+  --ui-panel-bg: var(--surface-raised);
+  --ui-icon-size: 18px;
+  --ui-toggle-icon-size: 17px;
+}
+
+/* H1 — left-rail page title */
+.ui-page-title,
+.inputs-page-title,
+.settings-page-title,
+.plugins-page-title {
+  margin: 0 10px 18px;
+  font-size: var(--ui-h1-size);
+  line-height: var(--ui-h1-line);
+  font-weight: var(--ui-h1-weight);
+  color: var(--text-primary);
+}
+
+#plugins-page .plugins-page-title {
+  margin-bottom: 4px;
+}
+
+/* H2 — section panel title */
+.ui-section-title,
+.inputs-panel-header h2 {
+  margin: 0 0 6px;
+  font-size: var(--ui-h2-size);
+  line-height: var(--ui-h2-line);
+  font-weight: var(--ui-h2-weight);
+  color: var(--text-primary);
+}
+
+/* H3 — subsection / card / table heading */
+.ui-subsection-title,
+.inputs-device-card-title,
+.keyboard-controls-heading,
+.controller-devices-heading {
+  margin: 0 0 8px;
+  font-size: var(--ui-h3-size);
+  line-height: var(--ui-h3-line);
+  font-weight: var(--ui-h3-weight);
+  color: var(--text-primary);
+}
+
+.ui-help,
+.inputs-panel-help,
+.ui-toggle-help {
+  margin: 0 0 14px;
+  color: var(--text-muted, #8b91a8);
+  font-size: var(--ui-help-size);
+  line-height: 1.45;
+  max-width: none;
+}
+
+/* Plugin-like content container */
+.ui-panel {
+  width: 100%;
+  max-width: none;
+  border-radius: var(--ui-panel-radius);
+  border: 1px solid var(--ui-panel-border);
+  background: var(--ui-panel-bg);
+  padding: var(--ui-panel-pad);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: auto;
+  min-height: 0;
+  flex: 0 0 auto;
+}
+
+.ui-panel > .ui-help:last-child,
+.ui-panel > .ui-advanced:last-child {
+  margin-bottom: 0;
+}
+
+/* Single-color icons */
+.ui-icon,
+.ui-nav-icon,
+.inputs-nav-icon,
+.ui-toggle-row__icon {
+  width: var(--ui-icon-size);
+  height: var(--ui-icon-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+
+.ui-icon svg,
+.ui-nav-icon svg,
+.inputs-nav-icon svg,
+.ui-toggle-row__icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ui-toggle-row__icon {
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+}
+
+.ui-toggle-row__icon svg {
+  width: var(--ui-toggle-icon-size);
+  height: var(--ui-toggle-icon-size);
+}
+
+/* Short-label toggle row (Settings Behavior language) */
+.ui-toggle-row {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 18px;
+  align-items: center;
+  padding: 7px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--control-border) 48%, transparent);
+}
+
+.ui-toggle-row:last-child {
+  border-bottom: 0;
+}
+
+.ui-toggle-row.is-disabled {
+  opacity: 0.65;
+}
+
+.ui-toggle-row__main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ui-toggle-row__label {
+  font-size: 14px;
+  font-weight: 550;
+  color: var(--text-primary);
+}
+
+.ui-toggle-row .settings-toggle {
+  justify-self: end;
+}
+
+/* Multi-device table */
+.ui-device-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ui-device-table th,
+.ui-device-table td {
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--control-border) 48%, transparent);
+  vertical-align: middle;
+}
+
+.ui-device-table th {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ui-device-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.ui-device-table .ui-col-count {
+  width: 4.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-device-table .ui-col-toggle {
+  width: 3.5rem;
+  text-align: right;
+}
+
+.ui-device-table .ui-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Advanced disclosure for technical ids */
+.ui-advanced {
+  margin-top: 12px;
+}
+
+.ui-advanced > summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 12px;
+  user-select: none;
+  list-style: none;
+}
+
+.ui-advanced > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ui-advanced[open] > summary {
+  margin-bottom: 8px;
+}
+
+.ui-advanced__body {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.ui-advanced__body + .ui-advanced__body {
+  margin-top: 4px;
+}
+
+/* Inputs sub-nav icons */
+.inputs-nav-item {
+  gap: 10px;
+}
+
+.inputs-nav-item .inputs-nav-icon {
+  color: var(--text-muted);
+}
+
+.inputs-nav-item.active .inputs-nav-icon,
+.inputs-nav-item:hover:not(:disabled) .inputs-nav-icon {
+  color: var(--text-primary);
+}
+
+/* Natural height: Settings General must not stretch empty space */
+.settings-general-section.active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: auto;
+}
+
+.settings-general-section .settings-startup-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.settings-startup-card {
+  grid-template-rows: none;
+}
+
+.settings-osd-section .settings-card {
+  flex: 0 0 auto;
+  height: auto;
+}

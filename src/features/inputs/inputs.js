@@ -49,7 +49,7 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
 
   function ensureKeyboardMounted() {
     if (keyboardMounted || !keyboardTab) return;
-    const pane = content?.querySelector('[data-inputs-panel="keyboard"] [data-role="keyboard-host"]');
+    const pane = content?.querySelector('[data-inputs-panel="keyboard"] [data-role="keyboard-host"], [data-role="keyboard-host"]');
     if (!pane) return;
     try {
       keyboardTab.mount(pane);
@@ -62,7 +62,7 @@ export function createInputsFeature({ i18n, invoke, onMidiSectionShown }) {
   function ensureControllerMounted() {
     if (controllerMounted || !controllerTab) return;
     const pane = content?.querySelector(
-      '[data-inputs-panel="controller"] [data-role="controller-host"]',
+      '[data-inputs-panel="controller"] [data-role="controller-host"], [data-role="controller-host"]',
     );
     if (!pane) return;
     try {

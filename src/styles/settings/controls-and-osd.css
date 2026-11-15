@@ -253,9 +253,10 @@
 
 .settings-startup-card {
   padding: 0;
-  display: grid;
-  grid-template-rows: auto repeat(5, minmax(48px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 0;
+  height: auto;
 }
 
 .settings-startup-row {

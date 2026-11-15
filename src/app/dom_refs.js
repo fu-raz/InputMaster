@@ -18,6 +18,7 @@ export const DOM_REF_IDS = Object.freeze({
   profilePageExportCurrentButton: "profile-page-export-current",
   bindingsContainer: "bindings",
   bindingTypeFilter: "binding-type-filter",
+  bindingSourceFilter: "binding-source-filter",
   bindingSearchInput: "binding-search",
   bindingDensityToggle: "binding-density-toggle",
   mainScreen: "main-screen",

@@ -20,6 +20,7 @@ export function createListRenderer({
   bindingInteractionTimes,
   bindingLastValues,
   bindingMatchesTypeFilter,
+  bindingMatchesSourceFilter,
   bindingMuteValues,
   bindingRenderKey,
   bindingSearchText,
@@ -35,6 +36,7 @@ export function createListRenderer({
   focusBindingNameInput,
   getBindings,
   getBindingTypeFilter,
+  getBindingSourceFilter,
   getEditingId,
   getMuted,
   getPendingFocusId,
@@ -116,6 +118,7 @@ export function createListRenderer({
     renderedBindings.clear();
     const searchQuery = getSearchQuery();
     const typeFilter = getBindingTypeFilter();
+    const sourceFilter = getBindingSourceFilter();
     visibleBindingIds = [];
     let renderedCount = 0;
 
@@ -138,6 +141,9 @@ export function createListRenderer({
         binding.open_application = normalizeOpenApplicationMapping(binding.open_application);
         binding.autohotkey_script = normalizeAutoHotkeyScriptMapping(binding.autohotkey_script);
         if (!bindingMatchesTypeFilter(binding, typeFilter)) {
+          return;
+        }
+        if (!bindingMatchesSourceFilter(binding, sourceFilter)) {
           return;
         }
         if (searchQuery && !bindingSearchText(binding, index).includes(searchQuery)) {

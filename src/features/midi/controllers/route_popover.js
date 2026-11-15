@@ -169,12 +169,9 @@ export function createRoutePopover({
       display.className = "target-display";
       root.appendChild(display);
 
-      const statusRow = document.querySelector('[data-role="midi-status-row"]');
-      if (statusRow) {
-        statusRow.appendChild(root);
-      } else {
-        selectEl.insertAdjacentElement("afterend", root);
-      }
+      // Inputs MIDI no longer shows a redundant active/none summary row; keep status nodes off-DOM.
+      root.classList.add("visually-hidden");
+      selectEl.insertAdjacentElement("afterend", root);
 
       if (kind === "input") {
         routeView.inputStatusEl = root;

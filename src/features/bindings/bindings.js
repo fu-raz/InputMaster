@@ -89,6 +89,7 @@ export function createBindingsFeature({
     indicatorMsgTypeDropdown: null,
     feedbackOutputMsgTypeDropdown: null,
     bindingTypeFilter: "all",
+    bindingSourceFilter: "all",
     compactBindings: false,
     bindingDensitySaveSequence: 0,
     bindingsScrollbarWidth: 0,
@@ -204,7 +205,9 @@ export function createBindingsFeature({
     isButtonBinding: effectiveIsButton,
   });
   const normalizeBindingTypeFilter = bindingRenderModel.normalizeTypeFilter;
+  const normalizeBindingSourceFilter = bindingRenderModel.normalizeSourceFilter;
   const bindingMatchesTypeFilter = bindingRenderModel.matchesTypeFilter;
+  const bindingMatchesSourceFilter = bindingRenderModel.matchesSourceFilter;
   const bindingSearchText = bindingRenderModel.searchText;
 
   const bindingsCard = elements.bindingsContainer.closest?.(".bindings-card") || null;
@@ -328,6 +331,7 @@ export function createBindingsFeature({
   const {
     bindingRenderKey,
     getBindingTypeFilter,
+    getBindingSourceFilter,
     showMacroAlreadyConfiguredError,
     updateBindingTypeFilterUi,
     bindBindingTypeFilterUi,
@@ -341,6 +345,7 @@ export function createBindingsFeature({
     lifetime,
     alertAction,
     bindingMatchesTypeFilter,
+    bindingMatchesSourceFilter,
     bindingObjectIdentities,
     bindingSnapshotKey: (...args) => bindingSnapshotKey(...args),
     bindingsCard,
@@ -350,6 +355,7 @@ export function createBindingsFeature({
     invoke,
     listState,
     normalizeBindingTypeFilter,
+    normalizeBindingSourceFilter,
     renderBindings: (...args) => renderBindings(...args),
     renderedBindings,
     setEditingId,
@@ -692,6 +698,7 @@ export function createBindingsFeature({
     bindingInteractionTimes,
     bindingLastValues,
     bindingMatchesTypeFilter,
+    bindingMatchesSourceFilter,
     bindingMuteValues,
     bindingRenderKey,
     bindingSearchText,
@@ -707,6 +714,7 @@ export function createBindingsFeature({
     focusBindingNameInput,
     getBindings,
     getBindingTypeFilter,
+    getBindingSourceFilter,
     getEditingId,
     getMuted,
     getPendingFocusId,

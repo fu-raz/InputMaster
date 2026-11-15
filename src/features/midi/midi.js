@@ -133,6 +133,7 @@ export function createMidiFeature({
   function bindUi() {
     if (uiBound) return;
     uiBound = true;
+    bindMidiMasterToggle();
     startAvailabilityMonitor();
     ensureDeviceDropdowns();
     renderDeviceDropdowns();
@@ -162,8 +163,12 @@ export function createMidiFeature({
         startLearnBinding();
       });
     }
+    lifetime.listen(document, "midimaster:midi-routes-rendered", () => {
+      syncMidiMasterToggleUi();
+    });
     lifetime.listen(window, "midimaster:locale-changed", () => {
       renderDeviceDropdowns();
+      syncMidiMasterToggleUi();
       if (
         elements.learnPanel &&
         !elements.learnPanel.classList.contains("hidden") &&
@@ -374,6 +379,44 @@ export function createMidiFeature({
     unresolvedRouteStatus,
   });
 
+  function isMasterEnabled() {
+    const routes = desiredRoutes();
+    if (!routes.length) return false;
+    return routes.some((route) => route.enabled !== false);
+  }
+
+  async function setMasterEnabled(enabled) {
+    const routes = desiredRoutes();
+    if (!routes.length) {
+      syncMidiMasterToggleUi();
+      return { ok: true, enabled: false };
+    }
+    const next = routes.map((route) => ({ ...route, enabled: Boolean(enabled) }));
+    await applyRoutes(next, { source: "manual" });
+    syncMidiMasterToggleUi();
+    renderRoutesPopover();
+    return { ok: true, enabled: Boolean(enabled) };
+  }
+
+  function syncMidiMasterToggleUi() {
+    const input = document.querySelector('[data-role="midi-master-input"], #midi-master-enabled');
+    if (!input) return;
+    input.checked = isMasterEnabled();
+  }
+
+  function bindMidiMasterToggle() {
+    const input = document.querySelector('[data-role="midi-master-input"], #midi-master-enabled');
+    if (!input || input.dataset.bound === "1") return;
+    input.dataset.bound = "1";
+    lifetime.listen(input, "change", () => {
+      void setMasterEnabled(input.checked).catch((error) => {
+        console.error("Failed to update MIDI master toggle", error);
+        syncMidiMasterToggleUi();
+      });
+    });
+    syncMidiMasterToggleUi();
+  }
+
   function dispose() {
     discovery.disposed = true;
     lifetime.dispose();
@@ -405,5 +448,8 @@ export function createMidiFeature({
     checkAvailabilityNow: checkAvailabilityLoop,
     getDeviceMappingLabel,
     showInlineRoutesEditor,
+    isMasterEnabled,
+    setMasterEnabled,
+    syncMidiMasterToggleUi,
   };
 }

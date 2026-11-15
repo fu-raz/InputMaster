@@ -277,6 +277,9 @@ pub struct AppSettings {
     /// When true, poll XInput slots and emit observe-only controller events.
     #[serde(default)]
     pub controller_input_enabled: bool,
+    /// Enabled XInput slots. `None` = all slots; `Some(slots)` = only those indices.
+    #[serde(default)]
+    pub controller_slots_enabled: Option<Vec<u8>>,
 }
 
 impl Default for AppSettings {
@@ -306,6 +309,7 @@ impl Default for AppSettings {
             keyboard_input_enabled: false,
             keyboard_controls_enabled: None,
             controller_input_enabled: false,
+            controller_slots_enabled: None,
         }
     }
 }

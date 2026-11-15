@@ -2,11 +2,11 @@
 
 use super::catalog::{
     axis_event, device_id_for_slot, device_name_for_slot, note_event, ControllerControlId,
-    ControllerDeviceInfo, MAX_SLOTS,
+    ControllerDeviceInfo, BUTTON_COUNT, FADER_COUNT, KNOB_COUNT, MAX_SLOTS,
 };
 use crate::model::MidiEvent;
 use crate::run_logger;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::Duration;
@@ -25,6 +25,7 @@ const LEFT_THUMB_DEADZONE: i32 = 7849;
 const RIGHT_THUMB_DEADZONE: i32 = 8689;
 const TRIGGER_THRESHOLD: u8 = 30;
 const AXIS_DELTA_MIN: u8 = 2;
+pub const SLOT_MASK_ALL: u8 = 0b1111;
 
 #[derive(Clone, Copy, Default)]
 struct SlotSnapshot {
@@ -46,24 +47,31 @@ pub struct ControllerPoller {
     stop: Arc<AtomicBool>,
     join: Option<JoinHandle<()>>,
     shared: Arc<Mutex<SharedState>>,
+    slot_mask: Arc<AtomicU8>,
 }
 
 impl ControllerPoller {
-    pub fn start(sink: EventSink) -> Self {
+    pub fn start(sink: EventSink, slot_mask: u8) -> Self {
         let stop = Arc::new(AtomicBool::new(false));
+        let slot_mask = Arc::new(AtomicU8::new(slot_mask & SLOT_MASK_ALL));
         let shared = Arc::new(Mutex::new(SharedState {
             devices: std::array::from_fn(|slot| ControllerDeviceInfo {
                 slot: slot as u8,
                 device_id: device_id_for_slot(slot as u8),
                 device_name: device_name_for_slot(slot as u8),
                 connected: false,
+                enabled: true,
+                button_count: BUTTON_COUNT,
+                fader_count: FADER_COUNT,
+                knob_count: KNOB_COUNT,
             }),
         }));
         let stop_flag = Arc::clone(&stop);
         let shared_clone = Arc::clone(&shared);
+        let mask_clone = Arc::clone(&slot_mask);
         let join = thread::Builder::new()
             .name("controller-xinput-poll".into())
-            .spawn(move || poll_loop(stop_flag, shared_clone, sink))
+            .spawn(move || poll_loop(stop_flag, shared_clone, mask_clone, sink))
             .ok();
         if join.is_some() {
             run_logger::info("controller_input", "poll_started", "");
@@ -74,6 +82,7 @@ impl ControllerPoller {
             stop,
             join,
             shared,
+            slot_mask,
         }
     }
 
@@ -85,7 +94,18 @@ impl ControllerPoller {
         run_logger::info("controller_input", "poll_stopped", "");
     }
 
+    pub fn set_slot_mask(&self, mask: u8) {
+        self.slot_mask
+            .store(mask & SLOT_MASK_ALL, Ordering::SeqCst);
+        if let Ok(mut guard) = self.shared.lock() {
+            for (slot, device) in guard.devices.iter_mut().enumerate() {
+                device.enabled = (mask & (1 << slot)) != 0;
+            }
+        }
+    }
+
     pub fn connected_devices(&self) -> Vec<ControllerDeviceInfo> {
+        let mask = self.slot_mask.load(Ordering::Relaxed);
         self.shared
             .lock()
             .map(|state| {
@@ -94,6 +114,10 @@ impl ControllerPoller {
                     .iter()
                     .filter(|d| d.connected)
                     .cloned()
+                    .map(|mut d| {
+                        d.enabled = (mask & (1 << d.slot)) != 0;
+                        d
+                    })
                     .collect()
             })
             .unwrap_or_default()
@@ -106,9 +130,15 @@ impl Drop for ControllerPoller {
     }
 }
 
-fn poll_loop(stop: Arc<AtomicBool>, shared: Arc<Mutex<SharedState>>, sink: EventSink) {
+fn poll_loop(
+    stop: Arc<AtomicBool>,
+    shared: Arc<Mutex<SharedState>>,
+    slot_mask: Arc<AtomicU8>,
+    sink: EventSink,
+) {
     let mut previous = [SlotSnapshot::default(); MAX_SLOTS];
     while !stop.load(Ordering::Relaxed) {
+        let mask = slot_mask.load(Ordering::Relaxed);
         for slot in 0..MAX_SLOTS {
             let mut state = XINPUT_STATE::default();
             let result = unsafe { XInputGetState(slot as u32, &mut state) };
@@ -122,6 +152,7 @@ fn poll_loop(stop: Arc<AtomicBool>, shared: Arc<Mutex<SharedState>>, sink: Event
             if connected != previous[slot].connected {
                 if let Ok(mut guard) = shared.lock() {
                     guard.devices[slot].connected = connected;
+                    guard.devices[slot].enabled = (mask & (1 << slot)) != 0;
                 }
                 run_logger::info(
                     "controller_input",
@@ -134,10 +165,10 @@ fn poll_loop(stop: Arc<AtomicBool>, shared: Arc<Mutex<SharedState>>, sink: Event
                 );
             }
 
-            if connected {
+            let slot_enabled = (mask & (1 << slot)) != 0;
+            if connected && slot_enabled {
                 emit_deltas(slot as u8, &previous[slot], &snapshot, &sink);
-            } else if previous[slot].connected {
-                // Emit releases for any held buttons when the pad disappears.
+            } else if previous[slot].connected && previous[slot].buttons != 0 {
                 emit_button_releases(slot as u8, previous[slot].buttons, &sink);
             }
 
@@ -192,7 +223,13 @@ fn emit_deltas(slot: u8, prev: &SlotSnapshot, next: &SlotSnapshot, sink: &EventS
         }
     }
 
-    emit_axis_if_changed(slot, ControllerControlId::LeftTrigger, prev.left_trigger, next.left_trigger, sink);
+    emit_axis_if_changed(
+        slot,
+        ControllerControlId::LeftTrigger,
+        prev.left_trigger,
+        next.left_trigger,
+        sink,
+    );
     emit_axis_if_changed(
         slot,
         ControllerControlId::RightTrigger,
@@ -202,8 +239,20 @@ fn emit_deltas(slot: u8, prev: &SlotSnapshot, next: &SlotSnapshot, sink: &EventS
     );
     emit_axis_if_changed(slot, ControllerControlId::LeftStickX, prev.left_x, next.left_x, sink);
     emit_axis_if_changed(slot, ControllerControlId::LeftStickY, prev.left_y, next.left_y, sink);
-    emit_axis_if_changed(slot, ControllerControlId::RightStickX, prev.right_x, next.right_x, sink);
-    emit_axis_if_changed(slot, ControllerControlId::RightStickY, prev.right_y, next.right_y, sink);
+    emit_axis_if_changed(
+        slot,
+        ControllerControlId::RightStickX,
+        prev.right_x,
+        next.right_x,
+        sink,
+    );
+    emit_axis_if_changed(
+        slot,
+        ControllerControlId::RightStickY,
+        prev.right_y,
+        next.right_y,
+        sink,
+    );
 }
 
 fn emit_axis_if_changed(

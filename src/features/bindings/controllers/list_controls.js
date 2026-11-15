@@ -3,6 +3,7 @@ export function createListControls({
   lifetime,
   alertAction,
   bindingMatchesTypeFilter,
+  bindingMatchesSourceFilter,
   bindingObjectIdentities,
   bindingSnapshotKey,
   bindingsCard,
@@ -12,6 +13,7 @@ export function createListControls({
   invoke,
   listState,
   normalizeBindingTypeFilter,
+  normalizeBindingSourceFilter,
   renderBindings,
   renderedBindings,
   setEditingId,
@@ -42,6 +44,10 @@ export function createListControls({
     return normalizeBindingTypeFilter(listState.bindingTypeFilter);
   }
 
+  function getBindingSourceFilter() {
+    return normalizeBindingSourceFilter(listState.bindingSourceFilter);
+  }
+
   function showMacroAlreadyConfiguredError() {
     alertAction(t("dialogs.macroAlreadyConfiguredTitle"), t("dialogs.macroAlreadyConfiguredMessage"));
   }
@@ -69,6 +75,9 @@ export function createListControls({
       optionButton.classList.toggle("selected", selected);
       optionButton.setAttribute("aria-pressed", selected ? "true" : "false");
     });
+    if (elements.bindingSourceFilter) {
+      elements.bindingSourceFilter.value = getBindingSourceFilter();
+    }
   }
 
   function setBindingTypeFilter(value) {
@@ -81,17 +90,32 @@ export function createListControls({
     }
   }
 
+  function setBindingSourceFilter(value) {
+    const next = normalizeBindingSourceFilter(value);
+    const changed = next !== listState.bindingSourceFilter;
+    listState.bindingSourceFilter = next;
+    updateBindingTypeFilterUi();
+    if (changed) {
+      renderBindings();
+    }
+  }
+
   function bindBindingTypeFilterUi() {
     const root = elements.bindingTypeFilter;
-    if (!root) return;
-
-    root.querySelectorAll("[data-filter]").forEach((optionButton) => {
-      lifetime.listen(optionButton, "click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setBindingTypeFilter(optionButton.dataset?.filter);
+    if (root) {
+      root.querySelectorAll("[data-filter]").forEach((optionButton) => {
+        lifetime.listen(optionButton, "click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setBindingTypeFilter(optionButton.dataset?.filter);
+        });
       });
-    });
+    }
+    if (elements.bindingSourceFilter) {
+      lifetime.listen(elements.bindingSourceFilter, "change", () => {
+        setBindingSourceFilter(elements.bindingSourceFilter.value);
+      });
+    }
 
     updateBindingTypeFilterUi();
   }
@@ -235,8 +259,13 @@ export function createListControls({
       elements.bindingSearchInput.value = "";
       needsRender = true;
     }
-    if (binding && !bindingMatchesTypeFilter(binding, getBindingTypeFilter())) {
+    if (
+      binding &&
+      (!bindingMatchesTypeFilter(binding, getBindingTypeFilter()) ||
+        !bindingMatchesSourceFilter(binding, getBindingSourceFilter()))
+    ) {
       listState.bindingTypeFilter = "all";
+      listState.bindingSourceFilter = "all";
       updateBindingTypeFilterUi();
       needsRender = true;
     }
@@ -297,6 +326,7 @@ export function createListControls({
   return {
     bindingRenderKey,
     getBindingTypeFilter,
+    getBindingSourceFilter,
     showMacroAlreadyConfiguredError,
     updateBindingTypeFilterUi,
     bindBindingTypeFilterUi,

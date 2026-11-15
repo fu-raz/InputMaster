@@ -35,6 +35,7 @@ macro_rules! command_registry {
             list_keyboard_controls,
             get_controller_input_status,
             set_controller_input_enabled,
+            set_controller_slot_enabled,
             list_controller_controls,
             get_midi_connection_health,
             get_midi_route_health,

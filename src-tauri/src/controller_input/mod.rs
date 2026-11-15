@@ -4,7 +4,8 @@ mod catalog;
 mod poll_windows;
 
 pub use catalog::{
-    catalog_controls, ControllerControlInfo, ControllerDeviceInfo,
+    catalog_controls, ControllerControlInfo, ControllerDeviceInfo, BUTTON_COUNT, FADER_COUNT,
+    KNOB_COUNT, MAX_SLOTS,
 };
 
 use crate::model::MidiEvent;
@@ -12,14 +13,56 @@ use crate::run_logger;
 use std::sync::Arc;
 
 #[cfg(target_os = "windows")]
-use poll_windows::ControllerPoller;
+use poll_windows::{ControllerPoller, SLOT_MASK_ALL};
 
 type EventSink = Arc<dyn Fn(MidiEvent) + Send + Sync + 'static>;
+
+pub fn slot_mask_from_preference(slots: Option<&[u8]>) -> u8 {
+    match slots {
+        None => {
+            #[cfg(target_os = "windows")]
+            {
+                SLOT_MASK_ALL
+            }
+            #[cfg(not(target_os = "windows"))]
+            {
+                0b1111
+            }
+        }
+        Some(list) => {
+            let mut mask = 0u8;
+            for slot in list {
+                if (*slot as usize) < MAX_SLOTS {
+                    mask |= 1 << slot;
+                }
+            }
+            mask
+        }
+    }
+}
+
+pub fn preference_from_slot_mask(mask: u8) -> Option<Vec<u8>> {
+    #[cfg(target_os = "windows")]
+    let all = SLOT_MASK_ALL;
+    #[cfg(not(target_os = "windows"))]
+    let all = 0b1111u8;
+    if mask & all == all {
+        return None;
+    }
+    let mut slots = Vec::new();
+    for slot in 0..MAX_SLOTS {
+        if mask & (1 << slot) != 0 {
+            slots.push(slot as u8);
+        }
+    }
+    Some(slots)
+}
 
 pub struct ControllerInputManager {
     #[cfg(target_os = "windows")]
     poller: Option<ControllerPoller>,
     enabled: bool,
+    slot_mask: u8,
     on_event: Option<EventSink>,
 }
 
@@ -35,6 +78,16 @@ impl ControllerInputManager {
             #[cfg(target_os = "windows")]
             poller: None,
             enabled: false,
+            slot_mask: {
+                #[cfg(target_os = "windows")]
+                {
+                    SLOT_MASK_ALL
+                }
+                #[cfg(not(target_os = "windows"))]
+                {
+                    0b1111
+                }
+            },
             on_event: None,
         }
     }
@@ -48,6 +101,27 @@ impl ControllerInputManager {
         if self.enabled {
             let _ = self.ensure_started();
         }
+    }
+
+    pub fn set_slot_mask(&mut self, mask: u8) {
+        self.slot_mask = mask & 0b1111;
+        #[cfg(target_os = "windows")]
+        if let Some(poller) = self.poller.as_ref() {
+            poller.set_slot_mask(self.slot_mask);
+        }
+    }
+
+    pub fn set_slot_enabled(&mut self, slot: u8, enabled: bool) -> u8 {
+        if (slot as usize) >= MAX_SLOTS {
+            return self.slot_mask;
+        }
+        if enabled {
+            self.slot_mask |= 1 << slot;
+        } else {
+            self.slot_mask &= !(1 << slot);
+        }
+        self.set_slot_mask(self.slot_mask);
+        self.slot_mask
     }
 
     pub fn set_enabled(&mut self, enabled: bool) -> Result<bool, String> {
@@ -90,7 +164,7 @@ impl ControllerInputManager {
             .on_event
             .clone()
             .ok_or_else(|| "Controller input event sink is not configured".to_string())?;
-        self.poller = Some(ControllerPoller::start(sink));
+        self.poller = Some(ControllerPoller::start(sink, self.slot_mask));
         Ok(())
     }
 

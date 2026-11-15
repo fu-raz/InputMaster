@@ -64,7 +64,11 @@ export function createNavigation({
       panel.classList.toggle("active", active);
       panel.classList.toggle("hidden", !active);
     });
-    virtualAudio.setActive(activeSection === "virtual-audio").catch(() => {});
+    if (activeSection === "virtual-audio") {
+      // Virtual Audio Settings tab removed (ILS-10); fall back to General.
+    } else {
+      virtualAudio.setActive(false).catch(() => {});
+    }
     if (activeSection === "osd") {
       syncOsdAppearanceControls();
     } else if (activeSection === "appearance") {

@@ -32,13 +32,7 @@
   scrollbar-gutter: stable;
 }
 
-.settings-page-title {
-  margin: 0 10px 18px;
-  font-size: 18px;
-  line-height: 1.2;
-  font-weight: 750;
-  color: var(--text-primary);
-}
+/* Page title tokens live in shared/ui-system.css (.ui-page-title / .settings-page-title). */
 
 .settings-nav-indicator {
   position: absolute;
@@ -157,20 +151,23 @@
 }
 
 .settings-osd-section .settings-card {
-  flex: 1 1 auto;
-  height: 100%;
+  flex: 0 0 auto;
+  height: auto;
   min-height: 0;
 }
 
 .settings-general-section.active {
-  display: grid;
-  grid-template-rows: minmax(280px, 5fr) minmax(204px, 3fr);
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  height: auto;
 }
 
 .settings-general-section .settings-startup-card,
 .settings-general-section .settings-update-card {
   min-height: 0;
+  flex: 0 0 auto;
+  height: auto;
 }
 
 .settings-maintenance-section .settings-maintenance-layout {

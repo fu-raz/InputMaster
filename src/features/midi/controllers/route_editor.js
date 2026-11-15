@@ -62,22 +62,53 @@ export function createRouteEditor({
     markRouteEditorDirty(routes);
   }
 
+  function addRouteBlockedReason() {
+    const inputs = discovery.lastDeviceSnapshot.inputs || [];
+    const routes = currentRoutesForSave();
+    if (!inputs.length) {
+      return null; // allow empty scaffolding when no devices are present
+    }
+    const usedInputs = new Set(
+      routes.map((route) => route.inputDeviceId).filter((id) => Boolean(id)),
+    );
+    if (inputs.every((device) => usedInputs.has(device.id))) {
+      return t("midi.noAvailableRoute");
+    }
+    return null;
+  }
+
   function addRoute() {
     const inputs = discovery.lastDeviceSnapshot.inputs || [];
     const outputs = discovery.lastDeviceSnapshot.outputs || [];
     const routes = currentRoutesForSave();
-    const usedInputs = new Set(routes.map((route) => route.inputDeviceId));
-    const input = inputs.find((device) => !usedInputs.has(device.id));
-    const output = input ? outputs.find((device) => device.name === input.name) || outputs[0] : null;
-    if (!input || !output) {
-      if (elements.midiStatus) elements.midiStatus.textContent = t("midi.noAvailableRoute");
+    const blocked = addRouteBlockedReason();
+    if (blocked) {
+      if (elements.midiStatus) elements.midiStatus.textContent = blocked;
       return;
     }
+    if (!inputs.length) {
+      routes.push({
+        inputDeviceId: "",
+        outputDeviceId: "",
+        inputDeviceName: "",
+        outputDeviceName: "",
+        enabled: true,
+      });
+      markRouteEditorDirty(routes);
+      return;
+    }
+    const usedInputs = new Set(
+      routes.map((route) => route.inputDeviceId).filter((id) => Boolean(id)),
+    );
+    const input = inputs.find((device) => !usedInputs.has(device.id));
+    const output = input
+      ? outputs.find((device) => device.name === input.name) || outputs[0] || null
+      : null;
     routes.push({
-      inputDeviceId: input.id,
-      outputDeviceId: output.id,
-      inputDeviceName: input.name,
-      outputDeviceName: output.name,
+      inputDeviceId: input?.id || "",
+      outputDeviceId: output?.id || "",
+      inputDeviceName: input?.name || "",
+      outputDeviceName: output?.name || "",
       enabled: true,
     });
     markRouteEditorDirty(routes);
@@ -246,7 +277,12 @@ export function createRouteEditor({
     add.type = "button";
     add.className = "midi-route-action-button secondary-action";
     add.textContent = t("midi.addRoute");
-    add.disabled = routeView.routeEditorApplyInFlight;
+    const addBlocked = addRouteBlockedReason();
+    add.disabled = routeView.routeEditorApplyInFlight || Boolean(addBlocked);
+    if (addBlocked) {
+      add.title = addBlocked;
+      add.setAttribute("aria-label", `${t("midi.addRoute")}: ${addBlocked}`);
+    }
     add.addEventListener("click", addRoute);
     const disableAll = document.createElement("button");
     disableAll.type = "button";
@@ -278,6 +314,12 @@ export function createRouteEditor({
     footer.appendChild(routeActions);
     footer.appendChild(commitActions);
     routeView.routesPopoverEl.appendChild(footer);
+
+    try {
+      document.dispatchEvent(new CustomEvent("midimaster:midi-routes-rendered"));
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   return { updateRouteFromSelect, renderRoutesPopover };

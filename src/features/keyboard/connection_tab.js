@@ -1,13 +1,23 @@
 import { KEYBOARD_DEVICE_ID } from "./catalog.js";
 
-/** Inputs → Keyboard pane: Settings-style master toggle + per-key capture list. */
+const KEYBOARD_ICON = `
+  <svg viewBox="0 0 24 24" focusable="false">
+    <path d="M4 7h16v10H4z"></path>
+    <path d="M8 11h.01"></path>
+    <path d="M12 11h.01"></path>
+    <path d="M16 11h.01"></path>
+    <path d="M7 15h10"></path>
+  </svg>
+`;
+
+/** Inputs → Keyboard: Settings-style panel, short master toggle, advanced for ids. */
 export function createKeyboardConnectionTab({ invoke, t }) {
   let root = null;
   let status = {
     enabled: false,
     supported: true,
     deviceId: KEYBOARD_DEVICE_ID,
-    deviceName: "Keyboard / media keys",
+    deviceName: "Keyboard",
     controls: [],
   };
   let busy = false;
@@ -30,23 +40,18 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     for (const control of controls) {
       const item = document.createElement("li");
       item.className = "keyboard-control-item";
-
       const label = document.createElement("label");
       label.className = "keyboard-control-label";
-
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.className = "keyboard-control-checkbox";
       checkbox.checked = control.enabled !== false;
       checkbox.disabled = busy;
-      checkbox.dataset.controlId = control.id;
       checkbox.onchange = () => {
         void setControlEnabled(control.id, checkbox.checked);
       };
-
       const name = document.createElement("span");
       name.textContent = control.name || control.id;
-
       label.appendChild(checkbox);
       label.appendChild(name);
       item.appendChild(label);
@@ -62,6 +67,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     const masterRow = read("master-row");
     const controlsBlock = read("controls-block");
     const unsupported = read("unsupported");
+    const advancedId = read("advanced-id");
 
     if (masterInput) {
       masterInput.checked = enabled;
@@ -76,6 +82,9 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     }
     if (controlsBlock) {
       controlsBlock.classList.toggle("hidden", !enabled || !supported);
+    }
+    if (advancedId) {
+      advancedId.textContent = status.deviceId || KEYBOARD_DEVICE_ID;
     }
     if (enabled && supported) {
       renderControls();
@@ -137,14 +146,12 @@ export function createKeyboardConnectionTab({ invoke, t }) {
   function mount(container) {
     root = container;
     root.innerHTML = `
-      <div class="keyboard-settings">
-        <p class="keyboard-unsupported hidden" data-role="unsupported"></p>
-        <div class="settings-startup-row keyboard-master-row" data-role="master-row">
-          <div class="settings-startup-row-main">
-            <span class="settings-startup-copy">
-              <strong data-role="master-label"></strong>
-              <span class="settings-startup-help" data-role="master-help"></span>
-            </span>
+      <div class="ui-panel keyboard-settings">
+        <p class="ui-help keyboard-unsupported hidden" data-role="unsupported"></p>
+        <div class="ui-toggle-row" data-role="master-row">
+          <div class="ui-toggle-row__main">
+            <span class="ui-toggle-row__icon" aria-hidden="true">${KEYBOARD_ICON}</span>
+            <span class="ui-toggle-row__label" data-role="master-label"></span>
           </div>
           <label class="settings-toggle" data-role="master-toggle">
             <input type="checkbox" data-role="master-input" />
@@ -152,17 +159,21 @@ export function createKeyboardConnectionTab({ invoke, t }) {
           </label>
         </div>
         <div class="keyboard-controls-block hidden" data-role="controls-block">
-          <p class="keyboard-controls-heading" data-role="controls-heading"></p>
+          <h3 class="ui-subsection-title" data-role="controls-heading"></h3>
           <ul class="keyboard-controls-list" data-role="controls"></ul>
         </div>
+        <details class="ui-advanced">
+          <summary data-role="advanced-summary"></summary>
+          <div class="ui-advanced__body" data-role="advanced-id"></div>
+        </details>
       </div>
     `;
     const masterLabel = read("master-label");
     if (masterLabel) masterLabel.textContent = t("keyboard.masterLabel");
-    const masterHelp = read("master-help");
-    if (masterHelp) masterHelp.textContent = t("keyboard.masterHelp");
     const heading = read("controls-heading");
     if (heading) heading.textContent = t("keyboard.controlsHeading");
+    const advancedSummary = read("advanced-summary");
+    if (advancedSummary) advancedSummary.textContent = t("ui.showAdvanced");
     const masterInput = read("master-input");
     if (masterInput) {
       masterInput.addEventListener("change", () => {
