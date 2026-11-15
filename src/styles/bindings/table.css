@@ -1096,7 +1096,7 @@ body.dark-mode:not([data-theme]) .profile-select .dropdown-item .delete:hover {
   align-items: center;
   min-width: 0;
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--app-font-size);
   font-weight: 500;
 }
 

@@ -75,7 +75,7 @@
 .binding-config-title {
   color: #dfe9fb;
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 .binding-config-title-with-action {

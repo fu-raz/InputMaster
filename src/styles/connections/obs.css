@@ -6,7 +6,7 @@
   padding: 8px 12px;
   background: #f4f5fa;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   color: #2b2d42;
 }
 

@@ -482,7 +482,7 @@ body.dark-mode:not([data-theme]) .alert-panel-actions .secondary:hover {
   margin-top: 12px;
   text-align: center;
   color: #6b6f80;
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 .status {
@@ -584,7 +584,7 @@ body.dark-mode:not([data-theme]) .alert-panel-actions .secondary:hover {
   border-radius: 6px;
   background: #fff;
   color: #2b2d42;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   line-height: 1;
 }
 

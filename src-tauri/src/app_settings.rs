@@ -46,7 +46,7 @@ fn default_font_family() -> String {
 }
 
 fn default_font_size() -> f64 {
-    14.0
+    15.0
 }
 
 fn default_text_rendering() -> String {

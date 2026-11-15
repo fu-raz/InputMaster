@@ -263,7 +263,7 @@
 
 .binding-config-curve-preset-form-title {
   color: #dce8fb;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   font-weight: 800;
 }
 

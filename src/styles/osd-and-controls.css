@@ -138,7 +138,7 @@ body.osd-only[data-anchor="bottom-right"] .osd-card {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   font-weight: 600;
 }
 

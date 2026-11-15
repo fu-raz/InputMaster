@@ -385,7 +385,7 @@
   min-width: 0;
   overflow: hidden;
   color: inherit;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   line-height: 1.2;
   font-weight: 750;
   text-overflow: ellipsis;

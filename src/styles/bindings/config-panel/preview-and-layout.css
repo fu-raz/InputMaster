@@ -558,7 +558,7 @@
 }
 
 .binding-config-panel--button .binding-config-preview-button-label {
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 .binding-config-panel--button .binding-config-preview-meta {
@@ -639,7 +639,7 @@
 }
 
 .binding-config-panel--button .binding-config-title {
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 .binding-config-panel--button .binding-config-stack input[type="text"] {
@@ -717,7 +717,7 @@
 }
 
 .binding-config-panel--button .binding-config-toggle-title {
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 .binding-config-panel--button .binding-config-toggle-help {
@@ -729,7 +729,7 @@
 .binding-config-panel--button .binding-config-preview-learn-row .binding-config-button {
   height: 38px;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 .binding-config-panel--button .binding-config-footer {
@@ -740,7 +740,7 @@
   min-width: 136px;
   height: 38px;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 .binding-config-panel--button.binding-config-panel--macro-page .binding-config-content {

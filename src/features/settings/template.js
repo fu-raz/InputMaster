@@ -243,8 +243,8 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                           <div class="appearance-inline-control appearance-inline-control--font-size">
                             <label class="appearance-control-label" for="appearance-font-size" data-i18n="settings.appearance.fontSize">Font Size</label>
                             <div class="settings-range-control">
-                              <input id="appearance-font-size" class="binding-volume-slider" type="range" min="11" max="18" step="1" value="14" />
-                              <span id="appearance-font-size-value" class="settings-range-value">14px</span>
+                              <input id="appearance-font-size" class="binding-volume-slider" type="range" min="11" max="18" step="1" value="15" />
+                              <span id="appearance-font-size-value" class="settings-range-value">15px</span>
                             </div>
                           </div>
                           <div class="appearance-inline-control appearance-inline-control--surface-contrast">

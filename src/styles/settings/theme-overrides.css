@@ -802,14 +802,14 @@ body[data-theme] :where(
   font-size: var(--app-font-size);
 }
 
-/* Sub-nav labels share --ui-subnav-size (Settings-perfect = app font 14px) */
+/* Sub-nav labels share --ui-subnav-size (= --app-font-size) */
 body[data-theme] :where(
   .settings-nav-label,
   .inputs-nav-label,
   .connections-nav-label,
   .ui-subnav-label
 ) {
-  font-size: var(--ui-subnav-size, var(--app-font-size, 14px));
+  font-size: var(--ui-subnav-size, var(--app-font-size, 15px));
 }
 
 body[data-theme] :where(

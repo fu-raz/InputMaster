@@ -2,7 +2,7 @@ export const APPEARANCE_THEME_FILE_KIND = "midimaster.appearance.theme.v1";
 
 export const DEFAULT_FONT_FAMILY = "bahnschrift";
 
-export const DEFAULT_FONT_SIZE = 14;
+export const DEFAULT_FONT_SIZE = 15;
 
 export const DEFAULT_TEXT_RENDERING = "auto";
 

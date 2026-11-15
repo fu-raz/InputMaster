@@ -295,7 +295,7 @@ button {
   border: 1px solid var(--line-strong);
   background: var(--control-bg);
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--app-font-size);
 }
 
 button {
@@ -337,7 +337,7 @@ input::placeholder {
   height: var(--control-h);
   padding: 0 12px;
   cursor: default;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   line-height: 1;
   user-select: text;
 }

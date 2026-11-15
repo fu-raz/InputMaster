@@ -1,7 +1,7 @@
 /* App-wide UI consistency tokens + primitives (ILS-10). See docs/ui-consistency.md
  *
- * HARD RULE (Rick): no ×1.25 (or similar) font multipliers. Labels/body use base
- * `--app-font-size` (14px). Do not change type-scale tokens unless he asks.
+ * HARD RULE (Rick): no ×1.25 (or similar) font multipliers. Labels/body/titles use
+ * `var(--app-font-size)` (15px) and calc offsets from it — no new hardcoded font-sizes.
  *
  * Cascade notes (verified via CDP):
  * - Custom props resolve var() where they are *defined*, then inherit the result.
@@ -41,16 +41,16 @@
   /* Subsection must clearly beat Add Route / secondary button label */
   --ui-h3-size: max(calc(18px * var(--ui-text-scale)), calc(var(--ui-button-label-size) + 8px));
   --ui-help-size: calc(13px * var(--ui-text-scale));
-  --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
+  --ui-body-size: calc(var(--app-font-size, 15px) * var(--ui-text-scale));
   /* Shared sub-nav size for Inputs / Plugins / Settings (do not enlarge Plugins alone) */
-  /* Sub-nav matches Settings label size (--app-font-size = 14px). Do not shrink below this. */
-  --ui-subnav-size: var(--app-font-size, 14px);
+  /* Sub-nav matches Settings label size (--app-font-size). Do not shrink below this. */
+  --ui-subnav-size: var(--app-font-size, 15px);
   /* Title↔subtitle stay tight; icon size is set from measured copy height in JS */
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
   --ui-toggle-label-size: calc(13px * var(--ui-text-scale));
   --ui-control-font-size: calc(13px * var(--ui-text-scale));
-  --ui-device-font-size: calc(14px * var(--ui-text-scale));
+  --ui-device-font-size: calc(var(--app-font-size, 15px) * var(--ui-text-scale));
   --ui-device-header-size: calc(11px * var(--ui-text-scale));
   --ui-meta-size: calc(12px * var(--ui-text-scale));
 }
@@ -64,15 +64,15 @@
   --ui-h1-size: calc(18px * var(--ui-text-scale));
   --ui-h3-size: max(calc(18px * var(--ui-text-scale)), calc(var(--ui-button-label-size) + 8px));
   --ui-help-size: calc(13px * var(--ui-text-scale));
-  --ui-body-size: var(--app-font-size, 14px);
+  --ui-body-size: var(--app-font-size, 15px);
   /* Same Settings-perfect sub-nav size on Inputs/Plugins (do not shrink vs Settings) */
-  --ui-subnav-size: var(--app-font-size, 14px);
+  --ui-subnav-size: var(--app-font-size, 15px);
   --ui-header-title-gap: 0px;
   --ui-header-icon-size: 36px;
-  --ui-toggle-label-size: var(--app-font-size, 14px);
-  --ui-control-font-size: var(--app-font-size, 14px);
+  --ui-toggle-label-size: var(--app-font-size, 15px);
+  --ui-control-font-size: var(--app-font-size, 15px);
   /* Bases below were already set for these pages; only the ×1.25 multiplier was removed */
-  --ui-device-font-size: var(--app-font-size, 14px);
+  --ui-device-font-size: var(--app-font-size, 15px);
   --ui-device-header-size: calc(12px * var(--ui-text-scale));
   --ui-meta-size: calc(12px * var(--ui-text-scale));
   font-size: var(--ui-body-size);
@@ -257,7 +257,7 @@ body[data-theme] svg.fa-icon {
 
 /* Match Settings section headers (Behavior, etc.): app-font-size + 1px */
 #inputs-page .ui-subsection-title {
-  font-size: calc(var(--app-font-size, 14px) + 1px);
+  font-size: calc(var(--app-font-size, 15px) + 1px);
   font-weight: 750;
   letter-spacing: 0.01em;
 }
@@ -415,7 +415,7 @@ body[data-theme] svg.fa-icon {
   border-radius: 5px;
   background: transparent;
   color: var(--text-secondary);
-  font-size: var(--ui-subnav-size, var(--app-font-size, 14px));
+  font-size: var(--ui-subnav-size, var(--app-font-size, 15px));
   font-weight: var(--ui-subnav-weight);
   line-height: 1.25;
   text-align: left;
@@ -427,7 +427,7 @@ body[data-theme] svg.fa-icon {
 .settings-nav-label,
 #plugins-page .connections-nav-label,
 .ui-subnav-label {
-  font-size: var(--ui-subnav-size, var(--app-font-size, 14px)) !important;
+  font-size: var(--ui-subnav-size, var(--app-font-size, 15px)) !important;
 }
 
 .ui-subnav-item:hover,
@@ -588,7 +588,7 @@ body[data-theme] svg.fa-icon {
   border: var(--ui-border-width) solid var(--ui-list-row-border, var(--control-border-strong));
   border-radius: var(--radius-control, 4px);
   background: var(--ui-list-row-bg);
-  font-size: var(--app-font-size, 14px);
+  font-size: var(--app-font-size, 15px);
   color: var(--text-primary);
   box-sizing: border-box;
 }

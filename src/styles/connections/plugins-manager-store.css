@@ -391,7 +391,7 @@
   background: #2b2d42;
   color: #fff;
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -515,7 +515,7 @@
 }
 
 .connection-placeholder p {
-  font-size: 14px;
+  font-size: var(--app-font-size);
   line-height: 1.5;
   color: #5c6280;
   max-width: 400px;

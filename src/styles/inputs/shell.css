@@ -147,7 +147,7 @@ body[data-theme] #inputs-page > .page-heading-row {
 
 .inputs-empty {
   color: #8b91a8;
-  font-size: 14px;
+  font-size: var(--app-font-size);
   padding: 8px 0;
 }
 
