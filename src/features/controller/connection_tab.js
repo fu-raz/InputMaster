@@ -1,11 +1,69 @@
+/** Xbox-like gamepad (inline SVG — not limited by an icon font). */
 const GAMEPAD_ICON = `
   <svg viewBox="0 0 24 24" focusable="false">
-    <path d="M6 9h12a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-2l-1.5 2h-5L9 17H6a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3z"></path>
-    <path d="M9 13h.01"></path>
-    <path d="M15 12v2"></path>
-    <path d="M14 13h2"></path>
+    <path d="M6.5 9.5h11c1.7 0 3 1.4 3 3.1v.6c0 1.2-.5 2.3-1.4 3.1l-1.3 1.2c-.4.4-1 .6-1.6.6H8.8c-.6 0-1.2-.2-1.6-.6l-1.3-1.2A4 4 0 0 1 3.5 13.2v-.6c0-1.7 1.3-3.1 3-3.1Z"></path>
+    <path d="M8 12v2.5"></path>
+    <path d="M6.75 13.25h2.5"></path>
+    <circle cx="15.2" cy="12.2" r="0.7"></circle>
+    <circle cx="17.1" cy="13.6" r="0.7"></circle>
+    <circle cx="13.4" cy="13.6" r="0.7"></circle>
+    <circle cx="15.2" cy="15" r="0.7"></circle>
+    <path d="M9.2 8.2c.4-.7 1.2-1.2 2.2-1.2h1.2c1 0 1.8.5 2.2 1.2"></path>
   </svg>
 `;
+
+const XBOX_VENDOR_ICON = `
+  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+    <circle cx="12" cy="12" r="9"></circle>
+    <path d="M7.2 8.2c1.6 1.2 2.9 3.4 3.3 5.8"></path>
+    <path d="M16.8 8.2c-1.6 1.2-2.9 3.4-3.3 5.8"></path>
+    <path d="M8.2 17.2c1.1-1.5 2.4-2.4 3.8-2.4s2.7.9 3.8 2.4"></path>
+  </svg>
+`;
+
+const PLAYSTATION_VENDOR_ICON = `
+  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+    <path d="M8 15.5v-7l5 2.2v7"></path>
+    <path d="M13 10.7 18 9v6.2c0 1.2-.8 1.8-2.2 2.2-1.2.3-2.3.1-2.8-.4"></path>
+    <path d="M8 15.5c-1.5.7-2.8.8-3.4.3-.7-.5-.3-1.6 1-2.4"></path>
+  </svg>
+`;
+
+const NINTENDO_VENDOR_ICON = `
+  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+    <rect x="4" y="5" width="6.5" height="14" rx="2.2"></rect>
+    <rect x="13.5" y="5" width="6.5" height="14" rx="2.2"></rect>
+    <circle cx="7.25" cy="14.5" r="1.1"></circle>
+    <circle cx="16.75" cy="9.5" r="1.1"></circle>
+  </svg>
+`;
+
+function detectVendor(device) {
+  const raw = String(device?.vendor || device?.deviceName || "").toLowerCase();
+  if (raw.includes("playstation") || raw.includes("dualshock") || raw.includes("dualsense") || raw.includes("sony")) {
+    return "playstation";
+  }
+  if (raw.includes("nintendo") || raw.includes("switch") || raw.includes("joy-con") || raw.includes("pro controller")) {
+    return "nintendo";
+  }
+  if (raw.includes("xbox") || raw.includes("xinput") || device?.vendor === "xbox") {
+    return "xbox";
+  }
+  // XInput path is Xbox-compatible; default when no stronger signal.
+  return "xbox";
+}
+
+function vendorIcon(vendor) {
+  if (vendor === "playstation") return PLAYSTATION_VENDOR_ICON;
+  if (vendor === "nintendo") return NINTENDO_VENDOR_ICON;
+  return XBOX_VENDOR_ICON;
+}
+
+function vendorLabel(t, vendor) {
+  if (vendor === "playstation") return t("controller.vendor.playstation");
+  if (vendor === "nintendo") return t("controller.vendor.nintendo");
+  return t("controller.vendor.xbox");
+}
 
 /** Inputs → Controller input panel (observe-only XInput). */
 export function createControllerConnectionTab({ invoke, t }) {
@@ -27,43 +85,70 @@ export function createControllerConnectionTab({ invoke, t }) {
   }
 
   function renderDevices() {
-    const list = read("devices");
-    if (!list) return;
-    list.innerHTML = "";
+    const table = read("devices");
+    if (!table) return;
+    table.innerHTML = "";
+
+    const header = document.createElement("div");
+    header.className = "ui-device-table__header";
+    header.setAttribute("aria-hidden", "true");
+    header.innerHTML = `
+      <span>${t("controller.col.number")}</span>
+      <span>${t("controller.col.name")}</span>
+      <span>${t("controller.col.buttons")}</span>
+      <span>${t("controller.col.faders")}</span>
+      <span>${t("controller.col.knobs")}</span>
+      <span>${t("controller.col.enable")}</span>
+    `;
+    table.appendChild(header);
+
     const devices = Array.isArray(status.devices) ? status.devices : [];
     if (!devices.length) {
       const empty = document.createElement("div");
-      empty.className = "ui-list-row";
+      empty.className = "ui-device-table__empty";
       empty.textContent = t("controller.noDevices");
-      list.appendChild(empty);
+      table.appendChild(empty);
       return;
     }
+
     for (const device of devices) {
       const row = document.createElement("div");
-      row.className = "ui-list-row";
-      row.style.gridTemplateColumns = "minmax(0, 1fr) auto";
+      row.className = "ui-device-table__row";
       if (device.enabled === false) row.classList.add("is-disabled");
 
-      const main = document.createElement("div");
+      const number = Number(device.slot) + 1;
+      const vendor = detectVendor(device);
+      const nameText =
+        device.deviceName && !/^controller\s+\d+$/i.test(String(device.deviceName).trim())
+          ? device.deviceName
+          : t("controller.xboxName");
+
+      const num = document.createElement("span");
+      num.className = "ui-device-table__num";
+      num.textContent = String(number);
+
       const name = document.createElement("div");
-      name.className = "ui-list-row__name";
-      name.textContent =
-        device.deviceName || t("controller.deviceName", { number: Number(device.slot) + 1 });
-      const meta = document.createElement("div");
-      meta.className = "ui-list-row__meta";
-      const buttons = Number(device.buttonCount ?? status.buttonCount ?? 14);
-      const faders = Number(device.faderCount ?? status.faderCount ?? 6);
-      const knobs = Number(device.knobCount ?? status.knobCount ?? 0);
-      meta.innerHTML = `
-        <span>${t("ui.count.buttons")}: ${buttons}</span>
-        <span>${t("ui.count.faders")}: ${faders}</span>
-        <span>${t("ui.count.knobs")}: ${knobs}</span>
+      name.className = "ui-device-table__name";
+      name.innerHTML = `
+        <span class="ui-device-table__vendor" title="${vendorLabel(t, vendor)}">${vendorIcon(vendor)}</span>
+        <span class="ui-device-table__name-text"></span>
       `;
-      main.appendChild(name);
-      main.appendChild(meta);
+      name.querySelector(".ui-device-table__name-text").textContent = nameText;
+
+      const buttons = document.createElement("span");
+      buttons.className = "ui-device-table__stat";
+      buttons.textContent = String(Number(device.buttonCount ?? status.buttonCount ?? 14));
+
+      const faders = document.createElement("span");
+      faders.className = "ui-device-table__stat";
+      faders.textContent = String(Number(device.faderCount ?? status.faderCount ?? 6));
+
+      const knobs = document.createElement("span");
+      knobs.className = "ui-device-table__stat";
+      knobs.textContent = String(Number(device.knobCount ?? status.knobCount ?? 0));
 
       const toggleCell = document.createElement("label");
-      toggleCell.className = "settings-toggle";
+      toggleCell.className = "settings-toggle ui-device-table__enable";
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = device.enabled !== false;
@@ -77,9 +162,13 @@ export function createControllerConnectionTab({ invoke, t }) {
       toggleCell.appendChild(input);
       toggleCell.appendChild(ui);
 
-      row.appendChild(main);
+      row.appendChild(num);
+      row.appendChild(name);
+      row.appendChild(buttons);
+      row.appendChild(faders);
+      row.appendChild(knobs);
       row.appendChild(toggleCell);
-      list.appendChild(row);
+      table.appendChild(row);
     }
   }
 
@@ -90,7 +179,6 @@ export function createControllerConnectionTab({ invoke, t }) {
     const masterInput = read("master-input");
     const devicesBlock = read("devices-block");
     const unsupported = read("unsupported");
-    const observeNote = read("observe-note");
 
     if (masterInput) {
       masterInput.checked = enabled;
@@ -99,9 +187,6 @@ export function createControllerConnectionTab({ invoke, t }) {
     if (unsupported) {
       unsupported.classList.toggle("hidden", supported);
       unsupported.textContent = t("controller.unsupported");
-    }
-    if (observeNote) {
-      observeNote.classList.toggle("hidden", !enabled || !supported);
     }
     if (devicesBlock) {
       devicesBlock.classList.toggle("hidden", !enabled || !supported);
@@ -188,21 +273,23 @@ export function createControllerConnectionTab({ invoke, t }) {
         <div class="ui-page-header" data-role="master-row">
           <div class="ui-page-header__main">
             <span class="ui-page-header__icon" aria-hidden="true">${GAMEPAD_ICON}</span>
-            <div>
+            <div class="ui-page-header__copy">
               <h1 class="ui-content-title" data-role="master-label"></h1>
               <p class="ui-help" data-role="master-help"></p>
             </div>
           </div>
-          <label class="settings-toggle" data-role="master-toggle">
-            <input type="checkbox" data-role="master-input" />
-            <span class="plugins-toggle-ui" aria-hidden="true"></span>
-          </label>
+          <div class="ui-enable-control">
+            <span class="ui-enable-caption">${t("ui.enable")}</span>
+            <label class="settings-toggle" data-role="master-toggle" title="${t("ui.enable")}">
+              <input type="checkbox" data-role="master-input" />
+              <span class="plugins-toggle-ui" aria-hidden="true"></span>
+            </label>
+          </div>
         </div>
         <p class="ui-help controller-unsupported hidden" data-role="unsupported"></p>
-        <p class="ui-help controller-observe-note hidden" data-role="observe-note"></p>
         <div class="controller-devices-block hidden" data-role="devices-block">
           <h3 class="ui-subsection-title" data-role="devices-heading"></h3>
-          <div class="ui-list-stack" data-role="devices"></div>
+          <div class="ui-device-table" data-role="devices"></div>
         </div>
       </div>
     `;
@@ -210,8 +297,6 @@ export function createControllerConnectionTab({ invoke, t }) {
     if (masterLabel) masterLabel.textContent = t("controller.masterLabel");
     const masterHelp = read("master-help");
     if (masterHelp) masterHelp.textContent = t("inputs.controller.help");
-    const observeNote = read("observe-note");
-    if (observeNote) observeNote.textContent = t("controller.observeOnly");
     const heading = read("devices-heading");
     if (heading) heading.textContent = t("controller.devicesHeading");
     const masterInput = read("master-input");

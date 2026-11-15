@@ -59,6 +59,7 @@ impl ControllerPoller {
                 slot: slot as u8,
                 device_id: device_id_for_slot(slot as u8),
                 device_name: device_name_for_slot(slot as u8),
+                vendor: "xbox".to_string(),
                 connected: false,
                 enabled: true,
                 button_count: BUTTON_COUNT,

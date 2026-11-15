@@ -2,11 +2,13 @@ import { KEYBOARD_DEVICE_ID } from "./catalog.js";
 
 const KEYBOARD_ICON = `
   <svg viewBox="0 0 24 24" focusable="false">
-    <path d="M4 7h16v10H4z"></path>
-    <path d="M8 11h.01"></path>
-    <path d="M12 11h.01"></path>
-    <path d="M16 11h.01"></path>
-    <path d="M7 15h10"></path>
+    <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+    <path d="M6 10h.01"></path>
+    <path d="M10 10h.01"></path>
+    <path d="M14 10h.01"></path>
+    <path d="M18 10h.01"></path>
+    <path d="M8 14h.01"></path>
+    <path d="M12 14h4"></path>
   </svg>
 `;
 
@@ -33,19 +35,18 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     const controls = Array.isArray(status.controls) ? status.controls : [];
     if (!controls.length) {
       const empty = document.createElement("div");
-      empty.className = "ui-list-row";
-      empty.textContent = t("keyboard.noControls");
+      empty.className = "ui-toggle-row";
+      empty.innerHTML = `<span class="ui-toggle-row__label">${t("keyboard.noControls")}</span>`;
       list.appendChild(empty);
       return;
     }
     for (const control of controls) {
       const row = document.createElement("div");
-      row.className = "ui-list-row keyboard-control-row";
-      row.style.gridTemplateColumns = "minmax(0, 1fr) auto";
+      row.className = "ui-toggle-row";
 
-      const name = document.createElement("span");
-      name.className = "ui-list-row__name";
-      name.textContent = control.name || control.id;
+      const label = document.createElement("span");
+      label.className = "ui-toggle-row__label";
+      label.textContent = control.name || control.id;
 
       const toggleLabel = document.createElement("label");
       toggleLabel.className = "settings-toggle";
@@ -62,7 +63,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
       toggleLabel.appendChild(checkbox);
       toggleLabel.appendChild(ui);
 
-      row.appendChild(name);
+      row.appendChild(label);
       row.appendChild(toggleLabel);
       list.appendChild(row);
     }
@@ -151,20 +152,23 @@ export function createKeyboardConnectionTab({ invoke, t }) {
         <div class="ui-page-header" data-role="master-row">
           <div class="ui-page-header__main">
             <span class="ui-page-header__icon" aria-hidden="true">${KEYBOARD_ICON}</span>
-            <div>
+            <div class="ui-page-header__copy">
               <h1 class="ui-content-title" data-role="master-label"></h1>
               <p class="ui-help" data-role="master-help"></p>
             </div>
           </div>
-          <label class="settings-toggle" data-role="master-toggle">
-            <input type="checkbox" data-role="master-input" />
-            <span class="plugins-toggle-ui" aria-hidden="true"></span>
-          </label>
+          <div class="ui-enable-control">
+            <span class="ui-enable-caption">${t("ui.enable")}</span>
+            <label class="settings-toggle" data-role="master-toggle" title="${t("ui.enable")}">
+              <input type="checkbox" data-role="master-input" />
+              <span class="plugins-toggle-ui" aria-hidden="true"></span>
+            </label>
+          </div>
         </div>
         <p class="ui-help keyboard-unsupported hidden" data-role="unsupported"></p>
         <div class="keyboard-controls-block hidden" data-role="controls-block">
           <h3 class="ui-subsection-title" data-role="controls-heading"></h3>
-          <div class="ui-list-stack" data-role="controls"></div>
+          <div class="ui-list-card" data-role="controls"></div>
         </div>
       </div>
     `;

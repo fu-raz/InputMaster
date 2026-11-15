@@ -151,33 +151,9 @@ body[data-theme] #inputs-page > .page-heading-row {
   padding: 8px 0;
 }
 
-.keyboard-controls-block {
-  margin-top: 12px;
-}
-
-.keyboard-controls-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.keyboard-control-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.keyboard-control-checkbox {
-  margin: 0;
-}
-
+.keyboard-controls-block,
 .controller-devices-block {
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 .midi-routes-inline-host {

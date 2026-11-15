@@ -24,8 +24,9 @@ pub fn is_controller_device_id(device_id: &str) -> bool {
     parse_xinput_slot(device_id).is_some()
 }
 
-pub fn device_name_for_slot(slot: u8) -> String {
-    format!("Controller {}", slot + 1)
+pub fn device_name_for_slot(_slot: u8) -> String {
+    // XInput devices are Xbox-compatible; slot number is shown separately in the UI.
+    "Xbox Controller".to_string()
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -191,6 +192,9 @@ pub struct ControllerDeviceInfo {
     pub slot: u8,
     pub device_id: String,
     pub device_name: String,
+    /// Vendor hint for UI icons: "xbox" | "playstation" | "nintendo" | "unknown".
+    /// XInput alone cannot distinguish DualSense/Switch — defaults to xbox.
+    pub vendor: String,
     pub connected: bool,
     pub enabled: bool,
     pub button_count: u8,

@@ -601,7 +601,7 @@ input::placeholder {
 .midi-route-action-button {
   min-height: 34px;
   padding: 0 12px;
-  font-size: 13px;
+  font-size: var(--ui-button-label-size, 13px);
   font-weight: 700;
 }
 
