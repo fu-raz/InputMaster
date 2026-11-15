@@ -1,28 +1,42 @@
+//! Windows media/volume capture + OS suppress.
+//! Ported from the proven `keyboard-capture-test` harness:
+//! - WH_KEYBOARD_LL returns 1 without CallNextHookEx to eat keys
+//! - RegisterHotKey backup on a message-only window (same capture thread)
+//! - No RIDEV_NOLEGACY (that stuck after disable)
+//! - Hook callback only emits MidiEvents (no UI / SendMessage)
+
 use super::catalog::{note_event, volume_wheel_event, KeyboardControlId};
 use crate::model::MidiEvent;
 use crate::run_logger;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU32, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::thread::{self, JoinHandle};
-use windows::Win32::Foundation::{LPARAM, LRESULT, WPARAM};
+use windows::core::w;
+use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::UI::Input::KeyboardAndMouse::{
-    VK_MEDIA_NEXT_TRACK, VK_MEDIA_PLAY_PAUSE, VK_MEDIA_PREV_TRACK, VK_MEDIA_STOP, VK_VOLUME_DOWN,
-    VK_VOLUME_MUTE, VK_VOLUME_UP,
+    RegisterHotKey, UnregisterHotKey, HOT_KEY_MODIFIERS, VK_MEDIA_NEXT_TRACK, VK_MEDIA_PLAY_PAUSE,
+    VK_MEDIA_PREV_TRACK, VK_MEDIA_STOP, VK_VOLUME_DOWN, VK_VOLUME_MUTE, VK_VOLUME_UP,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    CallNextHookEx, DispatchMessageW, GetMessageW, PostThreadMessageW, SetWindowsHookExW,
-    TranslateMessage, UnhookWindowsHookEx, HHOOK, KBDLLHOOKSTRUCT, KBDLLHOOKSTRUCT_FLAGS, MSG,
-    WH_KEYBOARD_LL, WM_KEYDOWN, WM_KEYUP, WM_QUIT, WM_SYSKEYDOWN, WM_SYSKEYUP,
+    CallNextHookEx, CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW,
+    PostQuitMessage, PostThreadMessageW, RegisterClassExW, SetWindowsHookExW, TranslateMessage,
+    UnhookWindowsHookEx, CS_GLOBALCLASS, HHOOK, HMENU, HWND_MESSAGE, KBDLLHOOKSTRUCT, MSG,
+    WINDOW_EX_STYLE, WINDOW_STYLE, WM_CREATE, WM_DESTROY, WM_HOTKEY, WM_KEYDOWN, WM_KEYUP, WM_QUIT,
+    WM_SYSKEYDOWN, WM_SYSKEYUP, WNDCLASSEXW, WH_KEYBOARD_LL,
 };
 
-const LLKHF_INJECTED: KBDLLHOOKSTRUCT_FLAGS = KBDLLHOOKSTRUCT_FLAGS(0x10);
-const LLKHF_LOWER_IL_INJECTED: KBDLLHOOKSTRUCT_FLAGS = KBDLLHOOKSTRUCT_FLAGS(0x02);
+const LLKHF_INJECTED: u32 = 0x10;
+const LLKHF_LOWER_IL_INJECTED: u32 = 0x02;
+const HC_ACTION: i32 = 0;
 
 type EventSink = Arc<dyn Fn(MidiEvent) + Send + Sync + 'static>;
 
 static HOOK_ACTIVE: AtomicBool = AtomicBool::new(false);
+static HOOK_HANDLE: AtomicIsize = AtomicIsize::new(0);
 static HOOK_THREAD_ID: AtomicU32 = AtomicU32::new(0);
+static HOTKEY_HWND: AtomicIsize = AtomicIsize::new(0);
 static EVENT_SINK: OnceLock<Mutex<Option<EventSink>>> = OnceLock::new();
 
 fn event_sink_slot() -> &'static Mutex<Option<EventSink>> {
@@ -37,17 +51,17 @@ fn emit(event: MidiEvent) {
     }
 }
 
-fn is_catalogued_vk(vk: u16) -> bool {
-    matches!(
-        vk,
-        v if v == VK_VOLUME_MUTE.0
-            || v == VK_VOLUME_DOWN.0
-            || v == VK_VOLUME_UP.0
-            || v == VK_MEDIA_NEXT_TRACK.0
-            || v == VK_MEDIA_PREV_TRACK.0
-            || v == VK_MEDIA_STOP.0
-            || v == VK_MEDIA_PLAY_PAUSE.0
-    )
+fn catalogued_vks() -> [(u16, u8); 7] {
+    // Hotkey id is index+1. Volume up/down map to wheel deltas (same as LL hook).
+    [
+        (VK_VOLUME_MUTE.0, 1),
+        (VK_VOLUME_DOWN.0, 2),
+        (VK_VOLUME_UP.0, 3),
+        (VK_MEDIA_NEXT_TRACK.0, 4),
+        (VK_MEDIA_PREV_TRACK.0, 5),
+        (VK_MEDIA_STOP.0, 6),
+        (VK_MEDIA_PLAY_PAUSE.0, 7),
+    ]
 }
 
 fn handle_catalogued_key(vk: u16, pressed: bool) {
@@ -76,38 +90,198 @@ fn handle_catalogued_key(vk: u16, pressed: bool) {
     }
 }
 
+fn is_catalogued_vk(vk: u16) -> bool {
+    catalogued_vks().iter().any(|(candidate, _)| *candidate == vk)
+}
+
 unsafe extern "system" fn low_level_keyboard_proc(
     code: i32,
     wparam: WPARAM,
     lparam: LPARAM,
 ) -> LRESULT {
-    if code >= 0 && HOOK_ACTIVE.load(Ordering::SeqCst) {
-        let kb = &*(lparam.0 as *const KBDLLHOOKSTRUCT);
-        let flags = kb.flags.0;
-        let injected = (flags & (LLKHF_INJECTED.0 | LLKHF_LOWER_IL_INJECTED.0)) != 0;
-        if !injected {
-            let vk = kb.vkCode as u16;
-            if is_catalogued_vk(vk) {
-                let message = wparam.0 as u32;
-                let pressed = matches!(message, WM_KEYDOWN | WM_SYSKEYDOWN);
-                let is_up = matches!(message, WM_KEYUP | WM_SYSKEYUP);
-                if pressed || is_up {
-                    handle_catalogued_key(vk, pressed);
-                }
-                // Suppress OS handling for catalogued media/volume keys.
-                return LRESULT(1);
-            }
+    if code != HC_ACTION {
+        return CallNextHookEx(None, code, wparam, lparam);
+    }
+    if !HOOK_ACTIVE.load(Ordering::SeqCst) {
+        return CallNextHookEx(None, code, wparam, lparam);
+    }
+
+    let kb = &*(lparam.0 as *const KBDLLHOOKSTRUCT);
+    let injected = (kb.flags.0 & (LLKHF_INJECTED | LLKHF_LOWER_IL_INJECTED)) != 0;
+    if injected {
+        return CallNextHookEx(None, code, wparam, lparam);
+    }
+
+    let vk = kb.vkCode as u16;
+    if !is_catalogued_vk(vk) {
+        return CallNextHookEx(None, code, wparam, lparam);
+    }
+
+    let message = wparam.0 as u32;
+    let pressed = matches!(message, WM_KEYDOWN | WM_SYSKEYDOWN);
+    let is_up = matches!(message, WM_KEYUP | WM_SYSKEYUP);
+    if pressed || is_up {
+        handle_catalogued_key(vk, pressed);
+    } else {
+        // Unknown edge for a catalogued VK — still eat while capture is active.
+        handle_catalogued_key(vk, true);
+    }
+
+    // Eat: do not CallNextHookEx (proven harness behavior).
+    LRESULT(1)
+}
+
+fn register_hotkeys(hwnd: HWND) {
+    for (vk, id) in catalogued_vks() {
+        match unsafe { RegisterHotKey(Some(hwnd), id as i32, HOT_KEY_MODIFIERS(0), vk as u32) } {
+            Ok(()) => run_logger::info(
+                "keyboard_input",
+                "hotkey_registered",
+                &format!("id={id} vk=0x{vk:02X}"),
+            ),
+            Err(err) => run_logger::warn(
+                "keyboard_input",
+                "hotkey_register_failed",
+                &format!("id={id} vk=0x{vk:02X} error={err}"),
+            ),
         }
     }
-    unsafe { CallNextHookEx(None, code, wparam, lparam) }
+}
+
+fn unregister_hotkeys(hwnd: HWND) {
+    for i in 1..=32 {
+        unsafe {
+            let _ = UnregisterHotKey(Some(hwnd), i);
+        }
+    }
+    let _ = hwnd;
+}
+
+fn handle_hotkey(id: i32) {
+    // Backup path if the OS delivers WM_HOTKEY instead of (or without) a suppressible LL event.
+    // Emit a short press for buttons / one wheel step for volume.
+    match id {
+        1 => {
+            emit(note_event(KeyboardControlId::VolumeMute, true));
+            emit(note_event(KeyboardControlId::VolumeMute, false));
+        }
+        2 => {
+            if let Some(event) = volume_wheel_event(-1) {
+                emit(event);
+            }
+        }
+        3 => {
+            if let Some(event) = volume_wheel_event(1) {
+                emit(event);
+            }
+        }
+        4 => {
+            emit(note_event(KeyboardControlId::MediaNext, true));
+            emit(note_event(KeyboardControlId::MediaNext, false));
+        }
+        5 => {
+            emit(note_event(KeyboardControlId::MediaPrev, true));
+            emit(note_event(KeyboardControlId::MediaPrev, false));
+        }
+        6 => {
+            emit(note_event(KeyboardControlId::MediaStop, true));
+            emit(note_event(KeyboardControlId::MediaStop, false));
+        }
+        7 => {
+            emit(note_event(KeyboardControlId::MediaPlayPause, true));
+            emit(note_event(KeyboardControlId::MediaPlayPause, false));
+        }
+        _ => {}
+    }
+}
+
+unsafe extern "system" fn hotkey_wnd_proc(
+    hwnd: HWND,
+    msg: u32,
+    wparam: WPARAM,
+    lparam: LPARAM,
+) -> LRESULT {
+    match msg {
+        WM_CREATE => LRESULT(0),
+        WM_HOTKEY => {
+            handle_hotkey(wparam.0 as i32);
+            LRESULT(0)
+        }
+        WM_DESTROY => {
+            unregister_hotkeys(hwnd);
+            HOTKEY_HWND.store(0, Ordering::SeqCst);
+            PostQuitMessage(0);
+            LRESULT(0)
+        }
+        _ => DefWindowProcW(hwnd, msg, wparam, lparam),
+    }
+}
+
+fn ensure_hotkey_window_class() -> windows::core::Result<()> {
+    static REGISTERED: OnceLock<bool> = OnceLock::new();
+    if REGISTERED.get().copied().unwrap_or(false) {
+        return Ok(());
+    }
+    let instance = unsafe { GetModuleHandleW(None)? };
+    let class_name = w!("InputMasterKeyboardHotkeyWindow");
+    let wc = WNDCLASSEXW {
+        cbSize: std::mem::size_of::<WNDCLASSEXW>() as u32,
+        style: CS_GLOBALCLASS,
+        lpfnWndProc: Some(hotkey_wnd_proc),
+        cbClsExtra: 0,
+        cbWndExtra: 0,
+        hInstance: instance.into(),
+        hIcon: Default::default(),
+        hCursor: Default::default(),
+        hbrBackground: Default::default(),
+        lpszMenuName: windows::core::PCWSTR::null(),
+        lpszClassName: class_name,
+        hIconSm: Default::default(),
+    };
+    let atom = unsafe { RegisterClassExW(&wc) };
+    if atom == 0 {
+        // Class may already exist from a previous start in-process.
+        run_logger::debug(
+            "keyboard_input",
+            "hotkey_class_register",
+            "RegisterClassExW returned 0 (may already exist)",
+        );
+    }
+    let _ = REGISTERED.set(true);
+    Ok(())
+}
+
+fn create_hotkey_window() -> windows::core::Result<HWND> {
+    ensure_hotkey_window_class()?;
+    let instance = unsafe { GetModuleHandleW(None)? };
+    let hwnd = unsafe {
+        CreateWindowExW(
+            WINDOW_EX_STYLE(0),
+            w!("InputMasterKeyboardHotkeyWindow"),
+            w!(""),
+            WINDOW_STYLE(0),
+            0,
+            0,
+            0,
+            0,
+            Some(HWND_MESSAGE),
+            None::<HMENU>,
+            Some(instance.into()),
+            None,
+        )?
+    };
+    HOTKEY_HWND.store(hwnd.0 as isize, Ordering::SeqCst);
+    register_hotkeys(hwnd);
+    Ok(hwnd)
 }
 
 fn install_hook() -> windows::core::Result<HHOOK> {
+    let instance = unsafe { GetModuleHandleW(None)? };
     unsafe {
         SetWindowsHookExW(
             WH_KEYBOARD_LL,
             Some(low_level_keyboard_proc),
-            None,
+            Some(instance.into()),
             0,
         )
     }
@@ -134,10 +308,29 @@ impl KeyboardCapture {
             .name("keyboard-input-hook".into())
             .spawn(|| {
                 HOOK_THREAD_ID.store(unsafe { GetCurrentThreadId() }, Ordering::SeqCst);
+
+                let hotkey_hwnd = match create_hotkey_window() {
+                    Ok(hwnd) => Some(hwnd),
+                    Err(err) => {
+                        run_logger::warn(
+                            "keyboard_input",
+                            "hotkey_window_failed",
+                            &format!("error={err} (continuing with LL hook only)"),
+                        );
+                        None
+                    }
+                };
+
                 let hook = match install_hook() {
                     Ok(hook) => hook,
                     Err(err) => {
                         HOOK_ACTIVE.store(false, Ordering::SeqCst);
+                        if let Some(hwnd) = hotkey_hwnd {
+                            unregister_hotkeys(hwnd);
+                            unsafe {
+                                let _ = DestroyWindow(hwnd);
+                            }
+                        }
                         run_logger::error(
                             "keyboard_input",
                             "hook_install_failed",
@@ -146,7 +339,12 @@ impl KeyboardCapture {
                         return;
                     }
                 };
-                run_logger::info("keyboard_input", "hook_started", "global media/volume capture");
+                HOOK_HANDLE.store(hook.0 as isize, Ordering::SeqCst);
+                run_logger::info(
+                    "keyboard_input",
+                    "hook_started",
+                    "LL hook + RegisterHotKey suppress active",
+                );
 
                 let mut msg = MSG::default();
                 unsafe {
@@ -154,8 +352,20 @@ impl KeyboardCapture {
                         let _ = TranslateMessage(&msg);
                         DispatchMessageW(&msg);
                     }
+                }
+
+                HOOK_ACTIVE.store(false, Ordering::SeqCst);
+                unsafe {
                     let _ = UnhookWindowsHookEx(hook);
                 }
+                HOOK_HANDLE.store(0, Ordering::SeqCst);
+                if let Some(hwnd) = hotkey_hwnd {
+                    unregister_hotkeys(hwnd);
+                    unsafe {
+                        let _ = DestroyWindow(hwnd);
+                    }
+                }
+                HOTKEY_HWND.store(0, Ordering::SeqCst);
                 HOOK_THREAD_ID.store(0, Ordering::SeqCst);
                 run_logger::info("keyboard_input", "hook_stopped", "");
             })
@@ -168,12 +378,24 @@ impl KeyboardCapture {
     }
 
     pub fn stop(&mut self) {
-        if !HOOK_ACTIVE.swap(false, Ordering::SeqCst) {
+        if !HOOK_ACTIVE.swap(false, Ordering::SeqCst) && self.join.is_none() {
             return;
         }
+        // Stop eating immediately even before the thread unwinds.
+        HOOK_ACTIVE.store(false, Ordering::SeqCst);
+
+        let hwnd = HWND(HOTKEY_HWND.load(Ordering::SeqCst) as *mut _);
+        if !hwnd.0.is_null() {
+            unregister_hotkeys(hwnd);
+        }
+
         let thread_id = HOOK_THREAD_ID.load(Ordering::SeqCst);
         if thread_id != 0 {
             unsafe {
+                // Destroying the message window posts WM_DESTROY → PostQuitMessage.
+                if !hwnd.0.is_null() {
+                    let _ = DestroyWindow(hwnd);
+                }
                 let _ = PostThreadMessageW(thread_id, WM_QUIT, WPARAM(0), LPARAM(0));
             }
         }
@@ -183,6 +405,9 @@ impl KeyboardCapture {
         if let Ok(mut sink) = event_sink_slot().lock() {
             *sink = None;
         }
+        HOTKEY_HWND.store(0, Ordering::SeqCst);
+        HOOK_HANDLE.store(0, Ordering::SeqCst);
+        HOOK_THREAD_ID.store(0, Ordering::SeqCst);
     }
 }
 
