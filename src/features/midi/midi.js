@@ -396,7 +396,13 @@ export function createMidiFeature({
     }
     discardRouteDrafts();
     const next = routes.map((route) => ({ ...route, enabled: want }));
-    await applyRoutes(next, { source: "manual", force: true });
+    // Persist enabled flags even when the pair is currently unplugged/unavailable,
+    // so Enable reflects intent and hotplug can reconnect later.
+    await applyRoutes(next, {
+      source: "manual",
+      force: true,
+      allowPartialUnavailable: true,
+    });
     // Keep inline editor in sync with the applied preference (enabled flags).
     routeEditor.begin(desiredRoutes());
     syncMidiMasterToggleUi();
