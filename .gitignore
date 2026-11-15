@@ -54,3 +54,6 @@ src-tauri/src/bin/store_tool.rs
 store-private-key*.txt
 *.midimaster.key
 *.midimaster
+
+# Font Awesome Pro desktop pack (local license). App embeds selected SVGs under src/assets/fa/.
+resources/fontawesome-pro-*/

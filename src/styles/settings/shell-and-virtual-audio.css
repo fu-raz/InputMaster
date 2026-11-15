@@ -73,6 +73,12 @@
 .settings-maintenance-icon svg {
   width: 18px;
   height: 18px;
+}
+
+.settings-button-icon svg:not(.fa-icon),
+.settings-status-icon svg:not(.fa-icon),
+.virtual-audio-setup-icon svg:not(.fa-icon),
+.settings-maintenance-icon svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;

@@ -1,20 +1,5 @@
 import { KEYBOARD_DEVICE_ID } from "./catalog.js";
-
-const KEYBOARD_ICON = `
-  <svg viewBox="0 0 24 24" focusable="false">
-    <rect x="1.5" y="5" width="21" height="14" rx="2.2"></rect>
-    <path d="M5.5 9h.01"></path>
-    <path d="M9 9h.01"></path>
-    <path d="M12.5 9h.01"></path>
-    <path d="M16 9h.01"></path>
-    <path d="M19.5 9h.01"></path>
-    <path d="M5.5 12.5h.01"></path>
-    <path d="M9 12.5h.01"></path>
-    <path d="M12.5 12.5h.01"></path>
-    <path d="M16 12.5h.01"></path>
-    <path d="M7.5 16h9"></path>
-  </svg>
-`;
+import { faSvg, hydrateFaIcons } from "../../shared/fa_icons.js";
 
 /** Inputs → Keyboard input panel. */
 export function createKeyboardConnectionTab({ invoke, t }) {
@@ -30,6 +15,13 @@ export function createKeyboardConnectionTab({ invoke, t }) {
 
   function read(role) {
     return root?.querySelector(`[data-role="${role}"]`);
+  }
+
+  function syncMasterPanelOpacity() {
+    const panel = read("content-panel");
+    if (!panel) return;
+    const enabled = Boolean(status.enabled) && status.supported !== false;
+    panel.classList.toggle("is-master-off", !enabled);
   }
 
   function renderControls() {
@@ -92,6 +84,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
     if (controlsBlock) {
       controlsBlock.classList.toggle("hidden", !enabled || !supported);
     }
+    syncMasterPanelOpacity();
     if (enabled && supported) {
       renderControls();
     }
@@ -152,23 +145,23 @@ export function createKeyboardConnectionTab({ invoke, t }) {
   function mount(container) {
     root = container;
     root.innerHTML = `
-      <div class="ui-panel keyboard-settings">
-        <div class="ui-page-header" data-role="master-row">
-          <div class="ui-page-header__main">
-            <span class="ui-page-header__icon" aria-hidden="true">${KEYBOARD_ICON}</span>
-            <div class="ui-page-header__copy">
-              <h1 class="ui-content-title" data-role="master-label"></h1>
-              <p class="ui-help" data-role="master-help"></p>
-            </div>
-          </div>
-          <div class="ui-enable-control">
-            <span class="ui-enable-caption">${t("ui.enable")}</span>
-            <label class="settings-toggle" data-role="master-toggle" title="${t("ui.enable")}">
-              <input type="checkbox" data-role="master-input" />
-              <span class="plugins-toggle-ui" aria-hidden="true"></span>
-            </label>
+      <div class="ui-page-header" data-role="master-row">
+        <div class="ui-page-header__main">
+          <span class="ui-page-header__icon" aria-hidden="true">${faSvg("keyboard")}</span>
+          <div class="ui-page-header__copy">
+            <h1 class="ui-content-title" data-role="master-label"></h1>
+            <p class="ui-help" data-role="master-help"></p>
           </div>
         </div>
+        <div class="ui-enable-control">
+          <span class="ui-enable-caption">${t("ui.enable")}</span>
+          <label class="settings-toggle" data-role="master-toggle" title="${t("ui.enable")}">
+            <input type="checkbox" data-role="master-input" />
+            <span class="plugins-toggle-ui" aria-hidden="true"></span>
+          </label>
+        </div>
+      </div>
+      <div class="ui-panel keyboard-settings" data-role="content-panel">
         <p class="ui-help keyboard-unsupported hidden" data-role="unsupported"></p>
         <div class="keyboard-controls-block hidden" data-role="controls-block">
           <h3 class="ui-subsection-title" data-role="controls-heading"></h3>
@@ -176,6 +169,7 @@ export function createKeyboardConnectionTab({ invoke, t }) {
         </div>
       </div>
     `;
+    hydrateFaIcons(root);
     const masterLabel = read("master-label");
     if (masterLabel) masterLabel.textContent = t("keyboard.masterLabel");
     const masterHelp = read("master-help");

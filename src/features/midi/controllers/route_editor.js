@@ -203,7 +203,6 @@ export function createRouteEditor({
       const columnHeader = document.createElement("div");
       columnHeader.className = "midi-route-column-header";
       columnHeader.setAttribute("aria-hidden", "true");
-      columnHeader.appendChild(document.createElement("span"));
 
       const selectLabels = document.createElement("div");
       selectLabels.className = "midi-route-select-labels";
@@ -218,6 +217,10 @@ export function createRouteEditor({
       columnHeader.appendChild(selectLabels);
       columnHeader.appendChild(document.createElement("span"));
       columnHeader.appendChild(document.createElement("span"));
+      const enableLabel = document.createElement("span");
+      enableLabel.className = "midi-route-column-label midi-route-column-label--enable";
+      enableLabel.textContent = t("midi.col.enable");
+      columnHeader.appendChild(enableLabel);
       body.appendChild(columnHeader);
     }
 
@@ -226,19 +229,6 @@ export function createRouteEditor({
       const row = document.createElement("div");
       row.className = "midi-route-row";
       row.classList.toggle("disabled", route.enabled === false);
-
-      const enableLabel = document.createElement("label");
-      enableLabel.className = "plugins-toggle midi-route-enable";
-      const enable = document.createElement("input");
-      enable.type = "checkbox";
-      enable.checked = route.enabled !== false;
-      enable.disabled = routeView.routeEditorApplyInFlight;
-      enable.addEventListener("change", () => setRouteEnabled(index, enable.checked));
-      const enableUi = document.createElement("span");
-      enableUi.className = "plugins-toggle-ui";
-      enableLabel.appendChild(enable);
-      enableLabel.appendChild(enableUi);
-      row.appendChild(enableLabel);
 
       const selects = document.createElement("div");
       selects.className = "midi-route-selects";
@@ -265,6 +255,19 @@ export function createRouteEditor({
       setIconButton(remove, "trash");
       remove.addEventListener("click", () => removeRoute(index));
       row.appendChild(remove);
+
+      const enableLabel = document.createElement("label");
+      enableLabel.className = "plugins-toggle midi-route-enable";
+      const enable = document.createElement("input");
+      enable.type = "checkbox";
+      enable.checked = route.enabled !== false;
+      enable.disabled = routeView.routeEditorApplyInFlight;
+      enable.addEventListener("change", () => setRouteEnabled(index, enable.checked));
+      const enableUi = document.createElement("span");
+      enableUi.className = "plugins-toggle-ui";
+      enableLabel.appendChild(enable);
+      enableLabel.appendChild(enableUi);
+      row.appendChild(enableLabel);
       body.appendChild(row);
     });
     routeView.routesPopoverEl.appendChild(body);

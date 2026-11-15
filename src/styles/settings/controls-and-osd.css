@@ -244,6 +244,9 @@
 .settings-card-section-icon svg {
   width: 17px;
   height: 17px;
+}
+
+.settings-card-section-icon svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
@@ -318,6 +321,9 @@
 .settings-startup-icon svg {
   width: 17px;
   height: 17px;
+}
+
+.settings-startup-icon svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
@@ -325,7 +331,7 @@
   stroke-linejoin: round;
 }
 
-.settings-startup-icon svg path {
+.settings-startup-icon svg:not(.fa-icon) path {
   vector-effect: non-scaling-stroke;
 }
 

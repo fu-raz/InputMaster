@@ -1,7 +1,9 @@
 import { initializePerformanceAudit, performanceAudit } from "./app/performance_audit_api.js";
 import { hydrateThemeLogo } from "./app/theme_logo.js";
+import { hydrateFaIcons } from "./shared/fa_icons.js";
 
 hydrateThemeLogo();
+hydrateFaIcons();
 
 const STORAGE_KEY = "midimaster.pendingFrontendLogs";
 const pendingLogs = [];

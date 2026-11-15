@@ -34,10 +34,9 @@
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
   --ui-subnav-size: calc(13px * var(--ui-text-scale));
-  /* Title icon: larger than title alone — floor at 3.5rem so glyph reads as title+subtitle */
-  --ui-header-icon-size: max(
-    3.5rem,
-    calc((var(--ui-h1-size) * var(--ui-h1-line)) + 10px + (var(--ui-help-size) * var(--ui-help-line)))
+  /* Title icon height = title + subtitle stack only (row-gap 4px) */
+  --ui-header-icon-size: calc(
+    (var(--ui-h1-size) * var(--ui-h1-line)) + 4px + (var(--ui-help-size) * var(--ui-help-line))
   );
   --ui-toggle-label-size: calc(13px * var(--ui-text-scale));
   --ui-device-font-size: calc(14px * var(--ui-text-scale));
@@ -55,9 +54,8 @@
   --ui-help-size: calc(13px * var(--ui-text-scale));
   --ui-body-size: calc(var(--app-font-size, 14px) * var(--ui-text-scale));
   --ui-subnav-size: calc(13px * var(--ui-text-scale));
-  --ui-header-icon-size: max(
-    5.5rem,
-    calc((var(--ui-h1-size) * var(--ui-h1-line)) + 14px + (var(--ui-help-size) * var(--ui-help-line)))
+  --ui-header-icon-size: calc(
+    (var(--ui-h1-size) * var(--ui-h1-line)) + 4px + (var(--ui-help-size) * var(--ui-help-line))
   );
   --ui-toggle-label-size: calc(14px * var(--ui-text-scale));
   --ui-device-font-size: calc(16px * var(--ui-text-scale));
@@ -93,13 +91,24 @@ body[data-theme] {
   margin-bottom: 4px;
 }
 
-/* Content H1 — large icon + title/help + Enable control */
+/* Content H1 — large icon + title/help + Enable control (outside bordered panel) */
 .ui-page-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 18px;
   align-items: start;
-  margin-bottom: var(--ui-section-gap);
+  margin: 0 0 var(--ui-section-gap);
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.ui-page-header + .ui-panel {
+  margin-top: 0;
+}
+
+.ui-panel.is-master-off {
+  opacity: 0.75;
 }
 
 .ui-page-header__main {
@@ -146,15 +155,39 @@ body[data-theme] {
   width: 100%;
   height: 100%;
   display: block;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.45;
-  stroke-linecap: round;
-  stroke-linejoin: round;
   overflow: visible;
-  /* Glyph fills the measured box (viewBox padding otherwise looks title-only) */
-  transform: scale(1.22);
-  transform-origin: center;
+}
+
+/* Font Awesome Pro — filled currentColor glyphs (beats legacy stroke icon rules) */
+.fa-icon,
+svg.fa-icon,
+body[data-theme] .fa-icon,
+body[data-theme] svg.fa-icon {
+  fill: currentColor;
+  stroke: none;
+}
+
+.ui-page-header__icon .fa-icon,
+.nav-icon .fa-icon,
+.inputs-nav-icon .fa-icon,
+.settings-nav-icon .fa-icon,
+.ui-nav-icon .fa-icon,
+.ui-device-table__vendor .fa-icon,
+.sidebar-footer-icon .fa-icon,
+.topbar-icon-button .fa-icon,
+.binding-search-field .fa-icon,
+.binding-density-option .fa-icon,
+.settings-nav-icon .fa-icon,
+.settings-card-section-icon .fa-icon,
+.settings-startup-icon .fa-icon,
+.settings-status-icon .fa-icon,
+.settings-button-icon .fa-icon,
+.midi-route-icon-button .fa-icon {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: currentColor;
+  stroke: none;
 }
 
 #inputs-page .ui-subsection-title {
@@ -372,6 +405,12 @@ body[data-theme] {
   height: 100%;
   width: auto;
   max-width: 100%;
+}
+
+.ui-nav-icon svg:not(.fa-icon),
+.inputs-nav-icon svg:not(.fa-icon),
+.settings-nav-icon svg:not(.fa-icon),
+#plugins-page .connections-nav-icon--svg svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
@@ -512,6 +551,9 @@ body[data-theme] {
 .ui-device-table__vendor svg {
   width: 100%;
   height: 100%;
+}
+
+.ui-device-table__vendor svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;

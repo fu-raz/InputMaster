@@ -1,6 +1,8 @@
 import { bindingsTemplate } from "../features/bindings/template.js";
 import { settingsTemplate } from "../features/settings/template.js";
 import { targetsTemplate } from "../features/targets/template.js";
+import { hydrateFaIcons } from "../shared/fa_icons.js";
+
 export const FEATURE_TEMPLATES = Object.freeze({
   bindings: bindingsTemplate,
   settings: settingsTemplate,
@@ -13,4 +15,5 @@ export function mountFeatureTemplates(root = document) {
     if (html === undefined) throw new Error("Unknown feature template");
     placeholder.outerHTML = html;
   }
+  hydrateFaIcons(root);
 }

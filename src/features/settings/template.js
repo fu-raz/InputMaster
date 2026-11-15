@@ -7,51 +7,19 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                 <div class="settings-nav-indicator" aria-hidden="true"></div>
                 <nav class="settings-nav">
                   <button class="settings-nav-item active" type="button" data-settings-section="startup" aria-current="page">
-                    <span class="settings-nav-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M6 4v16"></path>
-                        <path d="M12 4v16"></path>
-                        <path d="M18 4v16"></path>
-                        <path d="M4 8h4"></path>
-                        <path d="M10 15h4"></path>
-                        <path d="M16 11h4"></path>
-                      </svg>
-                    </span>
+                    <span class="settings-nav-icon" data-fa="sliders" aria-hidden="true"></span>
                     <span class="settings-nav-label" data-i18n="settings.general">General</span>
                   </button>
                   <button class="settings-nav-item" type="button" data-settings-section="osd">
-                    <span class="settings-nav-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M4 6h16v11H4z"></path>
-                        <path d="M9 20h6"></path>
-                        <path d="M12 17v3"></path>
-                      </svg>
-                    </span>
+                    <span class="settings-nav-icon" data-fa="display" aria-hidden="true"></span>
                     <span class="settings-nav-label" data-i18n="settings.osd">On-Screen Display</span>
                   </button>
                   <button class="settings-nav-item" type="button" data-settings-section="appearance">
-                    <span class="settings-nav-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M12 3v2"></path>
-                        <path d="M12 19v2"></path>
-                        <path d="M3 12h2"></path>
-                        <path d="M19 12h2"></path>
-                        <path d="m5.65 5.65 1.4 1.4"></path>
-                        <path d="m16.95 16.95 1.4 1.4"></path>
-                        <path d="m18.35 5.65-1.4 1.4"></path>
-                        <path d="m7.05 16.95-1.4 1.4"></path>
-                        <path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"></path>
-                      </svg>
-                    </span>
+                    <span class="settings-nav-icon" data-fa="palette" aria-hidden="true"></span>
                     <span class="settings-nav-label" data-i18n="settings.appearance">Appearance</span>
                   </button>
                   <button class="settings-nav-item" type="button" data-settings-section="maintenance">
-                    <span class="settings-nav-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4.8 16.2a2.1 2.1 0 0 0 3 3l4.5-4.5a4 4 0 0 0 5.4-5.4"></path>
-                        <path d="m14 7 3 3"></path>
-                      </svg>
-                    </span>
+                    <span class="settings-nav-icon" data-fa="screwdriver-wrench" aria-hidden="true"></span>
                     <span class="settings-nav-label" data-i18n="settings.maintenance">Maintenance</span>
                   </button>
                 </nav>
@@ -61,39 +29,19 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                 <section class="settings-section settings-section-panel settings-general-section active" data-settings-panel="startup">
                   <div class="settings-card settings-startup-card">
                     <div class="settings-card-section-heading">
-                      <span class="settings-card-section-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" focusable="false">
-                          <path d="M5 12a7 7 0 1 0 14 0 7 7 0 0 0-14 0Z"></path>
-                          <path d="M12 7v5l3 2"></path>
-                        </svg>
-                      </span>
+                      <span class="settings-card-section-icon" data-fa="clock" aria-hidden="true"></span>
                       <span data-i18n="settings.behavior">Behavior</span>
                     </div>
                     <div class="settings-startup-row settings-language-row">
                       <div class="settings-startup-row-main">
-                        <span class="settings-startup-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M4 5h16"></path>
-                            <path d="M8 5c.75 4.5 3.25 8 8 10"></path>
-                            <path d="M16 5c-.75 4.5-3.25 8-8 10"></path>
-                            <path d="M5 19h6"></path>
-                            <path d="m8 15-3 4"></path>
-                            <path d="m8 15 3 4"></path>
-                            <path d="M13 19h6"></path>
-                          </svg>
-                        </span>
+                        <span class="settings-startup-icon" data-fa="language" aria-hidden="true"></span>
                         <div class="settings-field-label" data-i18n="settings.language">Language</div>
                       </div>
                       <select id="language-select" title="Language" data-i18n-title="settings.language"></select>
                     </div>
                     <div class="settings-startup-row">
                       <div class="settings-startup-row-main">
-                        <span class="settings-startup-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M12 3v7"></path>
-                            <path d="M7.05 6.35a8 8 0 1 0 9.9 0"></path>
-                          </svg>
-                        </span>
+                        <span class="settings-startup-icon" data-fa="power-off" aria-hidden="true"></span>
                         <div class="settings-field-label" data-i18n="settings.startWithWindows">Start with Windows</div>
                       </div>
                       <label class="settings-toggle" title="Start with Windows" data-i18n-title="settings.startWithWindows">
@@ -103,13 +51,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                     </div>
                     <div class="settings-startup-row">
                       <div class="settings-startup-row-main">
-                        <span class="settings-startup-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M12 4v9"></path>
-                            <path d="m8.5 9.5 3.5 3.5 3.5-3.5"></path>
-                            <path d="M5 16h14l-1.5 4h-11L5 16Z"></path>
-                          </svg>
-                        </span>
+                        <span class="settings-startup-icon" data-fa="arrow-down-to-bracket" aria-hidden="true"></span>
                         <div class="settings-field-label" data-i18n="settings.startInTray">Start in tray</div>
                       </div>
                       <label class="settings-toggle" title="Start in tray" data-i18n-title="settings.startInTray">
@@ -119,14 +61,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                     </div>
                     <div class="settings-startup-row">
                       <div class="settings-startup-row-main">
-                        <span class="settings-startup-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M5 6h14"></path>
-                            <path d="M9 11h6"></path>
-                            <path d="M12 13v5"></path>
-                            <path d="m9 16 3 3 3-3"></path>
-                          </svg>
-                        </span>
+                        <span class="settings-startup-icon" data-fa="arrow-down" aria-hidden="true"></span>
                         <div class="settings-field-label" data-i18n="settings.minimizeToTray">Minimize to tray</div>
                       </div>
                       <label class="settings-toggle" title="Minimize to tray" data-i18n-title="settings.minimizeToTray">
@@ -136,13 +71,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                     </div>
                     <div class="settings-startup-row">
                       <div class="settings-startup-row-main">
-                        <span class="settings-startup-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M14 7h4v10h-4"></path>
-                            <path d="M10 9 7 12l3 3"></path>
-                            <path d="M7 12h9"></path>
-                          </svg>
-                        </span>
+                        <span class="settings-startup-icon" data-fa="arrow-right-from-bracket" aria-hidden="true"></span>
                         <div class="settings-field-label" data-i18n="settings.exitToTray">Exit to tray</div>
                       </div>
                       <label class="settings-toggle" title="Exit to tray" data-i18n-title="settings.exitToTray">
@@ -154,25 +83,12 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
 
                   <div class="settings-card settings-update-card">
                     <div class="settings-card-section-heading">
-                      <span class="settings-card-section-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" focusable="false">
-                          <path d="M20 5v5h-5"></path>
-                          <path d="M4 19v-5h5"></path>
-                          <path d="M6.75 9A7 7 0 0 1 18 6.5L20 10"></path>
-                          <path d="M17.25 15A7 7 0 0 1 6 17.5L4 14"></path>
-                        </svg>
-                      </span>
+                      <span class="settings-card-section-icon" data-fa="arrows-rotate" aria-hidden="true"></span>
                       <span data-i18n="settings.updates">Updates</span>
                     </div>
                     <div class="settings-startup-row settings-update-toggle-row">
                       <div class="settings-startup-row-main">
-                        <span class="settings-startup-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M12 5v4l2.5 2.5"></path>
-                            <path d="M20 12a8 8 0 1 1-2.35-5.65"></path>
-                            <path d="M20 4v5h-5"></path>
-                          </svg>
-                        </span>
+                        <span class="settings-startup-icon" data-fa="arrows-rotate" aria-hidden="true"></span>
                         <div class="settings-field-label" data-i18n="settings.autoCheckUpdates">Automatically check for updates</div>
                       </div>
                       <label class="settings-toggle" title="Automatically check for updates" data-i18n-title="settings.autoCheckUpdates">
@@ -182,11 +98,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                     </div>
                     <div class="settings-update-summary">
                       <div id="settings-update-status" class="settings-inline-status">
-                        <span class="settings-status-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M5 12.5 9.25 16.75 19 7"></path>
-                          </svg>
-                        </span>
+                        <span class="settings-status-icon" data-fa="circle-check" aria-hidden="true"></span>
                         <span class="settings-status-text" data-i18n="settings.noUpdateCheckYet">No update check yet.</span>
                       </div>
                       <div class="settings-update-versions">
@@ -195,14 +107,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                       </div>
                     </div>
                     <button id="check-for-updates" type="button" class="settings-action">
-                      <span class="settings-button-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" focusable="false">
-                          <path d="M20 5v5h-5"></path>
-                          <path d="M4 19v-5h5"></path>
-                          <path d="M6.75 9A7 7 0 0 1 18 6.5L20 10"></path>
-                          <path d="M17.25 15A7 7 0 0 1 6 17.5L4 14"></path>
-                        </svg>
-                      </span>
+                      <span class="settings-button-icon" data-fa="arrows-rotate" aria-hidden="true"></span>
                       <span class="settings-button-label" data-i18n="settings.checkForUpdates">Check for updates</span>
                     </button>
                   </div>
@@ -364,10 +269,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                       <div class="appearance-color-popover-header">
                         <span id="appearance-color-popover-title" data-i18n="settings.appearance.customColor">Custom Color</span>
                         <button type="button" class="appearance-color-close" data-appearance-color-close aria-label="Close" data-i18n-aria-label="common.close">
-                          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-                            <path d="M6 6l12 12"></path>
-                            <path d="M18 6L6 18"></path>
-                          </svg>
+                          <span data-fa="xmark" aria-hidden="true"></span>
                         </button>
                       </div>
                       <div id="appearance-color-field" class="appearance-color-field" tabindex="0" aria-label="Custom color" data-i18n-aria-label="settings.appearance.customColor">
@@ -389,24 +291,14 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                     <div class="settings-card settings-maintenance-card settings-maintenance-card--diagnostics">
                       <div class="settings-maintenance-card-top">
                         <div class="settings-maintenance-card-main">
-                          <span class="settings-maintenance-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M3.75 7.75h5l1.75 2h9.75v8.5a2 2 0 0 1-2 2H5.75a2 2 0 0 1-2-2Z"></path>
-                              <path d="M3.75 7.75v-1a2 2 0 0 1 2-2h3.1l1.75 2H18.25a2 2 0 0 1 2 2v1"></path>
-                            </svg>
-                          </span>
+                          <span class="settings-maintenance-icon" data-fa="broom" aria-hidden="true"></span>
                           <span class="settings-maintenance-copy">
                             <span class="settings-maintenance-title" data-i18n="settings.diagnostics">Diagnostics</span>
                             <span class="settings-maintenance-description" data-i18n="settings.diagnosticsDescription">View application logs and diagnostics.</span>
                           </span>
                         </div>
                         <button id="open-logs-folder" type="button" class="settings-action settings-maintenance-button">
-                          <span class="settings-button-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M3.75 7.75h5l1.75 2h9.75v8.5a2 2 0 0 1-2 2H5.75a2 2 0 0 1-2-2Z"></path>
-                              <path d="M3.75 7.75v-1a2 2 0 0 1 2-2h3.1l1.75 2H18.25a2 2 0 0 1 2 2v1"></path>
-                            </svg>
-                          </span>
+                          <span class="settings-button-icon" data-fa="screwdriver-wrench" aria-hidden="true"></span>
                           <span class="settings-button-label" data-i18n="settings.openLogsFolder">Open Logs Folder</span>
                         </button>
                       </div>
@@ -419,12 +311,7 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                     <div class="settings-card settings-maintenance-card settings-maintenance-card--privacy">
                       <div class="settings-maintenance-card-top">
                         <div class="settings-maintenance-card-main">
-                          <span class="settings-maintenance-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M12 3.75 5.25 6.5v5.1c0 4.25 2.7 7.55 6.75 8.65 4.05-1.1 6.75-4.4 6.75-8.65V6.5Z"></path>
-                              <path d="M9 12.25 11.1 14.25 15.25 9.75"></path>
-                            </svg>
-                          </span>
+                          <span class="settings-maintenance-icon" data-fa="screwdriver-wrench" aria-hidden="true"></span>
                           <span class="settings-maintenance-copy">
                             <span class="settings-maintenance-title" data-i18n="settings.midiDeviceInventory">MIDI Device Inventory</span>
                             <span class="settings-maintenance-description" data-i18n="settings.midiDeviceInventoryDescription">When enabled, shares app version, privacy notice version, MIDI input/output names, local MIDI port IDs, selected routes, and counts.</span>
@@ -445,30 +332,14 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                     <div class="settings-card settings-maintenance-card settings-maintenance-card--danger">
                       <div class="settings-maintenance-card-top">
                         <div class="settings-maintenance-card-main">
-                          <span class="settings-maintenance-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M4.75 7.75h14.5"></path>
-                              <path d="M9.25 4.75h5.5"></path>
-                              <path d="M8 7.75v10.5a1.5 1.5 0 0 0 1.5 1.5h5a1.5 1.5 0 0 0 1.5-1.5V7.75"></path>
-                              <path d="M10 11v5"></path>
-                              <path d="M14 11v5"></path>
-                            </svg>
-                          </span>
+                          <span class="settings-maintenance-icon" data-fa="screwdriver-wrench" aria-hidden="true"></span>
                           <span class="settings-maintenance-copy">
                             <span class="settings-maintenance-title" data-i18n="settings.appData">App Data</span>
                             <span class="settings-maintenance-description" data-i18n="settings.appDataDescription">Resetting app data will restore all settings to their default values.</span>
                           </span>
                         </div>
                         <button id="reset-app-data" type="button" class="settings-reset settings-maintenance-button settings-maintenance-button--danger">
-                          <span class="settings-button-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" focusable="false">
-                              <path d="M4.75 7.75h14.5"></path>
-                              <path d="M9.25 4.75h5.5"></path>
-                              <path d="M8 7.75v10.5a1.5 1.5 0 0 0 1.5 1.5h5a1.5 1.5 0 0 0 1.5-1.5V7.75"></path>
-                              <path d="M10 11v5"></path>
-                              <path d="M14 11v5"></path>
-                            </svg>
-                          </span>
+                          <span class="settings-button-icon" data-fa="broom" aria-hidden="true"></span>
                           <span class="settings-button-label" data-i18n="settings.resetAppData">Reset App Data</span>
                         </button>
                       </div>

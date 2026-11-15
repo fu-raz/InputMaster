@@ -145,11 +145,19 @@ body.dark-mode {
 
 .nav-icon {
   width: 28px;
+  height: 22px;
   display: inline-flex;
+  align-items: center;
   justify-content: center;
   color: var(--accent);
   font-size: 18px;
   line-height: 1;
+}
+
+.nav-icon .fa-icon,
+.sidebar-footer-icon .fa-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .status-dot {
@@ -476,7 +484,7 @@ input::placeholder {
 
 .midi-route-row {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto 34px;
+  grid-template-columns: minmax(0, 1fr) auto 34px 44px;
   align-items: center;
   gap: 8px;
   padding: 8px;
@@ -487,7 +495,7 @@ input::placeholder {
 
 .midi-route-column-header {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto 34px;
+  grid-template-columns: minmax(0, 1fr) auto 34px 44px;
   align-items: center;
   gap: 8px;
   padding: 0 8px;
@@ -507,6 +515,11 @@ input::placeholder {
   font-weight: 750;
   line-height: 1;
   white-space: nowrap;
+}
+
+.midi-route-column-label--enable {
+  justify-self: center;
+  text-align: center;
 }
 
 .midi-route-row.disabled {

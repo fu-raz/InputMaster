@@ -91,11 +91,20 @@
 .binding-density-option svg {
   width: 18px;
   height: 18px;
+}
+
+.binding-density-option svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.binding-density-option .fa-icon,
+.binding-search-field .fa-icon {
+  fill: currentColor;
+  stroke: none;
 }
 
 .binding-add-button:hover {
@@ -154,6 +163,9 @@
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
+}
+
+.binding-search-field svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
@@ -1646,11 +1658,26 @@ body[data-theme] .binding-search-field svg,
 body[data-theme] .topbar-icon-button svg {
   width: 18px;
   height: 18px;
+}
+
+body[data-theme] .binding-action svg:not(.fa-icon),
+body[data-theme] .binding-add-button svg:not(.fa-icon),
+body[data-theme] .binding-search-field svg:not(.fa-icon),
+body[data-theme] .topbar-icon-button svg:not(.fa-icon) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+body[data-theme] .binding-action .fa-icon,
+body[data-theme] .binding-add-button .fa-icon,
+body[data-theme] .binding-search-field .fa-icon,
+body[data-theme] .topbar-icon-button .fa-icon,
+body[data-theme] .midi-route-icon-button .fa-icon {
+  fill: currentColor;
+  stroke: none;
 }
 
 body[data-theme] .binding-action {

@@ -1,5 +1,6 @@
 import { closeOpenDropdowns, renderLabelWithBadges } from "../../ui/dropdown_badges.js";
 import { routesFromResolvedPreferences } from "../route_policy.js";
+import { faSvg } from "../../../shared/fa_icons.js";
 
 /** Route editor host — inline on Inputs→MIDI (no popover button). */
 export function createRoutePopover({
@@ -107,44 +108,14 @@ export function createRoutePopover({
     // No-op: popover trigger removed.
   }
 
-  function createRouteIcon(name) {
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("aria-hidden", "true");
-    svg.setAttribute("focusable", "false");
-    svg.setAttribute("fill", "none");
-    svg.setAttribute("stroke", "currentColor");
-    svg.setAttribute("stroke-width", "2");
-    svg.setAttribute("stroke-linecap", "round");
-    svg.setAttribute("stroke-linejoin", "round");
-
-    const icons = {
-      sliders: [
-        "M4 21v-7",
-        "M4 10V3",
-        "M12 21v-9",
-        "M12 8V3",
-        "M20 21v-5",
-        "M20 12V3",
-        "M2 14h4",
-        "M10 8h4",
-        "M18 16h4",
-      ],
-      close: ["M18 6 6 18", "M6 6l12 12"],
-      trash: ["M3 6h18", "M8 6V4h8v2", "M6 6l1 15h10l1-15", "M10 11v6", "M14 11v6"],
-    };
-
-    (icons[name] || icons.sliders).forEach((dValue) => {
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", dValue);
-      svg.appendChild(path);
-    });
-
-    return svg;
-  }
-
   function setIconButton(button, name) {
-    button.replaceChildren(createRouteIcon(name));
+    const map = { close: "xmark", trash: "trash", sliders: "sliders" };
+    const faName = map[name] || name;
+    button.replaceChildren();
+    const wrap = document.createElement("span");
+    wrap.innerHTML = faSvg(faName);
+    const svg = wrap.firstElementChild;
+    if (svg) button.appendChild(svg);
   }
 
   function syncRoutesPopoverPosition() {

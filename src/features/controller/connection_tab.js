@@ -1,45 +1,4 @@
-/** Xbox-style pad: angled grips, offset sticks, d-pad, ABXY diamond. */
-const GAMEPAD_ICON = `
-  <svg viewBox="0 0 24 24" focusable="false">
-    <path d="M2.4 9.1c0-1.1.9-2 2-2h15.2c1.1 0 2 .9 2 2v1.3c0 .9-.3 1.7-.9 2.4l-1.6 1.9c-.4.5-1 .8-1.6.8h-.7c-.4 0-.8-.2-1-.5L14.4 13H9.6l-1.4 2c-.2.3-.6.5-1 .5h-.7c-.6 0-1.2-.3-1.6-.8l-1.6-1.9c-.6-.7-.9-1.5-.9-2.4V9.1Z"></path>
-    <path d="M7.2 10.6v3.2"></path>
-    <path d="M5.6 12.2h3.2"></path>
-    <circle cx="9.2" cy="15.8" r="1.15"></circle>
-    <circle cx="15.5" cy="14.2" r="1.15"></circle>
-    <circle cx="16.2" cy="10.5" r="0.85"></circle>
-    <circle cx="18.1" cy="12.3" r="0.85"></circle>
-    <circle cx="14.3" cy="12.3" r="0.85"></circle>
-    <circle cx="16.2" cy="14.1" r="0.85"></circle>
-    <circle cx="12" cy="11.4" r="0.55"></circle>
-    <path d="M8.6 5.8c.9-1.2 2.2-1.9 3.8-1.9s2.9.7 3.8 1.9"></path>
-  </svg>
-`;
-
-const XBOX_VENDOR_ICON = `
-  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-    <circle cx="12" cy="12" r="9"></circle>
-    <path d="M7.2 8.2c1.6 1.2 2.9 3.4 3.3 5.8"></path>
-    <path d="M16.8 8.2c-1.6 1.2-2.9 3.4-3.3 5.8"></path>
-    <path d="M8.2 17.2c1.1-1.5 2.4-2.4 3.8-2.4s2.7.9 3.8 2.4"></path>
-  </svg>
-`;
-
-const PLAYSTATION_VENDOR_ICON = `
-  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-    <path d="M8 15.5v-7l5 2.2v7"></path>
-    <path d="M13 10.7 18 9v6.2c0 1.2-.8 1.8-2.2 2.2-1.2.3-2.3.1-2.8-.4"></path>
-    <path d="M8 15.5c-1.5.7-2.8.8-3.4.3-.7-.5-.3-1.6 1-2.4"></path>
-  </svg>
-`;
-
-const NINTENDO_VENDOR_ICON = `
-  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-    <rect x="4" y="5" width="6.5" height="14" rx="2.2"></rect>
-    <rect x="13.5" y="5" width="6.5" height="14" rx="2.2"></rect>
-    <circle cx="7.25" cy="14.5" r="1.1"></circle>
-    <circle cx="16.75" cy="9.5" r="1.1"></circle>
-  </svg>
-`;
+import { faBrandSvg, faSvg } from "../../shared/fa_icons.js";
 
 function detectVendor(device) {
   const raw = String(device?.vendor || device?.deviceName || "").toLowerCase();
@@ -57,9 +16,10 @@ function detectVendor(device) {
 }
 
 function vendorIcon(vendor) {
-  if (vendor === "playstation") return PLAYSTATION_VENDOR_ICON;
-  if (vendor === "nintendo") return NINTENDO_VENDOR_ICON;
-  return XBOX_VENDOR_ICON;
+  // FA Pro brands has xbox + playstation; no Nintendo brand glyph — use light joystick.
+  if (vendor === "playstation") return faBrandSvg("playstation");
+  if (vendor === "nintendo") return faSvg("joystick");
+  return faBrandSvg("xbox");
 }
 
 function vendorLabel(t, vendor) {
@@ -175,6 +135,13 @@ export function createControllerConnectionTab({ invoke, t }) {
     }
   }
 
+  function syncMasterPanelOpacity() {
+    const panel = read("content-panel");
+    if (!panel) return;
+    const enabled = Boolean(status.enabled) && status.supported !== false;
+    panel.classList.toggle("is-master-off", !enabled);
+  }
+
   function update() {
     if (!root) return;
     const supported = status.supported !== false;
@@ -194,6 +161,7 @@ export function createControllerConnectionTab({ invoke, t }) {
     if (devicesBlock) {
       devicesBlock.classList.toggle("hidden", !enabled || !supported);
     }
+    syncMasterPanelOpacity();
     if (enabled && supported) {
       renderDevices();
     }
@@ -272,23 +240,23 @@ export function createControllerConnectionTab({ invoke, t }) {
   function mount(container) {
     root = container;
     root.innerHTML = `
-      <div class="ui-panel controller-settings">
-        <div class="ui-page-header" data-role="master-row">
-          <div class="ui-page-header__main">
-            <span class="ui-page-header__icon" aria-hidden="true">${GAMEPAD_ICON}</span>
-            <div class="ui-page-header__copy">
-              <h1 class="ui-content-title" data-role="master-label"></h1>
-              <p class="ui-help" data-role="master-help"></p>
-            </div>
-          </div>
-          <div class="ui-enable-control">
-            <span class="ui-enable-caption">${t("ui.enable")}</span>
-            <label class="settings-toggle" data-role="master-toggle" title="${t("ui.enable")}">
-              <input type="checkbox" data-role="master-input" />
-              <span class="plugins-toggle-ui" aria-hidden="true"></span>
-            </label>
+      <div class="ui-page-header" data-role="master-row">
+        <div class="ui-page-header__main">
+          <span class="ui-page-header__icon" aria-hidden="true">${faSvg("gamepad-modern")}</span>
+          <div class="ui-page-header__copy">
+            <h1 class="ui-content-title" data-role="master-label"></h1>
+            <p class="ui-help" data-role="master-help"></p>
           </div>
         </div>
+        <div class="ui-enable-control">
+          <span class="ui-enable-caption">${t("ui.enable")}</span>
+          <label class="settings-toggle" data-role="master-toggle" title="${t("ui.enable")}">
+            <input type="checkbox" data-role="master-input" />
+            <span class="plugins-toggle-ui" aria-hidden="true"></span>
+          </label>
+        </div>
+      </div>
+      <div class="ui-panel controller-settings" data-role="content-panel">
         <p class="ui-help controller-unsupported hidden" data-role="unsupported"></p>
         <div class="controller-devices-block hidden" data-role="devices-block">
           <h3 class="ui-subsection-title" data-role="devices-heading"></h3>

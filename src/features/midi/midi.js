@@ -402,6 +402,10 @@ export function createMidiFeature({
     const input = document.querySelector('[data-role="midi-master-input"], #midi-master-enabled');
     if (!input) return;
     input.checked = isMasterEnabled();
+    const panel = document.querySelector('[data-role="midi-panel"]');
+    if (panel) {
+      panel.classList.toggle("is-master-off", !isMasterEnabled());
+    }
   }
 
   function bindMidiMasterToggle() {
