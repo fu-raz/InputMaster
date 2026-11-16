@@ -147,35 +147,13 @@ jobs:
             throw "Artifact Signing endpoint must be East US (https://eus.codesigning.azure.net), got '$endpoint'."
           }
 
-      - name: Validate Cloudflare Pages publish secrets
+      # ILS-17: MIDIMaster website / Netlify bridge secrets no longer required.
+      # Updater metadata is deployed to updates.inputmaster.app from the GitLab site.
+      - name: Note updater publish target
         shell: pwsh
-        env:
-          WEBSITE_REPO_TOKEN: ${{ secrets.WEBSITE_REPO_TOKEN }}
         run: |
-          if ([string]::IsNullOrWhiteSpace("${env:WEBSITE_REPO_TOKEN}")) {
-            throw "Missing WEBSITE_REPO_TOKEN secret. This token must be able to push to prgmitchell/MIDIMasterWebsite."
-          }
-
-      - name: Validate Netlify bridge publish secrets
-        shell: pwsh
-        env:
-          NETLIFY_BRIDGE_PUBLISH: ${{ vars.NETLIFY_BRIDGE_PUBLISH }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          $bridgeRaw = "${env:NETLIFY_BRIDGE_PUBLISH}"
-          if ([string]::IsNullOrWhiteSpace($bridgeRaw)) { $bridgeRaw = "true" }
-          $bridgeEnabled = @("1", "true", "yes", "on") -contains $bridgeRaw.Trim().ToLowerInvariant()
-          if (-not $bridgeEnabled) {
-            Write-Host "Netlify bridge publishing is disabled."
-            exit 0
-          }
-          if ([string]::IsNullOrWhiteSpace("${env:NETLIFY_AUTH_TOKEN}")) {
-            throw "Missing NETLIFY_AUTH_TOKEN secret. It is required while NETLIFY_BRIDGE_PUBLISH is enabled."
-          }
-          if ([string]::IsNullOrWhiteSpace("${env:NETLIFY_SITE_ID}")) {
-            throw "Missing NETLIFY_SITE_ID secret. It is required while NETLIFY_BRIDGE_PUBLISH is enabled."
-          }
+          Write-Host "Updater endpoint: https://updates.inputmaster.app/latest.json"
+          Write-Host "MIDIMasterWebsite / Netlify midimaster bridge publish is disabled."
 
       - name: Download pinned usbip-win2 0.9.7.7 payload
         shell: pwsh
@@ -257,8 +235,8 @@ jobs:
           file-digest: SHA256
           timestamp-rfc3161: http://timestamp.acs.microsoft.com
           timestamp-digest: SHA256
-          description: MIDIMaster
-          description-url: https://midimaster.app/
+          description: InputMaster
+          description-url: https://inputmaster.app/
 
       - name: Verify signed executables and pinned dependency
         shell: pwsh
@@ -383,103 +361,17 @@ jobs:
           $latestJsonPath = "src-tauri/target/release/bundle/latest.json"
           $latest | ConvertTo-Json -Depth 8 | Out-File -FilePath $latestJsonPath -Encoding utf8
 
-      - name: Checkout Cloudflare Pages source
-        uses: actions/checkout@v4
-        with:
-          repository: prgmitchell/MIDIMasterWebsite
-          token: ${{ secrets.WEBSITE_REPO_TOKEN }}
-          path: midimaster-website
-
-      - name: Publish updater metadata to Cloudflare Pages source
+      # ILS-17: do NOT publish InputMaster updater metadata to MIDIMasterWebsite /
+      # midimaster.app (cross-product updates). Generate latest.json above; deploy
+      # it to https://updates.inputmaster.app via the private GitLab update-site repo.
+      - name: Skip MIDIMaster website updater publish
         shell: pwsh
         run: |
-          $timer = Measure-Command {
-            $tag = "${env:GITHUB_REF_NAME}"
-            $latestJsonPath = "src-tauri/target/release/bundle/latest.json"
-            if (-not (Test-Path -LiteralPath $latestJsonPath)) {
-              throw "Updater metadata file not found: $latestJsonPath"
-            }
-
-            $websiteRoot = "midimaster-website"
-            $targetPath = Join-Path $websiteRoot "public/latest.json"
-            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $targetPath) | Out-Null
-            Copy-Item -LiteralPath $latestJsonPath -Destination $targetPath -Force
-
-            Push-Location $websiteRoot
-            try {
-              git config user.name "github-actions[bot]"
-              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-              git add public/latest.json
-
-              git diff --cached --quiet
-              if ($LASTEXITCODE -eq 0) {
-                Write-Host "Cloudflare Pages updater metadata is already current."
-              }
-              elseif ($LASTEXITCODE -eq 1) {
-                git commit -m "Update MIDIMaster updater metadata for $tag"
-                if ($LASTEXITCODE -ne 0) { throw "Failed to commit website updater metadata." }
-                git push
-                if ($LASTEXITCODE -ne 0) { throw "Failed to push website updater metadata." }
-              }
-              else {
-                throw "Failed to compare staged website updater metadata."
-              }
-            }
-            finally {
-              Pop-Location
-            }
+          Write-Host "MIDIMaster Cloudflare/Netlify updater publish disabled for InputMaster."
+          Write-Host "Deploy src-tauri/target/release/bundle/latest.json to updates.inputmaster.app (ILS-17)."
+          if (-not (Test-Path -LiteralPath "src-tauri/target/release/bundle/latest.json")) {
+            throw "Updater metadata file not found: src-tauri/target/release/bundle/latest.json"
           }
-          Write-Host ("Cloudflare Pages updater metadata publish completed in {0:N1}s" -f $timer.TotalSeconds)
-
-      - name: Publish updater metadata to Netlify bridge
-        shell: pwsh
-        env:
-          NETLIFY_BRIDGE_PUBLISH: ${{ vars.NETLIFY_BRIDGE_PUBLISH }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          $bridgeRaw = "${env:NETLIFY_BRIDGE_PUBLISH}"
-          if ([string]::IsNullOrWhiteSpace($bridgeRaw)) { $bridgeRaw = "true" }
-          $bridgeEnabled = @("1", "true", "yes", "on") -contains $bridgeRaw.Trim().ToLowerInvariant()
-          if (-not $bridgeEnabled) {
-            Write-Host "Netlify bridge publishing is disabled."
-            exit 0
-          }
-
-          $timer = Measure-Command {
-            $latestJsonPath = "src-tauri/target/release/bundle/latest.json"
-            if (-not (Test-Path -LiteralPath $latestJsonPath)) {
-              throw "Updater metadata file not found: $latestJsonPath"
-            }
-
-            $websiteCatalogPath = "midimaster-website/public/catalog.json"
-            if (-not (Test-Path -LiteralPath $websiteCatalogPath)) {
-              throw "Website store catalog not found: $websiteCatalogPath"
-            }
-
-            $publishDir = Join-Path $env:RUNNER_TEMP "netlify-bridge"
-            if (Test-Path -LiteralPath $publishDir) {
-              Remove-Item -LiteralPath $publishDir -Recurse -Force
-            }
-            New-Item -ItemType Directory -Force -Path (Join-Path $publishDir "updates") | Out-Null
-            Copy-Item -LiteralPath $latestJsonPath -Destination (Join-Path $publishDir "updates/latest.json") -Force
-            Copy-Item -LiteralPath $websiteCatalogPath -Destination (Join-Path $publishDir "catalog.json") -Force
-
-            $redirects = @(
-              "/latest.json  /updates/latest.json  301"
-              "/packages/*  https://store.midimaster.app/packages/:splat  301"
-              "/icons/*  https://store.midimaster.app/icons/:splat  301"
-              "/*  https://midimaster.app/:splat  301"
-            ) -join "`n"
-            $redirects += "`n"
-            $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-            [System.IO.File]::WriteAllText((Join-Path $publishDir "_redirects"), $redirects, $utf8NoBom)
-
-            & "scripts/netlify/Invoke-NetlifyMergeDeploy.ps1" `
-              -SourceDir $publishDir `
-              -SiteId "${env:NETLIFY_SITE_ID}"
-          }
-          Write-Host ("Netlify bridge redirect publish completed in {0:N1}s" -f $timer.TotalSeconds)
 
       - name: Prepare GitHub release asset list
         id: release_assets

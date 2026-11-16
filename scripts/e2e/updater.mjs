@@ -132,7 +132,7 @@ export const updater = [
       await emitStatus({
         phase: "failed",
         message:
-          "Update check failed: HTTP 504 Gateway Timeout (https://updates.midimaster.app/latest.json)",
+          "Update check failed: HTTP 504 Gateway Timeout (https://updates.inputmaster.app/latest.json)",
       });
       await eventually(
         () => app.query(status, "e.classList.contains('error')"),

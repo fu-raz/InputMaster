@@ -171,8 +171,8 @@ jobs:
           file-digest: SHA256
           timestamp-rfc3161: http://timestamp.acs.microsoft.com
           timestamp-digest: SHA256
-          description: MIDIMaster
-          description-url: https://midimaster.app/
+          description: InputMaster
+          description-url: https://inputmaster.app/
 
       - name: Verify signed executables and pinned dependency
         shell: pwsh
