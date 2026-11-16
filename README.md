@@ -1,16 +1,14 @@
-# MIDIMaster
+# InputMaster
 
-https://midimaster.app/
+https://inputmaster.app/
 
-MIDIMaster is a Windows desktop app for mapping MIDI controls like faders, knobs,
-and buttons to system audio, app audio sessions, audio devices, utility actions
+InputMaster is a Windows desktop app for mapping MIDI, keyboard, and controller
+inputs to system audio, app audio sessions, audio devices, utility actions
 like hotkeys and AutoHotkey scripts, and supported integrations via bundled and third-party plugins.
-
-<img width="903" height="518" alt="midimaster" src="https://github.com/user-attachments/assets/06ec01d2-1bd6-4245-a814-4110e7566ec2" />
 
 ## Platform
 
-MIDIMaster currently supports Windows.
+InputMaster currently supports Windows.
 
 ## Switch between headphones and speakers
 
@@ -23,7 +21,7 @@ can still set both a playback device and a microphone.
 
 ## Plugins and the Store
 
-MIDIMaster supports runtime plugins and an in-app Store for integrations. Plugins
+InputMaster supports runtime plugins and an in-app Store for integrations. Plugins
 can add binding targets, connection UI, runtime behavior, and feedback updates
 without rebuilding the app.
 
@@ -53,8 +51,8 @@ Prerequisites:
 Clone and run the app:
 
 ```powershell
-git clone https://github.com/prgmitchell/MIDIMaster.git
-cd MIDIMaster
+git clone https://github.com/fu-raz/InputMaster.git
+cd InputMaster
 cargo tauri dev
 ```
 
@@ -63,6 +61,8 @@ Build a local Windows bundle:
 ```powershell
 cargo tauri build
 ```
+
+Updater feed: `https://updates.inputmaster.app/latest.json`
 
 ## Verification
 

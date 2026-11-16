@@ -147,13 +147,11 @@ jobs:
             throw "Artifact Signing endpoint must be East US (https://eus.codesigning.azure.net), got '$endpoint'."
           }
 
-      # ILS-17: MIDIMaster website / Netlify bridge secrets no longer required.
-      # Updater metadata is deployed to updates.inputmaster.app from the GitLab site.
       - name: Note updater publish target
         shell: pwsh
         run: |
           Write-Host "Updater endpoint: https://updates.inputmaster.app/latest.json"
-          Write-Host "MIDIMasterWebsite / Netlify midimaster bridge publish is disabled."
+          Write-Host "Deploy latest.json via GitLab fluffy/inputmaster-updates (not midimaster.app)."
 
       - name: Download pinned usbip-win2 0.9.7.7 payload
         shell: pwsh
@@ -222,7 +220,7 @@ jobs:
             throw "ArtifactSigning $env:ARTIFACT_SIGNING_MODULE_VERSION was not installed."
           }
 
-      - name: Sign MIDIMaster executables
+      - name: Sign InputMaster executables
         uses: azure/artifact-signing-action@v2
         with:
           endpoint: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
@@ -361,17 +359,14 @@ jobs:
           $latestJsonPath = "src-tauri/target/release/bundle/latest.json"
           $latest | ConvertTo-Json -Depth 8 | Out-File -FilePath $latestJsonPath -Encoding utf8
 
-      # ILS-17: do NOT publish InputMaster updater metadata to MIDIMasterWebsite /
-      # midimaster.app (cross-product updates). Generate latest.json above; deploy
-      # it to https://updates.inputmaster.app via the private GitLab update-site repo.
-      - name: Skip MIDIMaster website updater publish
+      - name: Confirm updater metadata for GitLab feed
         shell: pwsh
         run: |
-          Write-Host "MIDIMaster Cloudflare/Netlify updater publish disabled for InputMaster."
-          Write-Host "Deploy src-tauri/target/release/bundle/latest.json to updates.inputmaster.app (ILS-17)."
-          if (-not (Test-Path -LiteralPath "src-tauri/target/release/bundle/latest.json")) {
-            throw "Updater metadata file not found: src-tauri/target/release/bundle/latest.json"
+          $latestJsonPath = "src-tauri/target/release/bundle/latest.json"
+          if (-not (Test-Path -LiteralPath $latestJsonPath)) {
+            throw "Updater metadata file not found: $latestJsonPath"
           }
+          Write-Host "Ready to publish $latestJsonPath to https://updates.inputmaster.app via gitlab.fluffy.media/fluffy/inputmaster-updates"
 
       - name: Prepare GitHub release asset list
         id: release_assets

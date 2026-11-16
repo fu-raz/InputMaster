@@ -61,8 +61,8 @@ Invoke-ArtifactSigning `
     -FileDigest SHA256 `
     -TimestampRfc3161 "http://timestamp.acs.microsoft.com" `
     -TimestampDigest SHA256 `
-    -Description "MIDIMaster" `
-    -DescriptionUrl "https://midimaster.app/" `
+    -Description "InputMaster" `
+    -DescriptionUrl "https://inputmaster.app/" `
     -CorrelationId $correlationId `
     -ExcludeEnvironmentCredential `
     -ExcludeWorkloadIdentityCredential `
