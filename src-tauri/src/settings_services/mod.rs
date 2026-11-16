@@ -17,7 +17,7 @@ use crate::{
     app_paths::app_data_root_dir,
     app_settings::{
         AppAppearanceSettings, AppSettings, AppearanceTheme, FaderCurvePreset,
-        MidiDeviceInventoryConsent, CURRENT_STARTUP_REGISTRATION_VERSION,
+        CURRENT_STARTUP_REGISTRATION_VERSION,
     },
     collect_monitor_descriptors,
     durable_json_store::StorageRecoveryNotice,
@@ -231,29 +231,6 @@ pub fn update_app_settings(
     *settings = updated.clone();
     drop(settings);
     crate::AppState::apply_app_settings(&app, &updated);
-    Ok(updated)
-}
-
-pub fn update_midi_device_inventory_consent(
-    state: &AppState,
-    consent: MidiDeviceInventoryConsent,
-    notice_version: Option<u32>,
-) -> Result<AppSettings, String> {
-    let notice_version =
-        notice_version.unwrap_or(crate::telemetry::MIDI_DEVICE_INVENTORY_NOTICE_VERSION);
-    run_logger::info(
-        "settings",
-        "update_midi_device_inventory_consent",
-        &format!("consent={:?} notice_version={}", consent, notice_version),
-    );
-    let updated = persist_app_settings_update(state, |settings| {
-        let consent_changed = settings.midi_device_inventory_consent != consent;
-        settings.midi_device_inventory_consent = consent;
-        settings.midi_device_inventory_notice_version = notice_version;
-        if consent_changed {
-            settings.midi_device_inventory_last_sent_hash = None;
-        }
-    })?;
     Ok(updated)
 }
 

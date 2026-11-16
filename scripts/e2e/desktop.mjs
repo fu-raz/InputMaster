@@ -90,8 +90,6 @@ export class Desktop {
       JSON.stringify({
         active_profile_name: "Performance Default",
         auto_check_updates: false,
-        midi_device_inventory_consent: "disabled",
-        midi_device_inventory_notice_version: 1,
         startup_registration_version: 2,
         start_with_windows: false,
         start_in_tray: false,

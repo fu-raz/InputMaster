@@ -1,26 +1,12 @@
-import {
-  normalizeMidiDeviceInventorySettings,
-  MIDI_DEVICE_INVENTORY_NOTICE_VERSION,
-} from "../../../app/midi_device_inventory.js";
-
 /** navigation workflow. */
 export function createNavigation({
   elements,
   defaultSettingsSection,
-  getAppSettings,
   syncAppearanceControls,
   syncOsdAppearanceControls,
   viewState,
   virtualAudio,
 }) {
-  function syncMidiDeviceInventoryToggle(settings = null) {
-    if (!elements.midiDeviceInventoryConsentToggle) return;
-    const current = settings || (typeof getAppSettings === "function" ? getAppSettings() || {} : {});
-    const inventory = normalizeMidiDeviceInventorySettings(current);
-    elements.midiDeviceInventoryConsentToggle.checked =
-      inventory.consent === "enabled" && inventory.noticeVersion >= MIDI_DEVICE_INVENTORY_NOTICE_VERSION;
-  }
-
   function closeSettingsPanel() {
     if (!elements.settingsPanel) return;
     virtualAudio.setActive(false).catch(() => {});
@@ -111,7 +97,6 @@ export function createNavigation({
   }
 
   return {
-    syncMidiDeviceInventoryToggle,
     closeSettingsPanel,
     openSettingsPanel,
     activateSettingsSection,

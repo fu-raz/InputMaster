@@ -46,7 +46,6 @@ import {
   defaultAppearanceSettings,
   normalizeAppearanceSettings,
 } from "../app/appearance.js";
-import { createMidiInventoryController } from "../app/midi_inventory_controller.js";
 import { createSessionRefresher } from "../app/session_refresh.js";
 import { createPluginRuntime } from "../app/plugin_runtime.js";
 
@@ -551,11 +550,9 @@ export function createApplication() {
 
     loadStoredAppearance: (...args) => loadStoredAppearance(...args),
     mainScreen,
-    maybePromptMidiDeviceInventoryConsent: () => maybePromptMidiDeviceInventoryConsent(),
     midiStatus,
     osdState,
     profileState,
-    queueMidiDeviceInventorySubmit: (reason) => queueMidiDeviceInventorySubmit(reason),
     recordPerformanceResult: (...args) => recordPerformanceResult(...args),
 
     refreshSessions: (...args) => refreshSessions(...args),
@@ -615,9 +612,6 @@ export function createApplication() {
     applyAppearance: applyGlobalAppearance,
     showAlert: (title, message = "") => showAlert(title, message),
     onUpdateAvailableClick: showUpdateAvailableDialog,
-    onMidiDeviceInventoryConsentChanged: () => {
-      queueMidiDeviceInventorySubmit("consent_changed");
-    },
   });
   diagnosticInfo("settings_factory_ok");
   diagnosticInfo("settings_bind_start");
@@ -758,16 +752,6 @@ export function createApplication() {
     showConfirm: (options = {}) => alertsController.showConfirm(options),
     onBindingsRendered: rebuildBindingLookupIndex,
   });
-  const midiInventoryController = createMidiInventoryController({
-    invoke,
-    settingsStore,
-    syncSettingsUi: (patch) => features.settings?.syncAppSettingsUI?.(patch),
-    showChoices,
-    translate: t,
-    reportError: diagnosticError,
-  });
-  const queueMidiDeviceInventorySubmit = (reason) => midiInventoryController.queueSubmit(reason);
-  const maybePromptMidiDeviceInventoryConsent = () => midiInventoryController.maybePromptConsent();
   diagnosticInfo("bindings_factory_ok");
   diagnosticInfo("bindings_bind_start");
   features.bindings.bindUi();
@@ -784,21 +768,16 @@ export function createApplication() {
     getSavedMidiDeviceIds: preferenceActions.getSavedMidiDeviceIds,
     onConnected: (connection = {}) => {
       viewState.activeMidiRouteCount = enabledMidiRouteCount(connection.routes || []);
-      queueMidiDeviceInventorySubmit("midi_connected");
     },
     onDisconnected: () => {
       viewState.activeMidiRouteCount = 0;
     },
     reconcileMidiRoutes: (args) => features.profiles.reconcileMidiRoutes(args),
     canReconcileMidi: () => !features.bindings?.hasMidiMappingDraft?.(),
-    onDeviceInventoryChanged: () => {
-      queueMidiDeviceInventorySubmit("device_inventory_changed");
-    },
     onProfileDeviceSelected: async (nextPreference) => {
       const normalized = normalizeMidiPreference(nextPreference);
       profileState.midiPreference = normalized;
       await features.profiles?.updateProfileMidiPreference?.(normalized);
-      queueMidiDeviceInventorySubmit("midi_routes_changed");
     },
   });
   diagnosticInfo("midi_factory_ok");

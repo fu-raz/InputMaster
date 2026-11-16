@@ -3,7 +3,6 @@ import {
   defaultAppearanceSettings,
   normalizeAppearanceSettings,
 } from "./appearance.js";
-import { normalizeMidiDeviceInventoryConsent } from "./midi_device_inventory.js";
 
 export function defaultAppSettings() {
   return {
@@ -16,8 +15,6 @@ export function defaultAppSettings() {
     language: "en",
     appearance: defaultAppearanceSettings(),
     faderCurvePresets: [],
-    midiDeviceInventoryConsent: "unknown",
-    midiDeviceInventoryNoticeVersion: 0,
   };
 }
 
@@ -49,20 +46,6 @@ export function normalizeAppSettings(
     faderCurvePresets: normalizeFaderCurvePresets(
       valueOf(settings, "faderCurvePresets", "fader_curve_presets", current.faderCurvePresets),
     ),
-    midiDeviceInventoryConsent: normalizeMidiDeviceInventoryConsent(
-      valueOf(
-        settings,
-        "midiDeviceInventoryConsent",
-        "midi_device_inventory_consent",
-        current.midiDeviceInventoryConsent,
-      ),
-    ),
-    midiDeviceInventoryNoticeVersion: Number(valueOf(
-      settings,
-      "midiDeviceInventoryNoticeVersion",
-      "midi_device_inventory_notice_version",
-      current.midiDeviceInventoryNoticeVersion,
-    )) || 0,
   };
 }
 

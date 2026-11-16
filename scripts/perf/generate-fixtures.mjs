@@ -167,8 +167,6 @@ export async function generateFixtureMatrix({
           await writeJson(join(appData, "app_settings.json"), {
             active_profile_name: "Performance Default",
             auto_check_updates: false,
-            midi_device_inventory_consent: "disabled",
-            midi_device_inventory_notice_version: 1,
           });
           await writeJson(join(appData, "plugins_state.json"), { disabled: disabledPlugins(pluginMode) });
           const manifest = {

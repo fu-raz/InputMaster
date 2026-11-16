@@ -42,7 +42,6 @@ mod shutdown;
 mod solo;
 mod soundboard;
 mod store_api;
-mod telemetry;
 mod virtual_audio;
 mod window_focus;
 mod windows_autostart;

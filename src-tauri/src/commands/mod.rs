@@ -6,7 +6,6 @@ pub mod midi;
 pub mod profiles;
 pub mod settings;
 pub mod soundboard;
-pub mod telemetry;
 pub mod updates;
 pub mod virtual_audio;
 
@@ -18,7 +17,6 @@ pub use midi::*;
 pub use profiles::*;
 pub use settings::*;
 pub use soundboard::*;
-pub use telemetry::*;
 pub use updates::*;
 pub use virtual_audio::*;
 
@@ -54,7 +52,6 @@ macro_rules! command_registry {
             set_compact_bindings,
             get_app_version,
             update_app_settings,
-            update_midi_device_inventory_consent,
             update_appearance_settings,
             update_fader_curve_presets,
             export_appearance_theme,
@@ -68,7 +65,6 @@ macro_rules! command_registry {
             open_logs_folder,
             pick_executable_path,
             pick_autohotkey_script_path,
-            submit_midi_device_inventory,
             focused_session,
             list_playback_devices,
             list_recording_devices,

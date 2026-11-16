@@ -33,8 +33,8 @@ export function createConnectionTab({
         </div>
         <div class="connection-content-wrapper">
           <div class="connection-description">
-            <p>Control Elgato Wave Link inputs, outputs, and monitor mix directly from your MIDI device.</p>
-            <p>Ensure Wave Link is running. Use auto connect to reconnect on startup.</p>
+            <p>Control Elgato Wave Link 3.0 inputs, outputs, and monitor mix directly from your MIDI device.</p>
+            <p>Requires Wave Link 3.0 (2.0 does not work). Ensure Wave Link is running. Use auto connect to reconnect on startup.</p>
             <p data-role="app-info">Wave Link app info unavailable.</p>
           </div>
         </div>

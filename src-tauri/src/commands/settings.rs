@@ -1,7 +1,6 @@
 use crate::{
     app_settings::{
         AppAppearanceSettings, AppSettings, AppearanceTheme, FaderCurvePreset,
-        MidiDeviceInventoryConsent,
     },
     durable_json_store::StorageRecoveryNotice,
     model::{MidiDeviceRoute, OsdSettings},
@@ -108,15 +107,6 @@ pub fn update_app_settings(
         auto_check_updates,
         language,
     )
-}
-
-#[tauri::command]
-pub fn update_midi_device_inventory_consent(
-    state: State<AppState>,
-    consent: MidiDeviceInventoryConsent,
-    notice_version: Option<u32>,
-) -> Result<AppSettings, String> {
-    settings_services::update_midi_device_inventory_consent(state.inner(), consent, notice_version)
 }
 
 #[tauri::command]

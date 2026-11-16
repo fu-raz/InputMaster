@@ -114,15 +114,6 @@ impl VirtualAudioSettings {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum MidiDeviceInventoryConsent {
-    #[default]
-    Unknown,
-    Enabled,
-    Disabled,
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AppearanceTheme {
@@ -264,9 +255,6 @@ pub struct AppSettings {
     pub appearance: AppAppearanceSettings,
     pub virtual_audio: VirtualAudioSettings,
     pub fader_curve_presets: Vec<FaderCurvePreset>,
-    pub midi_device_inventory_consent: MidiDeviceInventoryConsent,
-    pub midi_device_inventory_notice_version: u32,
-    pub midi_device_inventory_last_sent_hash: Option<String>,
     /// When true, capture and suppress catalogued Windows media/volume keys.
     #[serde(default)]
     pub keyboard_input_enabled: bool,
@@ -303,9 +291,6 @@ impl Default for AppSettings {
             appearance: AppAppearanceSettings::default(),
             virtual_audio: VirtualAudioSettings::default(),
             fader_curve_presets: Vec::new(),
-            midi_device_inventory_consent: MidiDeviceInventoryConsent::Unknown,
-            midi_device_inventory_notice_version: 0,
-            midi_device_inventory_last_sent_hash: None,
             keyboard_input_enabled: false,
             keyboard_controls_enabled: None,
             controller_input_enabled: false,

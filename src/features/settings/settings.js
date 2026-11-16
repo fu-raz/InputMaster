@@ -34,7 +34,6 @@ export function createSettingsFeature({
   applyAppearance,
   showAlert,
   onUpdateAvailableClick,
-  onMidiDeviceInventoryConsentChanged,
 }) {
   if (typeof invoke !== "function") {
     throw new Error("createSettingsFeature: invoke is required");
@@ -204,7 +203,6 @@ export function createSettingsFeature({
   });
 
   const {
-    syncMidiDeviceInventoryToggle,
     closeSettingsPanel,
     openSettingsPanel,
     activateSettingsSection,
@@ -212,7 +210,6 @@ export function createSettingsFeature({
   } = createNavigation({
     elements,
     defaultSettingsSection,
-    getAppSettings,
     syncAppearanceControls,
     syncOsdAppearanceControls: (...args) => syncOsdAppearanceControls(...args),
     viewState,
@@ -287,7 +284,6 @@ export function createSettingsFeature({
     setAppearanceState,
     settingsStore,
     showSettingsAlert,
-    syncMidiDeviceInventoryToggle,
     t,
   });
 
@@ -322,7 +318,6 @@ export function createSettingsFeature({
     loadMonitorOptions,
     loadOsdSettings,
     normalizeLanguage,
-    onMidiDeviceInventoryConsentChanged,
     onUpdateAvailableClick,
     openAppearanceColorPicker,
     openSettingsPanel,

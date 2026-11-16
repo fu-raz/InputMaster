@@ -11,7 +11,6 @@ export function createPreferences({
   setAppearanceState,
   settingsStore,
   showSettingsAlert,
-  syncMidiDeviceInventoryToggle,
   t,
 }) {
   function syncAppSettingsUI(nextSettings) {
@@ -36,7 +35,6 @@ export function createPreferences({
       elements.languageSelect.value = normalizeLanguage(merged.language);
       renderSettingsSelectDropdown(elements.languageSelect);
     }
-    syncMidiDeviceInventoryToggle(merged);
     renderUpdateUi();
   }
 

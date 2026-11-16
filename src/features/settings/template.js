@@ -308,27 +308,6 @@ export const settingsTemplate = `<section id="settings-panel" class="app-page hi
                       </div>
                     </div>
 
-                    <div class="settings-card settings-maintenance-card settings-maintenance-card--privacy">
-                      <div class="settings-maintenance-card-top">
-                        <div class="settings-maintenance-card-main">
-                          <span class="settings-maintenance-icon" data-fa="screwdriver-wrench" aria-hidden="true"></span>
-                          <span class="settings-maintenance-copy">
-                            <span class="settings-maintenance-title" data-i18n="settings.midiDeviceInventory">MIDI Device Inventory</span>
-                            <span class="settings-maintenance-description" data-i18n="settings.midiDeviceInventoryDescription">When enabled, shares app version, privacy notice version, MIDI input/output names, local MIDI port IDs, selected routes, and counts.</span>
-                          </span>
-                        </div>
-                        <label class="settings-maintenance-toggle-control" title="Share MIDI device inventory" data-i18n-title="settings.midiDeviceInventoryToggle">
-                          <span class="settings-maintenance-toggle-copy">
-                            <span class="settings-maintenance-toggle-label" data-i18n="settings.midiDeviceInventoryToggle">Share inventory</span>
-                          </span>
-                          <span class="settings-toggle">
-                            <input id="midi-device-inventory-consent-toggle" type="checkbox" />
-                            <span class="plugins-toggle-ui" aria-hidden="true"></span>
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-
                     <div class="settings-card settings-maintenance-card settings-maintenance-card--danger">
                       <div class="settings-maintenance-card-top">
                         <div class="settings-maintenance-card-main">

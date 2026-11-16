@@ -18,11 +18,9 @@ export function createStartup({
   invoke,
   loadStoredAppearance,
   mainScreen,
-  maybePromptMidiDeviceInventoryConsent,
   midiStatus,
   osdState,
   profileState,
-  queueMidiDeviceInventorySubmit,
   recordPerformanceResult,
   refreshSessions,
   requestBindingsRerender,
@@ -221,7 +219,6 @@ export function createStartup({
     });
     await pluginStartPromise;
     await showStorageRecoveryNotices();
-    queueMidiDeviceInventorySubmit("startup");
   }
 
   async function init() {
@@ -254,14 +251,6 @@ export function createStartup({
     diagnosticInfo("start_main_app_start");
     await startMainApp();
     diagnosticInfo("start_main_app_done");
-    setTimeout(() => {
-      if (startupState.storageRecoveryNoticeShown) {
-        return;
-      }
-      maybePromptMidiDeviceInventoryConsent().catch((error) => {
-        diagnosticError("midi_device_inventory_prompt_failed", error);
-      });
-    }, 0);
     try {
       const resetSkipOnceKey = "updaterResetSkipOnce";
       if (localStorage.getItem(resetSkipOnceKey) !== "1") {

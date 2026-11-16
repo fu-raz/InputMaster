@@ -9,10 +9,6 @@ import {
   appearanceBackgroundGlowPatch,
 } from "../../../app/appearance.js";
 import { normalizeOsdStyle } from "../../../core/osd_settings.js";
-import {
-  normalizeMidiDeviceInventorySettings,
-  MIDI_DEVICE_INVENTORY_NOTICE_VERSION,
-} from "../../../app/midi_device_inventory.js";
 
 /** events workflow. */
 export function createEvents({
@@ -46,7 +42,6 @@ export function createEvents({
   loadMonitorOptions,
   loadOsdSettings,
   normalizeLanguage,
-  onMidiDeviceInventoryConsentChanged,
   onUpdateAvailableClick,
   openAppearanceColorPicker,
   openSettingsPanel,
@@ -463,43 +458,6 @@ export function createEvents({
         persistAppSettings({ previousSettings: previous });
         renderUpdateUi();
         ensureAutoUpdateCheck();
-      });
-    }
-    if (elements.midiDeviceInventoryConsentToggle) {
-      lifetime.listen(elements.midiDeviceInventoryConsentToggle, "change", async () => {
-        const consent = elements.midiDeviceInventoryConsentToggle.checked ? "enabled" : "disabled";
-        const previous = normalizeMidiDeviceInventorySettings(
-          typeof getAppSettings === "function" ? getAppSettings() || {} : {},
-        );
-        syncAppSettingsUI({
-          midiDeviceInventoryConsent: consent,
-          midiDeviceInventoryNoticeVersion: MIDI_DEVICE_INVENTORY_NOTICE_VERSION,
-        });
-        try {
-          const updated = await invoke("update_midi_device_inventory_consent", {
-            consent,
-            noticeVersion: MIDI_DEVICE_INVENTORY_NOTICE_VERSION,
-          });
-          const normalized = normalizeMidiDeviceInventorySettings(
-            updated || {
-              consent,
-              noticeVersion: MIDI_DEVICE_INVENTORY_NOTICE_VERSION,
-            },
-          );
-          syncAppSettingsUI({
-            midiDeviceInventoryConsent: normalized.consent,
-            midiDeviceInventoryNoticeVersion: normalized.noticeVersion,
-          });
-          if (typeof onMidiDeviceInventoryConsentChanged === "function") {
-            onMidiDeviceInventoryConsentChanged(normalized);
-          }
-        } catch (error) {
-          console.error("Failed to update MIDI device inventory consent", error);
-          syncAppSettingsUI({
-            midiDeviceInventoryConsent: previous.consent,
-            midiDeviceInventoryNoticeVersion: previous.noticeVersion,
-          });
-        }
       });
     }
     if (elements.checkForUpdatesButton) {
