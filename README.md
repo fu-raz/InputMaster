@@ -2,9 +2,25 @@
 
 https://inputmaster.app/
 
+![InputMaster bindings view](docs/media/readme-hero.png)
+
 InputMaster is a Windows desktop app for mapping MIDI, keyboard, and controller
 inputs to system audio, app audio sessions, audio devices, utility actions
 like hotkeys and AutoHotkey scripts, and supported integrations via bundled and third-party plugins.
+
+## Credits
+
+InputMaster is a fork of [MIDIMaster](https://github.com/prgmitchell/MIDIMaster) by **Yolo** (prgmitchell). Thank you for the solid foundation — profiles, bindings, MIDI/controller capture, plugins, and the updater architecture this fork builds on.
+
+This fork is maintained by **Rick van Modem**, with substantial implementation help from **Cursor Auto**. It is an independent fork; it is not affiliated with, endorsed by, or sponsored by Yolo / MIDIMaster upstream.
+
+## What’s different in this fork
+
+- Product rename to **InputMaster** (`InputMaster.exe`, v1.0.0, AppData under InputMaster)
+- Updater feed only on `https://updates.inputmaster.app/latest.json` (no midimaster.app fallback)
+- Inputs IA refresh: clearer MIDI / keyboard / controller surfaces, enable toggles, Learn copy
+- UI consistency pass: shared type scale, 1px borders, Appearance editor polish
+- Fork packaging: signed 1.0 NSIS for the InputMaster feed; MIDIMaster website publish disabled
 
 ## Platform
 
