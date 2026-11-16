@@ -96,16 +96,6 @@ export function createListRenderer({
     // Filtering/removing rows can clamp the scroll position in WebView2.
     const scrollPosition = captureElementScroll(elements.bindingsContainer);
 
-    const editingIdAtRenderStart = getEditingId();
-    const activeEl = document.activeElement;
-    const activeIsNameInput = Boolean(activeEl && activeEl.classList?.contains("binding-name-input"));
-    const activeBindingId = activeIsNameInput ? String(activeEl.dataset?.bindingId || "") : "";
-    const shouldRestoreEditingFocus = Boolean(
-      editingIdAtRenderStart && activeBindingId && activeBindingId === String(editingIdAtRenderStart),
-    );
-    const selectionStart = shouldRestoreEditingFocus ? activeEl.selectionStart : null;
-    const selectionEnd = shouldRestoreEditingFocus ? activeEl.selectionEnd : null;
-
     const bindings = getBindings();
     const previousRendered = new Map();
     elements.bindingsContainer.querySelectorAll(".binding-item[data-binding-id]").forEach((item) => {
@@ -177,7 +167,7 @@ export function createListRenderer({
         item.dataset.bindingId = bindingId;
         renderedBindings.register(bindingId, { item });
 
-        const { nameInput, nameField } = createRowName(binding, index);
+        const { nameField } = createRowName(binding, index);
 
         const rowNumber = document.createElement("button");
         rowNumber.type = "button";
@@ -357,18 +347,6 @@ export function createListRenderer({
         item.appendChild(row);
         nextRows.push(item);
 
-        if (nameInput && shouldRestoreEditingFocus && String(binding.id) === String(editingIdAtRenderStart)) {
-          focusBindingNameInput(nameInput, binding.id);
-          if (Number.isInteger(selectionStart) && Number.isInteger(selectionEnd)) {
-            const max = nameInput.value.length;
-            const safeStart = Math.max(0, Math.min(selectionStart, max));
-            const safeEnd = Math.max(safeStart, Math.min(selectionEnd, max));
-            nameInput.setSelectionRange(safeStart, safeEnd);
-          }
-        } else if (binding.id === getPendingFocusId() && nameInput) {
-          setEditingId(binding.id);
-          focusBindingNameInput(nameInput, binding.id, { select: true });
-        }
       } catch (err) {
         const errorItem = document.createElement("div");
         errorItem.className = "list-item binding-item error-binding";
@@ -429,17 +407,7 @@ export function createListRenderer({
   }
 
   const { createRowName } = createRowNameController({
-    beginBindingEdit,
     fallbackNameFor,
-    finishBindingUiMutation,
-    flushPendingRerender,
-    getEditingId,
-    getPendingFocusId,
-    invoke,
-    nameDrafts,
-    setEditingId,
-    setPendingFocusId,
-    t,
   });
 
   const { createRowMode } = createRowModeController({

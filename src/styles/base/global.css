@@ -392,13 +392,9 @@ body.dark-mode:not([data-theme]) .binding-item:hover {
 
 body.dark-mode:not([data-theme]) .binding-name {
   background: transparent;
-  border-color: transparent;
+  border: 0;
   color: #eef3ff;
-}
-
-body.dark-mode:not([data-theme]) .binding-name:focus {
-  background: #25324a;
-  border-color: #5b719f;
+  cursor: default;
 }
 
 body.dark-mode:not([data-theme]) .connections-panel-content {

@@ -940,8 +940,6 @@ body[data-theme] .list-item.binding-item:hover {
   background: var(--surface-muted);
 }
 
-body[data-theme] .binding-name,
-body[data-theme] .binding-name-input,
 body[data-theme] .binding-control-cell,
 body[data-theme] .mode-dropdown .target-button,
 body[data-theme] .binding-row .target-button,
@@ -950,6 +948,12 @@ body[data-theme] .dropdown-item button,
 body[data-theme] .dropdown-item button:first-child {
   background: var(--control-bg);
   border-color: var(--control-border);
+  color: var(--text-primary);
+}
+
+body[data-theme] .binding-name {
+  background: transparent;
+  border: 0;
   color: var(--text-primary);
 }
 

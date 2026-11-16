@@ -123,7 +123,8 @@
   width: 100%;
   min-width: 118px;
   max-width: 148px;
-  padding: 0 10px;
+  /* Extra right pad so the native chevron matches left text inset from the border */
+  padding: 0 calc(var(--bindings-control-pad-x) + 16px) 0 var(--bindings-control-pad-x);
   border: 0;
   background: transparent;
   color: inherit;
@@ -287,7 +288,6 @@
 }
 
 .binding-name,
-.binding-name-input,
 .binding-control-cell,
 .binding-row .target-button,
 .binding-row .mode-dropdown .target-button,
@@ -305,7 +305,6 @@
 }
 
 #main-screen[data-bindings-density="compact"] .binding-name,
-#main-screen[data-bindings-density="compact"] .binding-name-input,
 #main-screen[data-bindings-density="compact"] .binding-control-cell,
 #main-screen[data-bindings-density="compact"] .binding-row .target-button,
 #main-screen[data-bindings-density="compact"] .mode-dropdown .target-button {
@@ -315,7 +314,6 @@
 }
 
 #main-screen[data-bindings-density="compact"] .binding-name,
-#main-screen[data-bindings-density="compact"] .binding-name-input,
 #main-screen[data-bindings-density="compact"] .binding-control-cell {
   padding-right: 8px;
   padding-left: 8px;
@@ -329,7 +327,6 @@
 @media (prefers-reduced-motion: reduce) {
   .binding-row,
   .binding-name,
-  .binding-name-input,
   .binding-control-cell,
   .binding-row .target-button,
   .binding-row .mode-dropdown .target-button,
@@ -355,8 +352,6 @@
   background: transparent;
 }
 
-.binding-name,
-.binding-name-input,
 .binding-control-cell,
 .binding-row .target-button,
 .mode-dropdown .target-button {
@@ -367,7 +362,22 @@
   color: var(--text);
 }
 
-.binding-name,
+.binding-name {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: default;
+  user-select: none;
+}
+
 .binding-control-cell {
   display: flex;
   align-items: center;
@@ -375,14 +385,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.binding-name {
-  cursor: text;
-}
-
-.binding-name-input {
-  padding: 0 10px;
 }
 
 .binding-control-cell {
@@ -889,8 +891,6 @@ body.dark-mode:not([data-theme]) .list-item.binding-item {
   box-shadow: none;
 }
 
-body.dark-mode:not([data-theme]) .binding-name,
-body.dark-mode:not([data-theme]) .binding-name-input,
 body.dark-mode:not([data-theme]) .binding-control-cell,
 body.dark-mode:not([data-theme]) .binding-row .target-button,
 body.dark-mode:not([data-theme]) .mode-dropdown .target-button,
@@ -900,6 +900,12 @@ body.dark-mode:not([data-theme]) .dropdown-item button:first-child {
   background: #111820;
   color: var(--text);
   border-color: var(--line-strong);
+}
+
+body.dark-mode:not([data-theme]) .binding-name {
+  background: transparent;
+  border: 0;
+  color: var(--text);
 }
 
 body.dark-mode:not([data-theme]) .dropdown-item:hover,
@@ -1256,8 +1262,6 @@ body[data-theme] .binding-index:focus-visible .drag-grip {
 body[data-theme] input,
 body[data-theme] select,
 body[data-theme] textarea,
-body[data-theme] .binding-name,
-body[data-theme] .binding-name-input,
 body[data-theme] .binding-search-field,
 body[data-theme] .target-button,
 body[data-theme] .select-button,
@@ -1273,13 +1277,18 @@ body[data-theme] .danger-action {
   box-shadow: none;
 }
 
+body[data-theme] .binding-name {
+  background: transparent;
+  border: 0;
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
 body[data-theme] input::placeholder,
 body[data-theme] textarea::placeholder {
   color: var(--text-muted);
 }
 
-body[data-theme] .binding-name:hover,
-body[data-theme] .binding-name-input:focus,
 body[data-theme] .binding-search-field:focus-within,
 body[data-theme] .target-button:hover,
 body[data-theme] .select-button:hover,

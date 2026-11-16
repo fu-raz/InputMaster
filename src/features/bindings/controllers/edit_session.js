@@ -127,45 +127,18 @@ export function createEditSession({
     finishBindingUiMutation("config save");
   }
 
-  function beginBindingEdit(bindingId, forceInline = false) {
+  function beginBindingEdit(bindingId) {
     const binding = getBindingById(bindingId);
     if (!binding) return;
-    if (!forceInline) {
-      openConfigModal(bindingId);
-      return;
-    }
-    listState.suppressPendingFocusClearUntil = Date.now() + 250;
-    setEditingId(bindingId);
-    setPendingFocusId(bindingId);
-    renderBindings();
+    openConfigModal(bindingId);
   }
 
-  function focusBindingNameInput(
-    nameInput,
-    bindingId,
-    { select = false } = {},
-  ) {
-    if (!nameInput) return;
-    const applyFocus = () => {
-      if (bindingId !== getEditingId()) return;
-      if (!nameInput.isConnected) return;
-      if (typeof window.focus === "function") {
-        window.focus();
-      }
-      nameInput.focus({ preventScroll: true });
-      if (select) {
-        nameInput.select();
-      }
-    };
-    applyFocus();
-    requestAnimationFrame(applyFocus);
-    requestAnimationFrame(() => requestAnimationFrame(applyFocus));
-    setTimeout(applyFocus, 0);
-    setTimeout(applyFocus, 32);
+  function focusBindingNameInput() {
+    // List names are plain text; rename happens in the Edit modal.
   }
 
   function isInlineNameEditingActive() {
-    return Boolean(getEditingId());
+    return false;
   }
 
   function isBindingDragActive() {

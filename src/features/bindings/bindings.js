@@ -286,24 +286,6 @@ export function createBindingsFeature({
     if (uiBound) return;
     uiBound = true;
 
-    lifetime.listen(
-      document,
-      "pointerdown",
-      (event) => {
-        const pendingId = getPendingFocusId();
-        if (!pendingId) return;
-        if (Date.now() < listState.suppressPendingFocusClearUntil) {
-          return;
-        }
-        const target = event.target;
-        if (target && target.classList?.contains("binding-name-input")) {
-          return;
-        }
-        setPendingFocusId(null);
-      },
-      true,
-    );
-
     bindConfigModalUi();
     bindModifiersUi();
     bindOutputsUi();

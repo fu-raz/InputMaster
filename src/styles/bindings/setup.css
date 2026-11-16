@@ -80,12 +80,11 @@ body[data-theme] .target-icon--device {
 }
 
 .binding-name {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid transparent;
+  padding: 8px 4px;
+  border: 0;
   color: #2b2d42;
   background: transparent;
-  cursor: text;
+  cursor: default;
   user-select: none;
 }
 
