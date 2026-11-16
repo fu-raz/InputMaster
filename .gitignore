@@ -57,3 +57,7 @@ store-private-key*.txt
 
 # Font Awesome Pro desktop pack (local license). App embeds selected SVGs under src/assets/fa/.
 resources/fontawesome-pro-*/
+
+# Updater private keys (never commit)
+*.key
+
