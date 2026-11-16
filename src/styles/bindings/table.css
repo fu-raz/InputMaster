@@ -110,21 +110,45 @@
 }
 
 .binding-source-filter-field {
+  --binding-source-chevron-size: 10px;
   order: 1;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
+  position: relative;
   min-width: 0;
   padding: 0;
   overflow: hidden;
+  color: var(--text);
+}
+
+/* Custom chevron: native WebView2 arrow ignores padding and sits flush */
+.binding-source-filter-field::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: var(--bindings-control-pad-x);
+  width: var(--binding-source-chevron-size);
+  height: var(--binding-source-chevron-size);
+  transform: translateY(-50%);
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M267.3 395.3c-6.2 6.2-16.4 6.2-22.6 0l-192-192c-6.2-6.2-6.2-16.4 0-22.6s16.4-6.2 22.6 0L256 361.4 436.7 180.7c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6l-192 192z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M267.3 395.3c-6.2 6.2-16.4 6.2-22.6 0l-192-192c-6.2-6.2-6.2-16.4 0-22.6s16.4-6.2 22.6 0L256 361.4 436.7 180.7c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6l-192 192z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  pointer-events: none;
 }
 
 .binding-source-filter-field select {
   width: 100%;
   min-width: 118px;
-  max-width: 148px;
-  /* Extra right pad so the native chevron matches left text inset from the border */
-  padding: 0 calc(var(--bindings-control-pad-x) + 16px) 0 var(--bindings-control-pad-x);
+  max-width: 160px;
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0
+    calc(var(--bindings-control-pad-x) + var(--binding-source-chevron-size) + 6px)
+    0
+    var(--bindings-control-pad-x);
   border: 0;
   background: transparent;
   color: inherit;
