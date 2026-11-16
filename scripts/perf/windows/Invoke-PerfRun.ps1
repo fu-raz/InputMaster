@@ -132,12 +132,12 @@ try {
         $fixtureRoot = (Resolve-Path -LiteralPath $FixturePath).Path
     }
     $fixtureManifest = Join-Path $fixtureRoot "fixture.json"
-    $fixtureAppData = Join-Path $fixtureRoot "app-data/MIDIMaster"
+    $fixtureAppData = Join-Path $fixtureRoot "app-data/InputMaster"
     if (-not (Test-Path -LiteralPath $fixtureManifest -PathType Leaf) -or -not (Test-Path -LiteralPath $fixtureAppData -PathType Container)) {
-        throw "FixturePath must contain fixture.json and app-data/MIDIMaster: $fixtureRoot"
+        throw "FixturePath must contain fixture.json and app-data/InputMaster: $fixtureRoot"
     }
 
-    $isolatedAppData = Join-Path $sandboxRoot "app-data/MIDIMaster"
+    $isolatedAppData = Join-Path $sandboxRoot "app-data/InputMaster"
     $isolatedWebView = if ([string]::IsNullOrWhiteSpace($ReusableWebViewDataDirectory)) {
         Join-Path $sandboxRoot "webview2-data"
     } elseif ([System.IO.Path]::IsPathRooted($ReusableWebViewDataDirectory)) {

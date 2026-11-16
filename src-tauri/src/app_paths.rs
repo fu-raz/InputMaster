@@ -2,8 +2,9 @@ use std::path::PathBuf;
 
 use tauri::Manager;
 
-pub const APP_DATA_DIR_NAME: &str = "MIDIMaster";
-const LEGACY_TAURI_IDENTIFIER_DIRS: &[&str] = &["com.midimaster.app"];
+pub const APP_DATA_DIR_NAME: &str = "InputMaster";
+// Prefer InputMaster; migrate once from older friendly/identifier folders.
+const LEGACY_TAURI_IDENTIFIER_DIRS: &[&str] = &["MIDIMaster", "com.midimaster.app", "com.midimaster.midimaster"];
 
 #[cfg(feature = "perf-audit")]
 const PERF_APP_DATA_ENV: &str = "MIDIMASTER_PERF_APP_DATA_DIR";
@@ -44,17 +45,20 @@ pub fn app_data_root_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let desired = base.join(APP_DATA_DIR_NAME);
 
     // One-time migration for existing installs.
-    // Best-effort: if it fails, we keep using the desired directory (fresh).
+    // Prefer the old friendly MIDIMaster folder before identifier-derived dirs
+    // (those are often empty shells). Best-effort: on failure, start fresh.
     if !desired.exists() {
-        if default_dir.exists() {
-            let _ = std::fs::rename(&default_dir, &desired);
-        } else {
-            for legacy in LEGACY_TAURI_IDENTIFIER_DIRS {
-                let legacy_dir = base.join(legacy);
-                if legacy_dir.exists() {
-                    let _ = std::fs::rename(&legacy_dir, &desired);
-                    break;
-                }
+        let mut candidates: Vec<PathBuf> = LEGACY_TAURI_IDENTIFIER_DIRS
+            .iter()
+            .map(|name| base.join(name))
+            .collect();
+        if !candidates.iter().any(|path| path == &default_dir) {
+            candidates.push(default_dir.clone());
+        }
+        for legacy_dir in candidates {
+            if legacy_dir.exists() && legacy_dir != desired {
+                let _ = std::fs::rename(&legacy_dir, &desired);
+                break;
             }
         }
     }

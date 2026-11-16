@@ -37,11 +37,11 @@ finally {
     $env:CARGO_PROFILE_RELEASE_OPT_LEVEL = $oldOptLevel
 }
 
-Write-Host "Audit executable: $(Join-Path $tauriRoot 'target/release/midimaster-perf-audit.exe')"
-Write-Host "Audit symbols: $(Join-Path $tauriRoot 'target/release/midimaster.pdb')"
-$auditExecutable = Join-Path $tauriRoot "target/release/midimaster-perf-audit.exe"
-Copy-Item -LiteralPath (Join-Path $tauriRoot "target/release/midimaster.exe") -Destination $auditExecutable -Force
-$auditMarker = Join-Path $tauriRoot "target/release/midimaster-perf-audit.perf-audit.json"
+Write-Host "Audit executable: $(Join-Path $tauriRoot 'target/release/InputMaster-perf-audit.exe')"
+Write-Host "Audit symbols: $(Join-Path $tauriRoot 'target/release/InputMaster.pdb')"
+$auditExecutable = Join-Path $tauriRoot "target/release/InputMaster-perf-audit.exe"
+Copy-Item -LiteralPath (Join-Path $tauriRoot "target/release/InputMaster.exe") -Destination $auditExecutable -Force
+$auditMarker = Join-Path $tauriRoot "target/release/InputMaster-perf-audit.perf-audit.json"
 $marker = [ordered]@{
     schema_version = "1.0.0"
     feature = "perf-audit"

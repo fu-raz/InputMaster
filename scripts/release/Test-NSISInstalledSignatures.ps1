@@ -27,7 +27,7 @@ try {
     }
 
     $ownedExecutables = @(
-        (Join-Path $installRoot "midimaster.exe")
+        (Join-Path $installRoot "InputMaster.exe")
         (Join-Path $installRoot "virtual-audio\midimaster-virtual-audio-service.exe")
         (Join-Path $installRoot "virtual-audio\midimaster-virtual-audio-setup.exe")
         $uninstaller

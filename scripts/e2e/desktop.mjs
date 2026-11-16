@@ -124,7 +124,7 @@ export class Desktop {
       TEMP: join(this.root, "temp"),
       TMP: join(this.root, "temp"),
     };
-    this.child = spawn(join(targetDirectory, "debug/midimaster.exe"), [], {
+    this.child = spawn(join(targetDirectory, "debug/InputMaster.exe"), [], {
       windowsHide: true,
       env,
       stdio: ["ignore", "pipe", "pipe"],

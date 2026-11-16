@@ -156,7 +156,7 @@ export async function generateFixtureMatrix({
         for (const pluginMode of pluginModes) {
           const id = `b${bindingCount}-p${profileCount}-${shape}-plugins-${pluginMode}`;
           const fixtureRoot = join(outputRoot, id);
-          const appData = join(fixtureRoot, "app-data", "MIDIMaster");
+          const appData = join(fixtureRoot, "app-data", "InputMaster");
           const webviewData = join(fixtureRoot, "webview2-data");
           await mkdir(appData, { recursive: true });
           await mkdir(webviewData, { recursive: true });
@@ -181,7 +181,7 @@ export async function generateFixtureMatrix({
             profiles_bytes: generated.bytes,
             target_profiles_bytes: generated.targetBytes,
             icon_count: generated.iconCount,
-            app_data_relative: "app-data/MIDIMaster",
+            app_data_relative: "app-data/InputMaster",
             webview_data_relative: "webview2-data",
             synthetic_only: true,
           };

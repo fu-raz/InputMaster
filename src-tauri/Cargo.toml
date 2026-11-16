@@ -1,11 +1,18 @@
 [package]
 name = "midimaster"
-version = "4.9.13"
+version = "1.0.0"
 edition = "2021"
-default-run = "midimaster"
+default-run = "InputMaster"
+autobins = false
 license = "MIT"
 repository = "https://github.com/prgmitchell/MIDIMaster"
-description = "Bind MIDI controls to system audio, devices, and plugin integrations"
+description = "Bind MIDI, keyboard, and controller inputs to system audio, devices, and plugin integrations"
+
+# Keep the Rust crate/lib name (`midimaster`) stable for internal modules and
+# path deps; only the shipped Windows executable is branded InputMaster.exe.
+[[bin]]
+name = "InputMaster"
+path = "src/main.rs"
 
 [features]
 default = []

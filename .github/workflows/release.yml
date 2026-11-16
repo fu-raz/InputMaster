@@ -251,7 +251,7 @@ jobs:
           signing-account-name: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT }}
           certificate-profile-name: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE }}
           files: |
-            ${{ github.workspace }}\src-tauri\target\release\midimaster.exe
+            ${{ github.workspace }}\src-tauri\target\release\InputMaster.exe
             ${{ github.workspace }}\virtual-audio\dist\midimaster-virtual-audio-service.exe
             ${{ github.workspace }}\virtual-audio\dist\midimaster-virtual-audio-setup.exe
           file-digest: SHA256
@@ -265,7 +265,7 @@ jobs:
         run: |
           & "scripts/release/Assert-Authenticode.ps1" `
             -Path @(
-              "src-tauri/target/release/midimaster.exe"
+              "src-tauri/target/release/InputMaster.exe"
               "virtual-audio/dist/midimaster-virtual-audio-service.exe"
               "virtual-audio/dist/midimaster-virtual-audio-setup.exe"
             ) `
@@ -339,7 +339,7 @@ jobs:
         shell: pwsh
         run: |
           & "scripts/release/Invoke-DefenderArtifactScan.ps1" -Path @(
-            "src-tauri/target/release/midimaster.exe"
+            "src-tauri/target/release/InputMaster.exe"
             "virtual-audio/dist/midimaster-virtual-audio-service.exe"
             "virtual-audio/dist/midimaster-virtual-audio-setup.exe"
             "${{ steps.windows_artifacts.outputs.setup_exe }}"
