@@ -84,10 +84,11 @@ export function createKeyboardConnectionTab({ invoke, t }) {
       unsupported.textContent = t("keyboard.unsupported");
     }
     if (controlsBlock) {
-      controlsBlock.classList.toggle("hidden", !enabled || !supported);
+      // Keep controls visible when master is off (dimmed via is-master-off).
+      controlsBlock.classList.toggle("hidden", !supported);
     }
     syncMasterPanelOpacity();
-    if (enabled && supported) {
+    if (supported) {
       renderControls();
     }
   }

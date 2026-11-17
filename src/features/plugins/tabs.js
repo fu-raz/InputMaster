@@ -9,6 +9,12 @@ export const PLUGINS_ICON_DATA = "data:image/svg+xml;utf8,<svg xmlns='http://www
 /** Fully stripped from the product — hide even if leftovers remain on disk / in catalog. */
 const RETIRED_PLUGIN_IDS = new Set(["fxsound", "voicemeeter"]);
 
+/**
+ * Remote plugin store (catalog.midimaster / store.midimaster.app) is disabled for now.
+ * Local installed list, enable/disable, uninstall, and .midimaster file install stay available.
+ */
+const REMOTE_STORE_ENABLED = false;
+
 function isRetiredPluginId(id) {
   return RETIRED_PLUGIN_IDS.has(String(id || "").trim().toLowerCase());
 }
@@ -173,6 +179,12 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
   }
 
   async function preloadStoreCatalog(force = false) {
+    if (!REMOTE_STORE_ENABLED) {
+      storeCatalogCache = { plugins: [] };
+      storeCatalogError = "";
+      storeCatalogPromise = null;
+      return storeCatalogCache;
+    }
     if (force) {
       storeCatalogPromise = null;
     }
@@ -197,14 +209,14 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
   }
 
   async function loadBrowserData(force = false) {
-    const [installed, catalog] = await Promise.all([
-      preloadInstalledPlugins(force),
-      preloadStoreCatalog(force),
-    ]);
+    const installed = await preloadInstalledPlugins(force);
+    const catalog = REMOTE_STORE_ENABLED
+      ? await preloadStoreCatalog(force)
+      : { plugins: [] };
     return {
       installed: Array.isArray(installed) ? installed : [],
       catalog: catalog && typeof catalog === "object" ? catalog : { plugins: [] },
-      storeError: storeCatalogError,
+      storeError: REMOTE_STORE_ENABLED ? storeCatalogError : "",
     };
   }
 
@@ -314,13 +326,19 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
       .filter((item) => item.count > 0)
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    return {
-      primary: [
-        { id: "installed", name: t("plugins.installed"), count: installedEntries.length },
-        { id: "all", name: t("plugins.allPlugins"), count: entries.length },
+    const primary = [
+      { id: "installed", name: t("plugins.installed"), count: installedEntries.length },
+      { id: "all", name: t("plugins.allPlugins"), count: entries.length },
+    ];
+    if (REMOTE_STORE_ENABLED) {
+      primary.push(
         { id: "updates", name: t("plugins.updates"), count: updatesEntries.length },
         { id: "store", name: t("plugins.store"), count: storeEntries.length },
-      ],
+      );
+    }
+
+    return {
+      primary,
       categories,
     };
   }
@@ -386,6 +404,9 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
   }
 
   function getActionLabel(entry, currentView) {
+    if (!REMOTE_STORE_ENABLED) {
+      return "";
+    }
     if (entry.isInstalled) {
       if (entry.hasUpdate) return t("plugins.update");
       if (currentView === "store") return t("plugins.installedAction");
@@ -418,7 +439,9 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
       });
       setStatus("");
       await preloadInstalledPlugins(true);
-      await preloadStoreCatalog(true);
+      if (REMOTE_STORE_ENABLED) {
+        await preloadStoreCatalog(true);
+      }
       await reload();
     } catch (error) {
       console.error("Failed to install plugin package", error);
@@ -434,11 +457,17 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
         await invoke("uninstall_plugin", { pluginId: entry.id });
         setStatus("");
       } else if (action === "install-store") {
+        if (!REMOTE_STORE_ENABLED) {
+          setStatus(t("plugins.installUnavailable"), "error");
+          return;
+        }
         await invoke("install_store_plugin", { pluginId: entry.id });
         setStatus("");
       }
       await preloadInstalledPlugins(true);
-      await preloadStoreCatalog(true);
+      if (REMOTE_STORE_ENABLED) {
+        await preloadStoreCatalog(true);
+      }
       await reload();
     } catch (error) {
       console.error(`Plugin action failed: ${action}`, error);
@@ -619,6 +648,9 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
   }
 
   async function updateAll(entries, setStatus) {
+    if (!REMOTE_STORE_ENABLED) {
+      return;
+    }
     const ids = eligibleUpdateIds(entries);
     if (!ids.length) return;
     const results = await invoke("install_store_plugins", { pluginIds: ids, plugin_ids: ids });
@@ -636,9 +668,16 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
   }
 
   async function mountPluginsBrowserTab(container, options = {}) {
-    const view = String(options.view || "installed");
+    let view = String(options.view || "installed");
+    if (!REMOTE_STORE_ENABLED && (view === "store" || view === "updates")) {
+      view = "installed";
+    }
     const label = String(options.label || "Plugins");
     const onOpenPluginPanel = (typeof options.onOpenPluginPanel === "function") ? options.onOpenPluginPanel : null;
+    const storeSortOptions = REMOTE_STORE_ENABLED
+      ? `<option value="updates-first">${escapeHtml(t("plugins.updatesFirst"))}</option>
+                <option value="version-desc">${escapeHtml(t("plugins.newestVersion"))}</option>`
+      : "";
 
     container.innerHTML = `
       <div class="plugins-browser">
@@ -657,8 +696,7 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
             <select class="plugins-browser-sort" data-role="sort">
                 <option value="name-asc">${escapeHtml(t("plugins.nameAsc"))}</option>
                 <option value="name-desc">${escapeHtml(t("plugins.nameDesc"))}</option>
-                <option value="updates-first">${escapeHtml(t("plugins.updatesFirst"))}</option>
-                <option value="version-desc">${escapeHtml(t("plugins.newestVersion"))}</option>
+                ${storeSortOptions}
               </select>
             </label>
             <button type="button" class="plugins-browser-install hidden" data-role="update-all">${escapeHtml(t("plugins.updateAll"))}</button>
@@ -682,6 +720,9 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
     const updateAllButton = container.querySelector('[data-role="update-all"]');
     const setStatus = createStatusSetter(statusEl);
     const preferences = browserPreferences.get(view) || { search: "", sort: "name-asc" };
+    if (!REMOTE_STORE_ENABLED && (preferences.sort === "updates-first" || preferences.sort === "version-desc")) {
+      preferences.sort = "name-asc";
+    }
     searchEl.value = preferences.search;
     sortEl.value = preferences.sort;
 
@@ -702,10 +743,12 @@ export function createPluginsTabs({ invoke, i18n, getPluginHost, reloadPlugins, 
         ? baseEntries.filter((entry) => entry.searchText.includes(q))
         : baseEntries;
       const visibleEntries = sortEntries(filteredEntries, sortValue);
-      const compatibleUpdates = model.entries.filter((entry) => entry.hasUpdate && entry.compatible && !entry.bundled);
+      const compatibleUpdates = REMOTE_STORE_ENABLED
+        ? model.entries.filter((entry) => entry.hasUpdate && entry.compatible && !entry.bundled)
+        : [];
       if (updateAllButton) {
-        updateAllButton.classList.toggle("hidden", compatibleUpdates.length === 0);
-        updateAllButton.disabled = compatibleUpdates.length === 0;
+        updateAllButton.classList.toggle("hidden", !REMOTE_STORE_ENABLED || compatibleUpdates.length === 0);
+        updateAllButton.disabled = !REMOTE_STORE_ENABLED || compatibleUpdates.length === 0;
       }
 
       renderPluginCards({ listEl, entries: visibleEntries, view, setStatus, onOpenPluginPanel });

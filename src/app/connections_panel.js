@@ -310,9 +310,7 @@ export function createConnectionsPanelController({
     const preloadTasks = [
       pluginsTabs.preloadInstalledPlugins().catch(() => { }),
     ];
-    if (typeof pluginsTabs.preloadStoreCatalog === "function") {
-      preloadTasks.push(pluginsTabs.preloadStoreCatalog().catch(() => { }));
-    }
+    // Remote store catalog preload intentionally skipped while store UI is disabled.
     await Promise.all(preloadTasks);
 
     d.connectionsPanel.classList.remove("hidden");
