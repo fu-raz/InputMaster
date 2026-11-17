@@ -161,10 +161,11 @@ export function createControllerConnectionTab({ invoke, t }) {
       unsupported.textContent = t("controller.unsupported");
     }
     if (devicesBlock) {
-      devicesBlock.classList.toggle("hidden", !enabled || !supported);
+      // Keep devices visible when master is off (dimmed via is-master-off).
+      devicesBlock.classList.toggle("hidden", !supported);
     }
     syncMasterPanelOpacity();
-    if (enabled && supported) {
+    if (supported) {
       renderDevices();
     }
   }
